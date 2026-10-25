@@ -1,0 +1,15 @@
+# Local development database. Same image as the backend tests (pgvector is needed from phase 4 on).
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg17
+    environment:
+      POSTGRES_DB: aquarium
+      POSTGRES_USER: aquarium
+      POSTGRES_PASSWORD: aquarium
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

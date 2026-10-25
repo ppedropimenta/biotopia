@@ -1,0 +1,1 @@
+-- Starting point of the schema. Tables arrive with the features that need them.

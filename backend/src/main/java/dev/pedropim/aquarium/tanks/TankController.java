@@ -1,0 +1,62 @@
+package dev.pedropim.aquarium.tanks;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import dev.pedropim.aquarium.identity.SessionUser;
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/tanks")
+class TankController {
+
+	private final TankService tanks;
+
+	TankController(TankService tanks) {
+		this.tanks = tanks;
+	}
+
+	@GetMapping
+	List<TankView> list(@AuthenticationPrincipal SessionUser user) {
+		return tanks.listOwnedBy(user.id());
+	}
+
+	@GetMapping("/{id}")
+	TankView read(@AuthenticationPrincipal SessionUser user, @PathVariable String id) {
+		return tanks.find(user.id(), tankId(id));
+	}
+
+	@PutMapping("/{id}")
+	TankView edit(@AuthenticationPrincipal SessionUser user, @PathVariable String id,
+			@Valid @RequestBody TankDetails details) {
+		return tanks.edit(user.id(), tankId(id), details);
+	}
+
+	/** An id that is not even a UUID cannot belong to any Tank, so it is just as not found. */
+	private static UUID tankId(String id) {
+		try {
+			return UUID.fromString(id);
+		}
+		catch (IllegalArgumentException malformed) {
+			throw TankService.notFound();
+		}
+	}
+
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	TankView create(@AuthenticationPrincipal SessionUser user, @Valid @RequestBody TankDetails details) {
+		return tanks.create(user.id(), details);
+	}
+
+}

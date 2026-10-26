@@ -5,6 +5,7 @@ import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpMethod;
@@ -88,16 +89,21 @@ public class ApiClient {
 	@SuppressWarnings("unchecked")
 	private static Response read(ConvertibleClientHttpResponse response) throws IOException {
 		MediaType type = response.getHeaders().getContentType();
-		Map<String, Object> body = type != null && type.isCompatibleWith(MediaType.APPLICATION_JSON)
-				? response.bodyTo(Map.class) : null;
+		Object body = type != null && type.isCompatibleWith(MediaType.APPLICATION_JSON)
+				? response.bodyTo(Object.class) : null;
 		return new Response(response.getStatusCode().value(), body);
 	}
 
-	/** Status and JSON body (null when the response has none). */
-	public record Response(int status, Map<String, Object> body) {
+	/** Status and JSON body: a map for an object, a list for an array, null when the response has none. */
+	public record Response(int status, Object body) {
 
 		public Object field(String name) {
-			return body == null ? null : body.get(name);
+			return body instanceof Map<?, ?> map ? map.get(name) : null;
+		}
+
+		@SuppressWarnings("unchecked")
+		public List<Map<String, Object>> items() {
+			return (List<Map<String, Object>>) body;
 		}
 
 	}

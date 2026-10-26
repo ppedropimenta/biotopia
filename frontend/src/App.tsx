@@ -9,6 +9,8 @@ import { HomePage } from './pages/HomePage'
 import { LogInPage } from './pages/LogInPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { SignUpPage } from './pages/SignUpPage'
+import { TankFormPage } from './pages/TankFormPage'
+import { TankPage } from './pages/TankPage'
 import { TanksPage } from './pages/TanksPage'
 
 export default function App() {
@@ -26,6 +28,9 @@ export default function App() {
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route element={<RequireAuth />}>
               <Route path="tanks" element={<TanksPage />} />
+              <Route path="tanks/new" element={<TankFormPage />} />
+              <Route path="tanks/:id" element={<TankPage />} />
+              <Route path="tanks/:id/edit" element={<TankFormPage />} />
             </Route>
           </Route>
         </Routes>

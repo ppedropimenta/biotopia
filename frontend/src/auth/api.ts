@@ -1,4 +1,5 @@
 import type { Language } from '../i18n/language'
+import type { Tank, TankDetails } from '../tanks/types'
 
 export type Account = { email: string; language: Language }
 
@@ -72,5 +73,9 @@ export const api = {
     request<void>('POST', '/api/auth/reset-password', { token, password }),
   logIn: (email: string, password: string) => request<Account>('POST', '/api/auth/login', { email, password }),
   logOut: () => request<void>('POST', '/api/auth/logout'),
+  tanks: () => request<Tank[]>('GET', '/api/tanks'),
+  tank: (id: string) => request<Tank>('GET', `/api/tanks/${id}`),
+  createTank: (details: TankDetails) => request<Tank>('POST', '/api/tanks', details),
+  editTank: (id: string, details: TankDetails) => request<Tank>('PUT', `/api/tanks/${id}`, details),
   saveLanguage: (language: Language) => request<void>('PUT', '/api/me/language', { language }),
 }

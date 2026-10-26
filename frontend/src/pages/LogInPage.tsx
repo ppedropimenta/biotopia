@@ -81,7 +81,12 @@ export function LogInPage() {
           <ResendLink email={email.trim()} />
         </div>
       )}
-      <p className="mt-8 text-[15px] text-on-tannin-muted">
+      <p className="mt-8 text-[15px]">
+        <Link to="/forgot-password" className={fieldLink}>
+          {t('auth.login.forgot')}
+        </Link>
+      </p>
+      <p className="mt-3 text-[15px] text-on-tannin-muted">
         {t('auth.login.noAccount')}{' '}
         <Link to="/signup" className={fieldLink}>
           {t('nav.signup')}

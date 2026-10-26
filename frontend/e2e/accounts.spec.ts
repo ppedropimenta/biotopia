@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { confirmationLink } from './mailbox.ts'
+import { confirmationLink, resetLink } from './mailbox.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -71,4 +71,43 @@ test('the language chosen in the app is saved on the account and restored on log
   await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible()
   await logIn(page, address)
   await expect(page.getByRole('heading', { name: 'Seus aquários' })).toBeVisible()
+})
+
+test('someone who forgot the password gets a link, sets a new one, and the link works once', async ({ page }) => {
+  const address = newAddress()
+  const newPassword = 'a brand new passphrase'
+  await signUp(page, address)
+  await page.goto(await confirmationLink(address))
+  await expect(page.getByRole('heading', { name: 'Email confirmed' })).toBeVisible()
+
+  await page.goto('/login')
+  await page.getByRole('link', { name: 'Forgot your password?' }).click()
+  await page.getByLabel('Email').fill(address)
+  await page.getByRole('button', { name: 'Send the link' }).click()
+  await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()
+
+  const link = await resetLink(address)
+  await page.goto(link)
+  await page.getByLabel('Password').fill('short')
+  await page.getByRole('button', { name: 'Save password' }).click()
+  await expect(page.getByText('Use at least 8 characters.')).toBeVisible()
+  await page.getByLabel('Password').fill(newPassword)
+  await page.getByRole('button', { name: 'Save password' }).click()
+  await expect(page.getByRole('heading', { name: 'Password changed' })).toBeVisible()
+
+  // The old password is gone, the new one works.
+  await page.getByRole('link', { name: 'Log in' }).last().click()
+  await logIn(page, address)
+  await expect(page.getByText('That email and password do not match.')).toBeVisible()
+  await page.getByLabel('Password').fill(newPassword)
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+
+  // Opening the same link again gets a way to ask for a new one.
+  await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click()
+  await page.goto(link)
+  await page.getByLabel('Password').fill('yet another passphrase')
+  await page.getByRole('button', { name: 'Save password' }).click()
+  await expect(page.getByRole('heading', { name: 'This link does not work' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ask for a new link' })).toBeVisible()
 })

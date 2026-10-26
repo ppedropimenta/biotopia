@@ -66,7 +66,8 @@ class SecurityConfig {
 			.securityContext(context -> context.securityContextRepository(securityContextRepository))
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/confirm",
-						"/api/auth/resend-confirmation", "/api/auth/login")
+						"/api/auth/resend-confirmation", "/api/auth/login", "/api/auth/forgot-password",
+						"/api/auth/reset-password")
 				.permitAll()
 				.requestMatchers("/api/**")
 				.authenticated()

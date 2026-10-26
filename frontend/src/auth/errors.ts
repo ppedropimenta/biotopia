@@ -16,7 +16,7 @@ export type FormErrors = { email?: ErrorKey; password?: ErrorKey; general?: Erro
  * Turns the API's stable codes into message keys. The API never sends text, so every message is in the
  * language the person has chosen.
  */
-export function describeError(error: unknown, form: 'signup' | 'login'): FormErrors {
+export function describeError(error: unknown, form: 'signup' | 'login' | 'reset'): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'auth.errors.generic' }
 
   if (error.code === 'invalid_credentials') return { general: 'auth.errors.invalid_credentials' }

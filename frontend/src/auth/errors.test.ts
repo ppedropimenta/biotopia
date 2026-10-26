@@ -18,6 +18,20 @@ describe('describeError', () => {
     expect(describeError(error, 'signup')).toEqual({ password: 'auth.errors.password_too_long' })
   })
 
+  it('explains a password problem when choosing a new one, like at sign-up', () => {
+    const tooShort = new ApiError(400, 'validation_failed', { password: 'too_short' })
+    const tooLong = new ApiError(400, 'validation_failed', { password: 'too_long' })
+
+    expect(describeError(tooShort, 'reset')).toEqual({ password: 'auth.errors.password_too_short' })
+    expect(describeError(tooLong, 'reset')).toEqual({ password: 'auth.errors.password_too_long' })
+  })
+
+  it('puts a bad address under the email field when asking for a reset link', () => {
+    const error = new ApiError(400, 'validation_failed', { email: 'invalid' })
+
+    expect(describeError(error, 'reset')).toEqual({ email: 'auth.errors.email_invalid' })
+  })
+
   it('puts a taken email under the email field', () => {
     expect(describeError(new ApiError(409, 'email_taken'), 'signup')).toEqual({ email: 'auth.errors.email_taken' })
   })

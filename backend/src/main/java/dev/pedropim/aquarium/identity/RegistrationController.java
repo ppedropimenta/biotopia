@@ -40,8 +40,20 @@ class RegistrationController {
 
 	@PostMapping("/resend-confirmation")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	void resendConfirmation(@Valid @RequestBody ResendRequest request) {
+	void resendConfirmation(@Valid @RequestBody EmailRequest request) {
 		accounts.resendConfirmation(request.email());
+	}
+
+	@PostMapping("/forgot-password")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void forgotPassword(@Valid @RequestBody EmailRequest request) {
+		accounts.requestPasswordReset(request.email());
+	}
+
+	@PostMapping("/reset-password")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+		accounts.resetPassword(request.token(), request.password());
 	}
 
 	record SignUpRequest(
@@ -58,9 +70,14 @@ class RegistrationController {
 	record ConfirmRequest(@NotBlank(message = "invalid") String token) {
 	}
 
-	record ResendRequest(@NotBlank(message = "invalid") String email) {
+	record ResetPasswordRequest(@NotBlank(message = "invalid") String token,
+			@NotBlank(message = "too_short") @Size(min = AccountService.MIN_PASSWORD_LENGTH, message = "too_short") String password) {
+	}
 
-		ResendRequest {
+	/** The requests that only need an address: a new confirmation link or a reset link. */
+	record EmailRequest(@NotBlank(message = "invalid") String email) {
+
+		EmailRequest {
 			email = Emails.stripped(email);
 		}
 

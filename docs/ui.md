@@ -79,7 +79,7 @@ opacity animate, and nothing moves when the visitor asks for reduced motion.
 
 ## Account screens
 
-Sign up, log in and email confirmation share one frame (`frontend/src/auth/AuthScreen.tsx`): the form on a
+Sign up, log in, email confirmation and password reset share one frame (`frontend/src/auth/AuthScreen.tsx`): the form on a
 blackwater field, a river photograph beside it, the photograph's caption above it so the picture runs
 straight into the footer. On a phone the form comes first, then the photograph.
 

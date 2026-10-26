@@ -53,6 +53,10 @@ class User {
 		return passwordHash;
 	}
 
+	void changePasswordHash(String passwordHash) {
+		this.passwordHash = passwordHash;
+	}
+
 	Language language() {
 		return Language.fromCode(language).orElseThrow();
 	}

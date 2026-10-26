@@ -67,6 +67,9 @@ export const api = {
     request<void>('POST', '/api/auth/signup', { email, password, language }),
   confirm: (token: string) => request<void>('POST', '/api/auth/confirm', { token }),
   resendConfirmation: (email: string) => request<void>('POST', '/api/auth/resend-confirmation', { email }),
+  forgotPassword: (email: string) => request<void>('POST', '/api/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) =>
+    request<void>('POST', '/api/auth/reset-password', { token, password }),
   logIn: (email: string, password: string) => request<Account>('POST', '/api/auth/login', { email, password }),
   logOut: () => request<void>('POST', '/api/auth/logout'),
   saveLanguage: (language: Language) => request<void>('PUT', '/api/me/language', { language }),

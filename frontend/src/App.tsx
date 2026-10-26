@@ -8,6 +8,8 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { HomePage } from './pages/HomePage'
 import { LogInPage } from './pages/LogInPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { MeasurementEditPage } from './pages/MeasurementEditPage'
+import { MeasurementFormPage } from './pages/MeasurementFormPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { TankFormPage } from './pages/TankFormPage'
 import { TankPage } from './pages/TankPage'
@@ -31,6 +33,8 @@ export default function App() {
               <Route path="tanks/new" element={<TankFormPage />} />
               <Route path="tanks/:id" element={<TankPage />} />
               <Route path="tanks/:id/edit" element={<TankFormPage />} />
+              <Route path="tanks/:id/measure" element={<MeasurementFormPage />} />
+              <Route path="tanks/:id/measurements/:measurementId/edit" element={<MeasurementEditPage />} />
             </Route>
           </Route>
         </Routes>

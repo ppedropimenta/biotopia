@@ -37,6 +37,11 @@ class TankService {
 		return TankView.of(tank);
 	}
 
+	/** Fails as not found unless the user owns the Tank. */
+	void requireOwned(UUID ownerId, UUID id) {
+		owned(ownerId, id);
+	}
+
 	/** Someone else's Tank answers exactly like one that does not exist, so its existence is not revealed. */
 	private Tank owned(UUID ownerId, UUID id) {
 		return tanks.findByIdAndOwnerId(id, ownerId).orElseThrow(() -> notFound());

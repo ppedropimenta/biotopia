@@ -44,7 +44,7 @@ class TankController {
 	}
 
 	/** An id that is not even a UUID cannot belong to any Tank, so it is just as not found. */
-	private static UUID tankId(String id) {
+	static UUID tankId(String id) {
 		try {
 			return UUID.fromString(id);
 		}

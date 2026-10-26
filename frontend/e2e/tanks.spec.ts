@@ -1,25 +1,7 @@
-import { expect, test, type Page } from '@playwright/test'
-import { confirmationLink } from './mailbox.ts'
+import { expect, test } from '@playwright/test'
+import { loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
-
-const password = 'correct horse battery'
-
-async function loggedInKeeper(page: Page) {
-  const address = `keeper-${Date.now()}-${Math.floor(Math.random() * 1000)}@example.com`
-  await page.goto('/signup')
-  await page.getByLabel('Email').fill(address)
-  await page.getByLabel('Password').fill(password)
-  await page.getByRole('button', { name: 'Create account' }).click()
-  await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()
-  await page.goto(await confirmationLink(address))
-  await expect(page.getByRole('heading', { name: 'Email confirmed' })).toBeVisible()
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(address)
-  await page.getByLabel('Password').fill(password)
-  await page.getByRole('button', { name: 'Log in' }).click()
-  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
-}
 
 test('a keeper adds a tank, finds it in the list and edits it, with numbers in their language', async ({ page }) => {
   await loggedInKeeper(page)

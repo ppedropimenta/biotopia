@@ -1,4 +1,5 @@
 import type { Language } from '../i18n/language'
+import type { Measurement, MeasurementChange, NewMeasurements, Parameter } from '../tanks/measurements'
 import type { Tank, TankDetails } from '../tanks/types'
 
 export type Account = { email: string; language: Language }
@@ -77,5 +78,17 @@ export const api = {
   tank: (id: string) => request<Tank>('GET', `/api/tanks/${id}`),
   createTank: (details: TankDetails) => request<Tank>('POST', '/api/tanks', details),
   editTank: (id: string, details: TankDetails) => request<Tank>('PUT', `/api/tanks/${id}`, details),
+  parameters: () => request<Parameter[]>('GET', '/api/parameters'),
+  measurements: (tankId: string, limit: number) =>
+    request<Measurement[]>('GET', `/api/tanks/${tankId}/measurements?limit=${limit}`),
+  latestMeasurements: (tankId: string) => request<Measurement[]>('GET', `/api/tanks/${tankId}/measurements/latest`),
+  measurement: (tankId: string, id: string) =>
+    request<Measurement>('GET', `/api/tanks/${tankId}/measurements/${id}`),
+  recordMeasurements: (tankId: string, measurements: NewMeasurements) =>
+    request<Measurement[]>('POST', `/api/tanks/${tankId}/measurements`, measurements),
+  editMeasurement: (tankId: string, id: string, change: MeasurementChange) =>
+    request<Measurement>('PUT', `/api/tanks/${tankId}/measurements/${id}`, change),
+  deleteMeasurement: (tankId: string, id: string) =>
+    request<void>('DELETE', `/api/tanks/${tankId}/measurements/${id}`),
   saveLanguage: (language: Language) => request<void>('PUT', '/api/me/language', { language }),
 }

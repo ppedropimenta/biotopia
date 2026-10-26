@@ -47,6 +47,11 @@ describe('formatNumber', () => {
     expect(formatNumber(1200, 'pt-BR')).toBe('1.200')
   })
 
+  it('can show more decimals, for readings a photometer gives to the thousandth', () => {
+    expect(formatNumber(0.025, 'en', { maxDecimals: 4 })).toBe('0.025')
+    expect(formatNumber(0.0051, 'pt-BR', { maxDecimals: 4 })).toBe('0,0051')
+  })
+
   it('can leave the grouping out, for a field that is parsed back', () => {
     expect(formatNumber(1200.5, 'pt-BR', { grouping: false })).toBe('1200,5')
   })

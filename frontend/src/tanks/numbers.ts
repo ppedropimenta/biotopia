@@ -16,7 +16,11 @@ export function parseNumber(text: string, language: Language): number | null | '
   return Number(trimmed.replace(separator, '.'))
 }
 
-/** A number the way the language writes it, with at most two decimals (the API keeps no more). */
-export function formatNumber(value: number, language: Language, { grouping = true } = {}): string {
-  return new Intl.NumberFormat(language, { maximumFractionDigits: 2, useGrouping: grouping }).format(value)
+/** A number the way the language writes it, with at most two decimals unless `maxDecimals` says more. */
+export function formatNumber(
+  value: number,
+  language: Language,
+  { grouping = true, maxDecimals = 2 } = {},
+): string {
+  return new Intl.NumberFormat(language, { maximumFractionDigits: maxDecimals, useGrouping: grouping }).format(value)
 }

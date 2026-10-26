@@ -5,6 +5,7 @@ import { api } from '../auth/api'
 import { paperButton } from '../auth/classes'
 import { formatDay } from '../tanks/dates'
 import { LoadError } from '../tanks/LoadError'
+import { MeasurementSections } from '../tanks/MeasurementSections'
 import { formatNumber } from '../tanks/numbers'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
@@ -52,11 +53,18 @@ export function TankPage() {
             </h1>
             <p className="mt-4 text-[18px]">{t('tanks.since', { date: formatDay(data.startDate, language) })}</p>
           </div>
-          <Link to={`/tanks/${data.id}/edit`} className={paperButton}>
-            {t('tanks.page.edit')}
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <Link to={`/tanks/${data.id}/edit`} className="underline underline-offset-4 hover:text-muted">
+              {t('tanks.page.edit')}
+            </Link>
+            <Link to={`/tanks/${data.id}/measure`} className={paperButton}>
+              {t('measurements.record')}
+            </Link>
+          </div>
         </div>
       </div>
+
+      <MeasurementSections tankId={data.id} />
 
       <section className="mb-16 bg-tannin px-5 py-14 text-on-tannin sm:px-8 lg:mb-24 lg:py-20">
         <h2 className="rise font-display text-[30px] italic">{t('tanks.page.details')}</h2>

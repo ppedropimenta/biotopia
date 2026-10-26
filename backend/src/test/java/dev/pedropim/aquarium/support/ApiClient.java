@@ -46,6 +46,10 @@ public class ApiClient {
 		return send(HttpMethod.PUT, path, body);
 	}
 
+	public Response delete(String path) {
+		return send(HttpMethod.DELETE, path, null);
+	}
+
 	/** A write without the CSRF header, as a page on another site would send it. */
 	public Response postWithoutCsrfToken(String path, Object body) {
 		get("/api/me");

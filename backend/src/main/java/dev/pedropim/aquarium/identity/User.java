@@ -30,6 +30,9 @@ class User {
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
+	@Column(name = "password_changed_at")
+	private Instant passwordChangedAt;
+
 	protected User() {
 	}
 
@@ -53,8 +56,9 @@ class User {
 		return passwordHash;
 	}
 
-	void changePasswordHash(String passwordHash) {
+	void changePassword(String passwordHash, Instant when) {
 		this.passwordHash = passwordHash;
+		this.passwordChangedAt = when;
 	}
 
 	Language language() {

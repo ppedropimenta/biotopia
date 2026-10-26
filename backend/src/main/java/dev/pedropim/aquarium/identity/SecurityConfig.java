@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -52,8 +53,8 @@ class SecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository securityContextRepository)
-			throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository securityContextRepository,
+			UserRepository users) throws Exception {
 		// The SPA reads the XSRF-TOKEN cookie and sends it back in the X-XSRF-TOKEN header. A page on another site
 		// cannot read our cookie, so it cannot forge a write. A null attribute name makes the token load on every
 		// request, so the cookie exists before the first write.
@@ -64,6 +65,8 @@ class SecurityConfig {
 			.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.csrfTokenRequestHandler(csrfHandler))
 			.securityContext(context -> context.securityContextRepository(securityContextRepository))
+			// Not a bean: a Filter bean would also be registered in the servlet chain and run twice.
+			.addFilterAfter(new StaleSessionFilter(users), SecurityContextHolderFilter.class)
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers(HttpMethod.POST, "/api/auth/signup", "/api/auth/confirm",
 						"/api/auth/resend-confirmation", "/api/auth/login", "/api/auth/forgot-password",

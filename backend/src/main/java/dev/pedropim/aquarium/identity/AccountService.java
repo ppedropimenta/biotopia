@@ -121,7 +121,7 @@ class AccountService {
 			throw invalidLink();
 		}
 		User user = users.findById(found.userId()).orElseThrow(AccountService::invalidLink);
-		user.changePasswordHash(passwordEncoder.encode(newPassword));
+		user.changePassword(passwordEncoder.encode(newPassword), clock.instant());
 		if (!user.isConfirmed()) {
 			user.confirm(clock.instant());
 			tokens.deleteByUserId(user.id());

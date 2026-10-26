@@ -1,5 +1,6 @@
 package dev.pedropim.aquarium.identity;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -33,8 +34,8 @@ record AccountDetails(UUID id, String email, String passwordHash, boolean confir
 		return email;
 	}
 
-	SessionUser toSessionUser() {
-		return new SessionUser(id, email);
+	SessionUser toSessionUser(Instant loggedInAt) {
+		return new SessionUser(id, email, loggedInAt);
 	}
 
 	static AccountDetails of(User user) {

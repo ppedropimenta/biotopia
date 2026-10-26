@@ -73,6 +73,23 @@ class PasswordResetApiTest {
 	}
 
 	@Test
+	void aResetEndsTheSessionsThatWereAlreadyLoggedIn() {
+		confirmedAccount("en");
+		ApiClient otherBrowser = new ApiClient(port);
+		otherBrowser.post("/api/auth/login", Map.of("email", email, "password", PASSWORD));
+		assertThat(otherBrowser.get("/api/me").status()).isEqualTo(200);
+
+		clock.advance(Duration.ofMinutes(5));
+		forgotPassword(email);
+		resetPassword(resetToken(), NEW_PASSWORD);
+
+		assertThat(otherBrowser.get("/api/me").status()).isEqualTo(401);
+		// A login right after the reset, at the same instant, is a new session and stays.
+		assertThat(logIn(email, NEW_PASSWORD).status()).isEqualTo(200);
+		assertThat(browser.get("/api/me").status()).isEqualTo(200);
+	}
+
+	@Test
 	void askingNeverRevealsWhetherAnAddressHasAnAccount() {
 		confirmedAccount("en");
 		mail.clear();

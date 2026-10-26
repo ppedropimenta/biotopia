@@ -1,5 +1,6 @@
 package dev.pedropim.aquarium.identity;
 
+import java.time.Clock;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,11 @@ class SessionController {
 
 	private final AccountService accounts;
 
+	private final Clock clock;
+
 	SessionController(AuthenticationManager authenticationManager, SecurityContextRepository securityContextRepository,
-			UserRepository users, AccountService accounts) {
+			UserRepository users, AccountService accounts, Clock clock) {
+		this.clock = clock;
 		this.authenticationManager = authenticationManager;
 		this.securityContextRepository = securityContextRepository;
 		this.users = users;
@@ -65,7 +69,7 @@ class SessionController {
 			httpRequest.changeSessionId();
 		}
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
-		context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(account.toSessionUser(), null,
+		context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(account.toSessionUser(clock.instant()), null,
 				account.getAuthorities()));
 		SecurityContextHolder.setContext(context);
 		securityContextRepository.saveContext(context, httpRequest, httpResponse);

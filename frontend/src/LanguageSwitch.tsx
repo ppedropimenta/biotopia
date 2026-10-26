@@ -12,10 +12,10 @@ export function LanguageSwitch() {
   const { t, i18n } = useTranslation()
 
   return (
-    <label className="flex items-center gap-2 text-sm">
-      {t('language.label')}
+    <label className="rise flex items-center gap-2">
+      <span className="sr-only sm:not-sr-only sm:text-muted">{t('language.label')}</span>
       <select
-        className="border px-1 py-0.5"
+        className="h-10 cursor-pointer bg-paper-deep px-3 transition-colors hover:bg-ink hover:text-paper"
         value={i18n.language}
         onChange={(event) => {
           if (isLanguage(event.target.value)) changeLanguage(event.target.value)

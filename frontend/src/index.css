@@ -1,1 +1,111 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/instrument-sans/wght.css';
+@import '@fontsource-variable/newsreader/opsz.css';
+@import '@fontsource-variable/newsreader/opsz-italic.css';
+
+/*
+ * Colour and type for the whole app. Components use these through Tailwind classes
+ * (bg-paper, text-muted, font-display...), never raw values.
+ *
+ * Two worlds side by side: an old naturalist's notebook (aged paper, brown ink, a plate) and a
+ * blackwater river (tea-dark fields, the neon tetra's blue on the figures). No shadows, no
+ * gradients; surfaces change by tone.
+ */
+@theme {
+  --color-paper: #ece6d6;
+  --color-paper-deep: #e2dac5;
+  --color-ink: #24170e;
+  --color-muted: #5c4a3a;
+  --color-tannin: #24130a;
+  --color-tannin-2: #301a0d;
+  --color-tannin-3: #3d2211;
+  --color-on-tannin: #f3e6cc;
+  --color-on-tannin-muted: #cdb491;
+  --color-neon: #3fe0e6;
+  --color-neon-red: #ff5a47;
+  --color-positive: #2e6b3a;
+  --color-negative: #a8321f;
+  --color-warning: #8a5a0b;
+
+  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-display: 'Newsreader Variable', Georgia, serif;
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-neon);
+    color: var(--color-tannin);
+  }
+}
+
+/*
+ * Plates are scanned on white; multiply lets the paper show through instead of a white box.
+ * Their figure carries bg-paper, because the entrance animation isolates blending.
+ */
+.plate {
+  mix-blend-mode: multiply;
+}
+
+/*
+ * Entrance: each part of a section rises into place once, in reading order. Only transform
+ * and opacity move, and content is never left hidden when motion is reduced.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* A lead picture settles in from slightly larger, like a page laid flat. */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+/* The river photo drifts very slowly, so the water reads as moving without becoming a video. */
+@keyframes drift {
+  to {
+    transform: scale(1.08) translateX(-1.5%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .settle {
+    animation: settle 1200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .drift {
+    animation: drift 24s ease-in-out infinite alternate;
+  }
+
+  .rise:nth-child(2) {
+    animation-delay: 80ms;
+  }
+
+  .rise:nth-child(3) {
+    animation-delay: 160ms;
+  }
+
+  .rise:nth-child(4) {
+    animation-delay: 240ms;
+  }
+}

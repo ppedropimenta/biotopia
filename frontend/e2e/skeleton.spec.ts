@@ -4,10 +4,10 @@ test.use({ locale: 'en-US' })
 
 test('a visitor switches to Portuguese and opens the credits page', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'A logbook for freshwater tanks' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your aquarium’s logbook' })).toBeVisible()
 
   await page.getByLabel('Language').selectOption('pt-BR')
-  await expect(page.getByRole('heading', { name: 'Um diário para aquários de água doce' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'O diário do seu aquário' })).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
 
   await page.getByRole('contentinfo').getByRole('link', { name: 'Créditos e licenças' }).click()
@@ -23,6 +23,6 @@ test.describe('with a Portuguese browser', () => {
 
   test('the app starts in Portuguese', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: 'Um diário para aquários de água doce' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'O diário do seu aquário' })).toBeVisible()
   })
 })

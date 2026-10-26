@@ -6,6 +6,10 @@ export const ptBR: Messages = {
   },
   nav: {
     credits: 'Créditos',
+    login: 'Entrar',
+    signup: 'Criar conta',
+    logout: 'Sair',
+    tanks: 'Seus aquários',
   },
   language: {
     label: 'Idioma',
@@ -14,6 +18,7 @@ export const ptBR: Messages = {
     title: 'O diário do seu aquário',
     lead: 'Testes de água, manutenções e fotos datadas de cada aquário, guardados juntos ao longo dos meses.',
     status: 'Ainda em construção. O aquário de demonstração abre aqui em breve.',
+    cta: 'Criar uma conta',
     hero: {
       alt: 'Água preta, cor de chá, correndo sobre pedra lisa, com a mata na outra margem',
       caption: 'Água preta sobre a pedra. Cachoeira das Lajes, Presidente Figueiredo, Amazonas',
@@ -46,6 +51,56 @@ export const ptBR: Messages = {
       igapoAlt: 'Mata alagada no Rio Negro, com folhas de vitória-régia sobre a água escura',
       igapoCaption: 'Igapó no Rio Negro, com vitórias-régias',
     },
+  },
+  auth: {
+    email: 'E-mail',
+    password: 'Senha',
+    working: 'Um instante…',
+    signup: {
+      title: 'Comece o seu diário',
+      lead: 'Uma conta mantém seus aquários privados, e iguais em todos os aparelhos.',
+      passwordHint: 'Pelo menos 8 caracteres.',
+      submit: 'Criar conta',
+      haveAccount: 'Já tem conta?',
+      photoAlt: 'Um neon, com a faixa azul sobre o vermelho, entre plantas verdes',
+      photoCaption: 'Paracheirodon innesi, o neon',
+    },
+    sent: {
+      title: 'Veja seu e-mail',
+      text: 'Enviamos um link para {{email}}. Abra-o para confirmar o endereço e depois entre.',
+      resend: 'Enviar o link de novo',
+      resent: 'Enviado de novo. Pode levar um minuto para chegar.',
+    },
+    login: {
+      title: 'Bem-vindo de volta',
+      lead: 'Entre para ver seus aquários.',
+      submit: 'Entrar',
+      noAccount: 'Ainda não tem conta?',
+      unconfirmed: 'Seu e-mail ainda não foi confirmado. Abra o link que enviamos ou peça um novo.',
+      photoAlt: 'Água preta, cor de chá, correndo sobre pedra lisa, com a mata na outra margem',
+      photoCaption: 'Água preta sobre a pedra. Cachoeira das Lajes, Amazonas',
+    },
+    confirm: {
+      working: 'Confirmando o seu e-mail…',
+      doneTitle: 'E-mail confirmado',
+      doneText: 'Sua conta está pronta.',
+      failedTitle: 'Este link não funciona',
+      failedText:
+        'Ele já foi usado ou expirou. Se você já confirmou, entre. Se não, tente entrar e peça um link novo ali.',
+    },
+    errors: {
+      invalid_credentials: 'Esse e-mail e essa senha não conferem.',
+      email_taken: 'Este e-mail já tem conta. Entre com ela.',
+      email_invalid: 'Digite um e-mail válido.',
+      password_too_short: 'Use pelo menos 8 caracteres.',
+      password_too_long: 'Use no máximo 72 caracteres.',
+      login_incomplete: 'Digite o seu e-mail e a sua senha.',
+      generic: 'Algo deu errado. Tente de novo em instantes.',
+    },
+  },
+  tanks: {
+    title: 'Seus aquários',
+    empty: 'Nenhum aquário ainda. Adicionar o primeiro chega em breve.',
   },
   credits: {
     title: 'Créditos e licenças',

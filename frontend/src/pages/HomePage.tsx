@@ -1,4 +1,7 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
+import { paperButton } from '../auth/classes'
+import { useAuth } from '../auth/context'
 import { pictures } from '../credits'
 
 const logged = ['parameters', 'maintenance', 'photos'] as const
@@ -8,6 +11,7 @@ const rowTones = ['bg-tannin-2', 'bg-tannin-3', 'bg-tannin-2']
 
 export function HomePage() {
   const { t } = useTranslation()
+  const { state } = useAuth()
 
   return (
     <>
@@ -17,7 +21,14 @@ export function HomePage() {
             {t('home.title')}
           </h1>
           <p className="rise mt-8 max-w-[34ch] text-[18px] leading-relaxed">{t('home.lead')}</p>
-          <p className="rise mt-4 max-w-[34ch] text-[15px]">{t('home.status')}</p>
+          {state.status === 'out' && (
+            <p className="rise mt-8">
+              <Link to="/signup" className={paperButton}>
+                {t('home.cta')}
+              </Link>
+            </p>
+          )}
+          <p className="rise mt-6 max-w-[34ch] text-[15px]">{t('home.status')}</p>
         </div>
         <figure className="settle">
           <div className="aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-[72svh]">

@@ -26,3 +26,6 @@ dist-ssr
 # Playwright
 test-results
 playwright-report
+
+# End-to-end tests: the backend log the journeys read emails from
+e2e/.output

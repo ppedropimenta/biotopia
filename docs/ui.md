@@ -76,3 +76,20 @@ it is a choice, because aged paper is the point.
 Parts of a section rise into place once, in reading order (`rise`); a lead picture settles in from
 slightly larger (`settle`); the hero river photo drifts very slowly (`drift`). Only transform and
 opacity animate, and nothing moves when the visitor asks for reduced motion.
+
+## Account screens
+
+Sign up, log in and email confirmation share one frame (`frontend/src/auth/AuthScreen.tsx`): the form on a
+blackwater field, a river photograph beside it, the photograph's caption above it so the picture runs
+straight into the footer. On a phone the form comes first, then the photograph.
+
+- Fields are a step lighter than the field they sit on (`tannin-3`), with the label above in `on-tannin-muted`.
+  No outlined boxes.
+- The one filled action on blackwater is `neon` on `tannin`; on paper it is `ink` on `paper`.
+- Messages come from the API as codes and are written in the chosen language. Forms use `noValidate` so the
+  browser's own validation messages (in the browser's language) never appear.
+- The header on a phone holds only the name, Log in (or Log out) and the language; Sign up is offered on the
+  home page and on the login page. The language list says "Português", not "Português (Brasil)", to fit.
+- These are working screens with one photograph, so the landing-page rules (a minimum number of pictures,
+  a motion count) do not apply to them. The remaining judgement calls are the same choices as elsewhere:
+  warm paper, a large title for a first visit, and the form centred in a full-height field.

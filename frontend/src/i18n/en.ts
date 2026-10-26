@@ -4,6 +4,10 @@ export const en = {
   },
   nav: {
     credits: 'Credits',
+    login: 'Log in',
+    signup: 'Sign up',
+    logout: 'Log out',
+    tanks: 'Your tanks',
   },
   language: {
     label: 'Language',
@@ -12,6 +16,7 @@ export const en = {
     title: 'Your aquarium’s logbook',
     lead: 'Water tests, maintenance and dated photos of each tank, kept together over the months.',
     status: 'Still being built. The demo tank opens here soon.',
+    cta: 'Create an account',
     hero: {
       alt: 'Tea-coloured blackwater running over flat rock, with forest on the far bank',
       caption: 'Blackwater over rock. Cachoeira das Lajes, Presidente Figueiredo, Amazonas',
@@ -44,6 +49,56 @@ export const en = {
       igapoAlt: 'Flooded forest on the Rio Negro, with giant water lily pads on brown water',
       igapoCaption: 'Igapó, flooded forest on the Rio Negro, with giant water lilies',
     },
+  },
+  auth: {
+    email: 'Email',
+    password: 'Password',
+    working: 'One moment…',
+    signup: {
+      title: 'Start your logbook',
+      lead: 'An account keeps your tanks private, and the same on every device.',
+      passwordHint: 'At least 8 characters.',
+      submit: 'Create account',
+      haveAccount: 'Already have an account?',
+      photoAlt: 'A neon tetra, blue stripe over red, among green plants',
+      photoCaption: 'Paracheirodon innesi, the neon tetra',
+    },
+    sent: {
+      title: 'Check your email',
+      text: 'We sent a link to {{email}}. Open it to confirm your address, then log in.',
+      resend: 'Send the link again',
+      resent: 'Sent again. It can take a minute to arrive.',
+    },
+    login: {
+      title: 'Welcome back',
+      lead: 'Log in to your tanks.',
+      submit: 'Log in',
+      noAccount: 'No account yet?',
+      unconfirmed: 'Your email is not confirmed yet. Open the link we sent you, or ask for a new one.',
+      photoAlt: 'Tea-coloured blackwater running over flat rock, with forest on the far bank',
+      photoCaption: 'Blackwater over rock. Cachoeira das Lajes, Amazonas',
+    },
+    confirm: {
+      working: 'Confirming your email…',
+      doneTitle: 'Email confirmed',
+      doneText: 'Your account is ready.',
+      failedTitle: 'This link does not work',
+      failedText:
+        'It was already used or has expired. If you have confirmed already, log in. If not, try to log in and ask for a new link there.',
+    },
+    errors: {
+      invalid_credentials: 'That email and password do not match.',
+      email_taken: 'This email already has an account. Log in instead.',
+      email_invalid: 'Enter a valid email address.',
+      password_too_short: 'Use at least 8 characters.',
+      password_too_long: 'Use at most 72 characters.',
+      login_incomplete: 'Enter your email and your password.',
+      generic: 'Something went wrong. Try again in a moment.',
+    },
+  },
+  tanks: {
+    title: 'Your tanks',
+    empty: 'No tanks yet. Adding the first one is coming soon.',
   },
   credits: {
     title: 'Credits and licences',

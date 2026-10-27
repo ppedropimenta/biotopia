@@ -7,8 +7,8 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await loggedInKeeper(page)
 
   // A new account has no tanks, and the empty list invites the first one.
-  await expect(page.getByRole('heading', { name: 'No tanks yet' })).toBeVisible()
-  await page.getByRole('link', { name: 'Add your first tank' }).click()
+  await expect(page.getByText('No tanks yet. Start with a name and a volume.')).toBeVisible()
+  await page.getByRole('link', { name: 'Start a new plate' }).click()
 
   // A name and a start date are needed before anything is sent.
   await page.getByRole('button', { name: 'Save tank' }).click()
@@ -29,6 +29,10 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await page.getByRole('link', { name: 'My tanks' }).click()
   const card = page.getByRole('link', { name: /Blackwater 120/ })
   await expect(card).toContainText('98.5')
+  await expect(card).toContainText('Plate I')
+  // Nothing was measured, so the three fixed values show a dash, never a zero, and ammonia is not NH₃.
+  await expect(card).toContainText('Total ammonia')
+  await expect(card.getByText('not measured yet')).toHaveCount(3)
 
   // In Brazilian Portuguese the same number is written with a decimal comma.
   await page.getByRole('button', { name: 'PT', exact: true }).click()
@@ -52,7 +56,7 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
 
 test('someone else’s tank looks like a tank that does not exist', async ({ page, browser }) => {
   await loggedInKeeper(page)
-  await page.getByRole('link', { name: 'Add your first tank' }).click()
+  await page.getByRole('link', { name: 'Start a new plate' }).click()
   await page.getByLabel('Name').fill('Private tank')
   await page.getByLabel('Start date').fill('2025-03-01')
   await page.getByRole('button', { name: 'Save tank' }).click()

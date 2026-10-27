@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { api } from '../auth/api'
-import { fieldButton, fieldLink } from '../auth/classes'
-import { Field, TextAreaField } from '../auth/Field'
+import { FormError } from '../auth/FormError'
+import { Button, ButtonLink } from '../components/ui/Button'
+import { NoteField, TextField } from '../components/ui/Field'
+import { Plate } from '../components/ui/Plate'
+import { PageHeader } from '../components/ui/Structure'
 import { describeTankError, emptyForm, formFromTank, toDetails, type FormErrors, type TankForm } from '../tanks/form'
 import { formatNumber } from '../tanks/numbers'
 import type { Tank } from '../tanks/types'
@@ -17,13 +20,7 @@ export function TankFormPage() {
   const tank = useLoad(() => (id ? api.tank(id) : Promise.resolve(null)), id ?? 'new')
 
   if (tank.status === 'loading') return null
-  if (tank.status === 'error') {
-    return (
-      <div className="px-5 pt-10 pb-24 sm:px-8 lg:pt-16">
-        <LoadError error={tank.error} />
-      </div>
-    )
-  }
+  if (tank.status === 'error') return <LoadError error={tank.error} />
   return <TankFormScreen tank={tank.data} />
 }
 
@@ -62,62 +59,50 @@ function TankFormScreen({ tank }: { tank: Tank | null }) {
 
   return (
     <>
-      <div className="px-5 pt-10 pb-14 sm:px-8 lg:pt-16">
-        <h1 className="rise font-display text-[clamp(40px,6vw,88px)] leading-[0.95] tracking-[-0.02em]">
-          {tank ? t('tanks.form.editTitle') : t('tanks.form.newTitle')}
-        </h1>
-        {!tank && <p className="rise mt-5 max-w-[46ch] text-[18px] leading-relaxed">{t('tanks.form.newLead')}</p>}
-      </div>
+      <PageHeader
+        title={tank ? t('tanks.form.editTitle') : t('tanks.form.newTitle')}
+        subtitle={t('tanks.enough')}
+      />
 
-      <section className="mb-16 bg-tannin px-5 py-14 text-on-tannin sm:px-8 lg:mb-24 lg:py-20">
-        <form onSubmit={submit} noValidate className="grid gap-12 lg:grid-cols-2 lg:gap-x-20">
-          <div className="grid content-start gap-12">
-            <div className="grid gap-6 sm:grid-cols-[2fr_1fr]">
-              <Field id="name" name="name" autoComplete="off" label={t('tanks.form.name')} {...bind('name')} />
-              <Field id="startDate" name="startDate" type="date" label={t('tanks.form.startDate')} {...bind('startDate')} />
-            </div>
-
-            <fieldset>
-              <legend className="font-display text-[30px] italic">{t('tanks.form.sizeTitle')}</legend>
-              <p className="mt-2 text-[18px]">{t('tanks.form.sizeLead')}</p>
-              <div className="mt-6 grid gap-6 sm:grid-cols-3">
-                <Field id="lengthCm" name="lengthCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.length')} {...bind('lengthCm')} />
-                <Field id="widthCm" name="widthCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.width')} {...bind('widthCm')} />
-                <Field id="heightCm" name="heightCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.height')} {...bind('heightCm')} />
-              </div>
-              <div className="mt-6 max-w-sm">
-                <Field
-                  id="netVolumeLiters"
-                  name="netVolumeLiters"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  label={t('tanks.form.netVolume')}
-                  hint={t('tanks.form.netVolumeHint')}
-                  {...bind('netVolumeLiters')}
-                />
-              </div>
-            </fieldset>
+      <Plate size="lg" as="div" className="w-full max-w-[720px]">
+        <form onSubmit={submit} noValidate aria-busy={saving} className="flex flex-col gap-7">
+          <div className="grid gap-5.5 sm:grid-cols-[2fr_1fr]">
+            <TextField name="name" autoComplete="off" label={t('tanks.form.name')} {...bind('name')} />
+            <TextField name="startDate" type="date" label={t('tanks.form.startDate')} {...bind('startDate')} />
           </div>
 
-          <div className="grid content-start gap-12">
-            <TextAreaField id="note" name="note" label={t('tanks.form.note')} {...bind('note')} />
-
-            {errors.general && (
-              <p role="alert" className="text-[15px] text-neon-red">
-                {message(errors.general)}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <button type="submit" disabled={saving} className={fieldButton}>
-                {saving ? t('tanks.form.saving') : t('tanks.form.save')}
-              </button>
-              <Link to={tank ? `/tanks/${tank.id}` : '/tanks'} className={fieldLink}>
-                {t('tanks.form.cancel')}
-              </Link>
+          <fieldset className="m-0 flex min-w-0 flex-col gap-5.5 border-0 p-0">
+            <legend className="mb-2 p-0 text-h3">{t('tanks.form.sizeTitle')}</legend>
+            <p className="m-0 text-ink-soft">{t('tanks.form.sizeLead')}</p>
+            <div className="grid gap-5.5 sm:grid-cols-3">
+              <TextField name="lengthCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.length')} {...bind('lengthCm')} />
+              <TextField name="widthCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.width')} {...bind('widthCm')} />
+              <TextField name="heightCm" inputMode="decimal" autoComplete="off" label={t('tanks.form.height')} {...bind('heightCm')} />
             </div>
+            <TextField
+              name="netVolumeLiters"
+              inputMode="decimal"
+              autoComplete="off"
+              label={t('tanks.form.netVolume')}
+              hint={t('tanks.form.netVolumeHint')}
+              className="max-w-sm"
+              {...bind('netVolumeLiters')}
+            />
+          </fieldset>
+
+          <NoteField name="note" label={t('tanks.form.note')} {...bind('note')} />
+
+          {errors.general && <FormError>{message(errors.general)}</FormError>}
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="submit" size="lg" disabled={saving}>
+              {saving ? t('tanks.form.saving') : t('tanks.form.save')}
+            </Button>
+            <ButtonLink to={tank ? `/tanks/${tank.id}` : '/tanks'} variant="secondary" size="lg">
+              {t('tanks.form.cancel')}
+            </ButtonLink>
           </div>
         </form>
-      </section>
+      </Plate>
     </>
   )
 }

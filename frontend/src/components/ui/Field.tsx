@@ -55,9 +55,15 @@ export function TextField({
   )
 }
 
-/** A free note on ruled paper. */
-export function NoteField({ label, className, ...rest }: { label: string } & ComponentProps<'textarea'>) {
+/** A free note on ruled paper. An `error` (in the chosen language) shows under it, like in `TextField`. */
+export function NoteField({
+  label,
+  error,
+  className,
+  ...rest
+}: { label: string; error?: string } & ComponentProps<'textarea'>) {
   const id = useId()
+  const errorId = `${id}-error`
   return (
     <div className={cx('flex flex-col gap-1', className)}>
       <label htmlFor={id} className={labelClasses}>
@@ -66,9 +72,17 @@ export function NoteField({ label, className, ...rest }: { label: string } & Com
       <textarea
         id={id}
         rows={2}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         className="ruled resize-y border-0 bg-transparent px-0.5 font-hand text-hand leading-[30px] text-ink-blue placeholder:text-ink-muted/70"
         {...rest}
       />
+      {error && (
+        <span id={errorId} role="alert" className="flex items-center gap-2 font-mono text-xs text-cardinal">
+          <Icon name="warning" size={16} strokeWidth={2} />
+          {error}
+        </span>
+      )}
     </div>
   )
 }

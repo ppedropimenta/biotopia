@@ -127,14 +127,16 @@ export const en = {
     new: 'New tank',
     since: 'Since {{date}}',
     netVolume: 'Net volume',
-    netVolumeUnset: 'Net volume not set',
     liters: 'liters',
-    size: '{{length}} × {{width}} × {{height}} cm',
     loadFailed: 'The tanks could not be loaded. Try again in a moment.',
-    empty: {
-      title: 'No tanks yet',
-      text: 'Add your first tank to start its logbook. All it needs is a name and the day it was set up.',
-      cta: 'Add your first tank',
+    enough: 'Name, volume and start date are enough; the rest comes with time.',
+    newPlate: 'Start a new plate',
+    empty: 'No tanks yet. Start with a name and a volume.',
+    plate: {
+      volume: '{{value}} L',
+      size: '{{length}}×{{width}}×{{height}} cm',
+      since: 'since {{date}}',
+      notMeasured: 'not measured yet',
     },
     page: {
       back: 'Your tanks',
@@ -148,7 +150,6 @@ export const en = {
     },
     form: {
       newTitle: 'New tank',
-      newLead: 'A name and the day it was set up are enough. The rest can wait.',
       editTitle: 'Edit tank',
       name: 'Name',
       startDate: 'Start date',

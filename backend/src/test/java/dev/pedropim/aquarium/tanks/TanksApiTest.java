@@ -2,6 +2,7 @@ package dev.pedropim.aquarium.tanks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import dev.pedropim.aquarium.support.Accounts;
 import dev.pedropim.aquarium.support.ApiClient;
 import dev.pedropim.aquarium.support.ApiClient.Response;
 import dev.pedropim.aquarium.support.ApiTest;
+import dev.pedropim.aquarium.support.MutableClock;
 import dev.pedropim.aquarium.support.RecordingEmailSender;
 
 @ApiTest
@@ -25,6 +27,9 @@ class TanksApiTest {
 
 	@Autowired
 	RecordingEmailSender mail;
+
+	@Autowired
+	MutableClock clock;
 
 	ApiClient keeper;
 
@@ -50,8 +55,9 @@ class TanksApiTest {
 	}
 
 	@Test
-	void theListShowsTheKeepersOwnTanksOnlyInAlphabeticalOrder() {
+	void theListShowsTheKeepersOwnTanksOnlyOldestFirst() {
 		keeper.post("/api/tanks", tank("shrimp cube"));
+		clock.advance(Duration.ofMinutes(1));
 		keeper.post("/api/tanks", tank("Blackwater 120"));
 		ApiClient someoneElse = Accounts.loggedInBrowser(port, mail);
 		someoneElse.post("/api/tanks", tank("Not mine"));
@@ -59,7 +65,7 @@ class TanksApiTest {
 		Response list = keeper.get("/api/tanks");
 
 		assertThat(list.status()).isEqualTo(200);
-		assertThat(list.items()).extracting(item -> item.get("name")).containsExactly("Blackwater 120", "shrimp cube");
+		assertThat(list.items()).extracting(item -> item.get("name")).containsExactly("shrimp cube", "Blackwater 120");
 	}
 
 	@Test

@@ -8,6 +8,7 @@
 import tankBlackwater from '../assets/illustrations/tanks/blackwater.svg'
 import cardinal from '../assets/illustrations/fish/cardinal.svg'
 import discus from '../assets/illustrations/fish/discus.svg'
+import folhas from '../assets/illustrations/plants/folhas.svg'
 import vitoriaRegia from '../assets/illustrations/plants/vitoria-regia.svg'
 
 export type Art = { src: string; width: number; height: number }
@@ -20,9 +21,10 @@ export const fishArt = {
   'symphysodon-aequifasciatus': art(discus, 380, 330),
 } as const
 
-/** Plants, by the slug of the scientific name. */
+/** Plants, by the slug of the scientific name; other plant drawings (dry leaves) by a plain name. */
 export const plantArt = {
   'victoria-amazonica': art(vitoriaRegia, 520, 250),
+  'folhas-secas': art(folhas, 280, 190),
 } as const
 
 /** Tank drawings, used until a tank has photos. */

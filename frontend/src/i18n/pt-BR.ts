@@ -129,14 +129,16 @@ export const ptBR: Messages = {
     new: 'Novo aquário',
     since: 'Desde {{date}}',
     netVolume: 'Volume líquido',
-    netVolumeUnset: 'Volume líquido não informado',
     liters: 'litros',
-    size: '{{length}} × {{width}} × {{height}} cm',
     loadFailed: 'Não foi possível carregar os aquários. Tente de novo em instantes.',
-    empty: {
-      title: 'Nenhum aquário ainda',
-      text: 'Adicione o seu primeiro aquário para começar o diário dele. Basta um nome e o dia em que foi montado.',
-      cta: 'Adicionar o primeiro aquário',
+    enough: 'Nome, volume e data de início bastam; o resto vem com o tempo.',
+    newPlate: 'Começar uma nova prancha',
+    empty: 'Nenhum aquário ainda. Comece pelo nome e pelo volume.',
+    plate: {
+      volume: '{{value}} L',
+      size: '{{length}}×{{width}}×{{height}} cm',
+      since: 'desde {{date}}',
+      notMeasured: 'ainda não medido',
     },
     page: {
       back: 'Seus aquários',
@@ -150,7 +152,6 @@ export const ptBR: Messages = {
     },
     form: {
       newTitle: 'Novo aquário',
-      newLead: 'Um nome e o dia em que foi montado bastam. O resto pode esperar.',
       editTitle: 'Editar aquário',
       name: 'Nome',
       startDate: 'Data de início',

@@ -5,7 +5,7 @@ test.use({ locale: 'en-US' })
 
 async function keeperWithATank(page: Page) {
   await loggedInKeeper(page)
-  await page.getByRole('link', { name: 'Add your first tank' }).click()
+  await page.getByRole('link', { name: 'Start a new plate' }).click()
   await page.getByLabel('Name').fill('Water tests')
   await page.getByLabel('Start date').fill('2025-03-01')
   await page.getByRole('button', { name: 'Save tank' }).click()
@@ -75,6 +75,12 @@ test('a keeper records several measurements at once, sees the latest values, edi
   await expect(page.getByRole('heading', { name: 'Water tests' })).toBeVisible()
   await expect(figure(latestValues(page), '35')).toHaveCount(0)
   await expect(figure(latestValues(page), '20')).toBeVisible()
+
+  // The tank list shows the latest pH on the tank's plate; temperature and total ammonia were never measured.
+  await page.getByRole('link', { name: 'My tanks' }).click()
+  const plate = page.getByRole('link', { name: /Water tests/ })
+  await expect(plate).toContainText('7.1')
+  await expect(plate.getByText('not measured yet')).toHaveCount(2)
 })
 
 test('in Brazilian Portuguese the decimal comma is typed and shown, and the point is refused', async ({ page }) => {

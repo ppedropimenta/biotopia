@@ -85,6 +85,7 @@ export const ptBR: Messages = {
       title: 'Bem-vindo de volta',
       submit: 'Entrar',
       forgot: 'Esqueci a senha',
+      remember: 'Manter conectado',
       unconfirmed: 'Seu e-mail ainda não foi confirmado. Abra o link que enviamos ou peça um novo.',
     },
     forgot: {

@@ -6,7 +6,7 @@ export type AuthState = { status: 'loading' } | { status: 'out' } | { status: 'i
 
 export type Auth = {
   state: AuthState
-  logIn: (email: string, password: string) => Promise<void>
+  logIn: (email: string, password: string, remember: boolean) => Promise<void>
   logOut: () => Promise<void>
   /** Switches the app language and, when someone is logged in, saves it on their account. */
   chooseLanguage: (language: Language) => Promise<void>

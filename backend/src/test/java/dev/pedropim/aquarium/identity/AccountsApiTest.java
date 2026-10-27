@@ -213,6 +213,28 @@ class AccountsApiTest {
 	}
 
 	@Test
+	void notKeepingMeLoggedInGivesACookieThatDiesWithTheBrowser() {
+		confirmedAccount("en");
+
+		Response login = browser.post("/api/auth/login",
+				Map.of("email", email, "password", PASSWORD, "remember", false));
+
+		assertThat(login.status()).isEqualTo(200);
+		assertThat(browser.cookieMaxAge("JSESSIONID")).isEqualTo(-1);
+		assertThat(browser.get("/api/me").status()).isEqualTo(200);
+	}
+
+	@Test
+	void keepingMeLoggedInGivesTheThirtyDayCookie() {
+		confirmedAccount("en");
+
+		browser.post("/api/auth/login", Map.of("email", email, "password", PASSWORD, "remember", true));
+
+		assertThat(browser.cookieMaxAge("JSESSIONID")).isBetween(Duration.ofDays(30).toSeconds() - 60,
+				Duration.ofDays(30).toSeconds());
+	}
+
+	@Test
 	void loggingOutEndsTheSession() {
 		confirmedAccount("en");
 		logIn(email, PASSWORD);

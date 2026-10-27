@@ -29,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const logIn = useCallback(async (email: string, password: string) => {
-    const account = await api.logIn(email, password)
+  const logIn = useCallback(async (email: string, password: string, remember: boolean) => {
+    const account = await api.logIn(email, password, remember)
     restoreLanguage(account)
     setState({ status: 'in', account })
   }, [])

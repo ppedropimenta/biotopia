@@ -68,6 +68,32 @@ test('a visitor signs up, confirms the email and logs in', async ({ page }) => {
   await expect(page).toHaveURL(/\/login$/)
 })
 
+test('keep me logged in is ticked by default, and unticked it gives a session that ends with the browser', async ({
+  page,
+}) => {
+  const address = newAddress()
+  await signUp(page, address)
+  await page.goto(await confirmationLink(address))
+  await expect(page.getByRole('heading', { name: 'Email confirmed' })).toBeVisible()
+  await page.getByRole('link', { name: 'Log in' }).last().click()
+
+  const sessionCookie = async () => (await page.context().cookies()).find((c) => c.name === 'JSESSIONID')
+
+  // Left as it comes: the session cookie lasts, as a person on their own device expects.
+  await expect(page.getByLabel('Keep me logged in')).toBeChecked()
+  await logIn(page, address)
+  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+  expect((await sessionCookie())?.expires).toBeGreaterThan(Date.now() / 1000 + 29 * 24 * 3600)
+  await page.getByRole('navigation').getByRole('button', { name: 'Log out' }).click()
+
+  // Unticked, for a borrowed computer: a cookie with no expiry, which the browser drops when it closes.
+  await page.goto('/login')
+  await page.getByLabel('Keep me logged in').uncheck()
+  await logIn(page, address)
+  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+  expect((await sessionCookie())?.expires).toBe(-1)
+})
+
 test('the language chosen in the app is saved on the account and restored on login', async ({ page }) => {
   const address = newAddress()
   await signUp(page, address)

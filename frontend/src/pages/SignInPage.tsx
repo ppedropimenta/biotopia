@@ -80,6 +80,7 @@ function LogInForm() {
   const { logIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [unconfirmed, setUnconfirmed] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -90,7 +91,7 @@ function LogInForm() {
     setErrors({})
     setUnconfirmed(false)
     try {
-      await logIn(email, password)
+      await logIn(email, password, remember)
     } catch (error) {
       if (error instanceof ApiError && error.code === 'email_not_confirmed') setUnconfirmed(true)
       else setErrors(describeError(error, 'login'))
@@ -124,6 +125,15 @@ function LogInForm() {
             {t('auth.login.forgot')}
           </Link>
         </div>
+        <label className="flex min-h-11 items-center gap-2.5 text-base">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(event) => setRemember(event.target.checked)}
+            className="size-[18px] accent-ink"
+          />
+          {t('auth.login.remember')}
+        </label>
         {errors.general && <FormError>{t(errors.general)}</FormError>}
         <Button type="submit" size="lg" disabled={submitting} className="w-full">
           {submitting ? t('auth.working') : t('auth.login.submit')}

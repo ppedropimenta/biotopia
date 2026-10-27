@@ -1,8 +1,10 @@
 package dev.pedropim.aquarium.identity;
 
 import java.time.Clock;
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +30,8 @@ import jakarta.validation.constraints.Pattern;
 
 @RestController
 class SessionController {
+
+	private static final String EXPIRY_ATTRIBUTES = "(?i);\\s*(?:Max-Age|Expires)=[^;]*";
 
 	private final AuthenticationManager authenticationManager;
 
@@ -73,8 +77,27 @@ class SessionController {
 				account.getAuthorities()));
 		SecurityContextHolder.setContext(context);
 		securityContextRepository.saveContext(context, httpRequest, httpResponse);
+		if (!request.keepLoggedIn()) {
+			makeSessionCookieEndWithTheBrowser(httpResponse);
+		}
 
 		return view(account.id());
+	}
+
+	// The container adds the 30-day Max-Age and Expires from application.properties when it creates the session
+	// cookie, and it has no per-session setting. Taking both attributes out of the header turns it into a
+	// session cookie, which the browser drops when it closes.
+	private static void makeSessionCookieEndWithTheBrowser(HttpServletResponse response) {
+		List<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE)
+			.stream()
+			.map(header -> header.startsWith("JSESSIONID=") ? header.replaceAll(EXPIRY_ATTRIBUTES, "") : header)
+			.toList();
+		if (headers.isEmpty()) {
+			return;
+		}
+		// setHeader replaces every Set-Cookie header, so the first one starts the list again.
+		response.setHeader(HttpHeaders.SET_COOKIE, headers.getFirst());
+		headers.stream().skip(1).forEach(header -> response.addHeader(HttpHeaders.SET_COOKIE, header));
 	}
 
 	@GetMapping("/api/me")
@@ -93,7 +116,14 @@ class SessionController {
 		return new AccountView(user.email(), user.language().code());
 	}
 
-	record LoginRequest(@NotBlank(message = "invalid") String email, @NotBlank(message = "invalid") String password) {
+	/** {@code remember} is optional: callers that do not send it get the 30-day session as before. */
+	record LoginRequest(@NotBlank(message = "invalid") String email, @NotBlank(message = "invalid") String password,
+			Boolean remember) {
+
+		boolean keepLoggedIn() {
+			return remember == null || remember;
+		}
+
 	}
 
 	record LanguageRequest(@Pattern(regexp = "en|pt-BR", message = "unsupported") String language) {

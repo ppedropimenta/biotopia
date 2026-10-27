@@ -83,6 +83,7 @@ export const en = {
       title: 'Welcome back',
       submit: 'Log in',
       forgot: 'Forgot my password',
+      remember: 'Keep me logged in',
       unconfirmed: 'Your email is not confirmed yet. Open the link we sent you, or ask for a new one.',
     },
     forgot: {

@@ -72,7 +72,9 @@ export const api = {
   forgotPassword: (email: string) => request<void>('POST', '/api/auth/forgot-password', { email }),
   resetPassword: (token: string, password: string) =>
     request<void>('POST', '/api/auth/reset-password', { token, password }),
-  logIn: (email: string, password: string) => request<Account>('POST', '/api/auth/login', { email, password }),
+  /** `remember` false makes the session end when the browser closes, instead of lasting 30 days. */
+  logIn: (email: string, password: string, remember: boolean) =>
+    request<Account>('POST', '/api/auth/login', { email, password, remember }),
   logOut: () => request<void>('POST', '/api/auth/logout'),
   tanks: () => request<Tank[]>('GET', '/api/tanks'),
   tank: (id: string) => request<Tank>('GET', `/api/tanks/${id}`),

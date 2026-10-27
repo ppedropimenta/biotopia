@@ -8,6 +8,7 @@
 import tankBlackwater from '../assets/illustrations/tanks/blackwater.svg'
 import cardinal from '../assets/illustrations/fish/cardinal.svg'
 import discus from '../assets/illustrations/fish/discus.svg'
+import vitoriaRegia from '../assets/illustrations/plants/vitoria-regia.svg'
 
 export type Art = { src: string; width: number; height: number }
 
@@ -19,6 +20,11 @@ export const fishArt = {
   'symphysodon-aequifasciatus': art(discus, 380, 330),
 } as const
 
+/** Plants, by the slug of the scientific name. */
+export const plantArt = {
+  'victoria-amazonica': art(vitoriaRegia, 520, 250),
+} as const
+
 /** Tank drawings, used until a tank has photos. */
 export const tankArt = {
   blackwater: art(tankBlackwater, 540, 360),
@@ -26,6 +32,6 @@ export const tankArt = {
 
 /** Looks a slug up in every group; undefined when there is no drawing (show the FishPlaceholder). */
 export function findArt(slug: string): Art | undefined {
-  const all: Record<string, Art> = { ...fishArt, ...tankArt }
+  const all: Record<string, Art> = { ...fishArt, ...plantArt, ...tankArt }
   return all[slug]
 }

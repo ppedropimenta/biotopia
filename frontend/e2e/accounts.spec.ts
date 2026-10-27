@@ -24,12 +24,28 @@ async function logIn(page: Page, address: string) {
   await page.getByRole('button', { name: 'Log in' }).click()
 }
 
+test('log in and sign up are one screen, and the switch moves the address', async ({ page }) => {
+  await page.goto('/signup')
+  await expect(page.getByRole('button', { name: 'Create account' })).toBeVisible()
+  // "Forgot my password" belongs to the log in side only.
+  await expect(page.getByRole('link', { name: 'Forgot my password' })).toHaveCount(0)
+
+  await page.getByRole('link', { name: 'Log in' }).click()
+  await expect(page).toHaveURL(/\/login$/)
+  await expect(page.getByRole('button', { name: 'Log in' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Forgot my password' })).toBeVisible()
+
+  await page.getByRole('link', { name: 'Create account' }).click()
+  await expect(page).toHaveURL(/\/signup$/)
+  await expect(page.getByRole('button', { name: 'Create account' })).toBeVisible()
+})
+
 test('a visitor signs up, confirms the email and logs in', async ({ page }) => {
   const address = newAddress()
   await signUp(page, address)
 
   // Before confirming, login is refused with a reason and a way to get the link again.
-  await page.getByRole('banner').getByRole('link', { name: 'Log in' }).click()
+  await page.getByRole('link', { name: 'Log in' }).click()
   await logIn(page, address)
   await expect(page.getByText('Your email is not confirmed yet')).toBeVisible()
   await page.getByRole('button', { name: 'Send the link again' }).click()
@@ -81,7 +97,9 @@ test('someone who forgot the password gets a link, sets a new one, and the link 
   await expect(page.getByRole('heading', { name: 'Email confirmed' })).toBeVisible()
 
   await page.goto('/login')
-  await page.getByRole('link', { name: 'Forgot your password?' }).click()
+  await page.getByRole('link', { name: 'Forgot my password' }).click()
+  // The log in page has an Email field too, so wait for the new page before typing into it.
+  await expect(page.getByRole('heading', { name: 'Forgot your password?' })).toBeVisible()
   await page.getByLabel('Email').fill(address)
   await page.getByRole('button', { name: 'Send the link' }).click()
   await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible()

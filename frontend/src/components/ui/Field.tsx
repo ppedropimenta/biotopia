@@ -2,19 +2,25 @@ import { useId, useState, type ComponentProps, type ReactNode } from 'react'
 import { cx } from '../../lib/cx'
 import { formatNumber, parseNumber } from '../../tanks/numbers'
 import { useLanguage } from '../../tanks/useLanguage'
+import { Icon } from './Icon'
 
 const labelClasses = 'font-mono text-[0.71875rem] tracking-[0.12em] text-ink-muted uppercase'
 
-/** An underlined field, like a notebook line. A mono label on top; an optional unit on the right. */
+/**
+ * An underlined field, like a notebook line. A mono label on top; an optional unit on the right. An `error`
+ * (already in the chosen language) replaces the hint, with a mark and words, so colour is not the only signal.
+ */
 export function TextField({
   label,
   unit,
   hint,
+  error,
   className,
   inputClassName,
   ...input
-}: { label: string; unit?: string; hint?: ReactNode; inputClassName?: string } & ComponentProps<'input'>) {
+}: { label: string; unit?: string; hint?: ReactNode; error?: string; inputClassName?: string } & ComponentProps<'input'>) {
   const id = useId()
+  const noteId = `${id}-note`
   return (
     <div className={cx('flex flex-col gap-1', className)}>
       <label htmlFor={id} className={labelClasses}>
@@ -23,6 +29,8 @@ export function TextField({
       <span className="flex items-baseline gap-1 border-b-[1.5px] border-ink">
         <input
           id={id}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error || hint ? noteId : undefined}
           className={cx(
             'min-h-11 w-full min-w-0 border-0 bg-transparent px-0.5 font-serif text-xl text-ink placeholder:text-ink-muted/70',
             inputClassName,
@@ -31,7 +39,18 @@ export function TextField({
         />
         {unit && <span className="font-mono text-xs">{unit}</span>}
       </span>
-      {hint && <span className="font-mono text-xs text-ink-muted">{hint}</span>}
+      {error ? (
+        <span id={noteId} role="alert" className="flex items-center gap-2 font-mono text-xs text-cardinal">
+          <Icon name="warning" size={16} strokeWidth={2} />
+          {error}
+        </span>
+      ) : (
+        hint && (
+          <span id={noteId} className="font-mono text-xs text-ink-muted">
+            {hint}
+          </span>
+        )
+      )}
     </div>
   )
 }

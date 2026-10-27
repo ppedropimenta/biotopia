@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { api } from '../auth/api'
 import { AuthScreen } from '../auth/AuthScreen'
-import { fieldButton } from '../auth/classes'
-import { pictures } from '../credits'
+import { ButtonLink } from '../components/ui/Button'
 
 type Outcome = 'working' | 'done' | 'failed'
 
@@ -38,15 +37,11 @@ export function ConfirmPage() {
     <AuthScreen
       title={titles[outcome]}
       lead={outcome === 'done' ? t('auth.confirm.doneText') : outcome === 'failed' ? t('auth.confirm.failedText') : undefined}
-      picture={pictures.igapo}
-      pictureAlt={t('home.notes.igapoAlt')}
-      pictureCaption={t('home.notes.igapoCaption')}
-      pictureFocus="50% 70%"
     >
       {outcome !== 'working' && (
-        <Link to="/login" className={fieldButton}>
+        <ButtonLink to="/login" size="lg" className="w-full">
           {t('nav.login')}
-        </Link>
+        </ButtonLink>
       )}
     </AuthScreen>
   )

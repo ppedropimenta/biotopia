@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { ApiError, api } from '../auth/api'
 import { AuthScreen } from '../auth/AuthScreen'
-import { fieldButton } from '../auth/classes'
 import { describeError, type FormErrors } from '../auth/errors'
-import { Field } from '../auth/Field'
-import { pictures } from '../credits'
+import { FormError } from '../auth/FormError'
+import { Button, ButtonLink } from '../components/ui/Button'
+import { TextField } from '../components/ui/Field'
 
 type Outcome = 'asking' | 'done' | 'failed'
 
@@ -36,55 +36,43 @@ export function ResetPasswordPage() {
     }
   }
 
-  const picture = {
-    picture: pictures.igapo,
-    pictureAlt: t('home.notes.igapoAlt'),
-    pictureCaption: t('home.notes.igapoCaption'),
-    pictureFocus: '50% 70%',
-  }
-
   if (outcome === 'done') {
     return (
-      <AuthScreen title={t('auth.reset.doneTitle')} lead={t('auth.reset.doneText')} {...picture}>
-        <Link to="/login" className={fieldButton}>
+      <AuthScreen title={t('auth.reset.doneTitle')} lead={t('auth.reset.doneText')}>
+        <ButtonLink to="/login" size="lg" className="w-full">
           {t('nav.login')}
-        </Link>
+        </ButtonLink>
       </AuthScreen>
     )
   }
 
   if (outcome === 'failed') {
     return (
-      <AuthScreen title={t('auth.reset.failedTitle')} lead={t('auth.reset.failedText')} {...picture}>
-        <Link to="/forgot-password" className={fieldButton}>
+      <AuthScreen title={t('auth.reset.failedTitle')} lead={t('auth.reset.failedText')}>
+        <ButtonLink to="/forgot-password" size="lg" className="w-full">
           {t('auth.reset.askAgain')}
-        </Link>
+        </ButtonLink>
       </AuthScreen>
     )
   }
 
   return (
-    <AuthScreen title={t('auth.reset.title')} lead={t('auth.reset.lead')} {...picture}>
-      <form onSubmit={submit} noValidate className="grid gap-6">
-        <Field
-          id="password"
-          type="password"
-          name="password"
-          autoComplete="new-password"
+    <AuthScreen title={t('auth.reset.title')} lead={t('auth.reset.lead')}>
+      <form onSubmit={submit} noValidate aria-busy={submitting} className="flex flex-col gap-5.5">
+        <TextField
           label={t('auth.password')}
+          name="password"
+          type="password"
+          autoComplete="new-password"
           hint={t('auth.signup.passwordHint')}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           error={errors.password && t(errors.password)}
         />
-        {errors.general && (
-          <p role="alert" className="text-[15px] text-neon-red">
-            {t(errors.general)}
-          </p>
-        )}
-        <button type="submit" disabled={submitting} className={fieldButton}>
+        {errors.general && <FormError>{t(errors.general)}</FormError>}
+        <Button type="submit" size="lg" disabled={submitting} className="w-full">
           {submitting ? t('auth.working') : t('auth.reset.submit')}
-        </button>
+        </Button>
       </form>
     </AuthScreen>
   )

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '../components/ui/Button'
 import { api } from './api'
-import { fieldButton } from './classes'
 
 /** Asks for the confirmation link again. The answer never says whether the address has an account. */
 export function ResendLink({ email }: { email: string }) {
@@ -20,12 +20,12 @@ export function ResendLink({ email }: { email: string }) {
 
   return (
     <div>
-      <button type="button" onClick={resend} disabled={state === 'sending'} className={fieldButton}>
+      <Button onClick={resend} disabled={state === 'sending'}>
         {t('auth.sent.resend')}
-      </button>
-      <p role="status" className="mt-3 text-[15px] text-on-tannin-muted">
+      </Button>
+      <p role="status" className="mt-3 font-mono text-xs text-ink-muted">
         {state === 'sent' && t('auth.sent.resent')}
-        {state === 'failed' && <span className="text-neon-red">{t('auth.errors.generic')}</span>}
+        {state === 'failed' && <span className="text-cardinal">{t('auth.errors.generic')}</span>}
       </p>
     </div>
   )

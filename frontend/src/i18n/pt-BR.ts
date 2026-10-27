@@ -14,12 +14,12 @@ export const ptBR: Messages = {
       logOut: 'Sair',
       credits: 'Créditos',
     },
+    plate: { plate: 'Prancha', fig: 'Fig.' },
     skip: 'Pular para o conteúdo',
     breadcrumb: 'Trilha',
   },
   nav: {
     login: 'Entrar',
-    signup: 'Criar conta',
   },
   home: {
     title: 'O diário do seu aquário',
@@ -63,14 +63,17 @@ export const ptBR: Messages = {
     email: 'E-mail',
     password: 'Senha',
     working: 'Um instante…',
+    tabs: { label: 'Entrar ou criar uma conta', login: 'Entrar', signup: 'Criar conta' },
+    frame: {
+      tagline: 'Cada medição, cada aquário —',
+      taglineEmphasis: 'no mesmo caderno.',
+      habitat: 'várzea',
+      privacy: 'Seus registros são só seus.',
+    },
     signup: {
       title: 'Comece o seu diário',
-      lead: 'Uma conta mantém seus aquários privados, e iguais em todos os aparelhos.',
       passwordHint: 'Pelo menos 8 caracteres.',
       submit: 'Criar conta',
-      haveAccount: 'Já tem conta?',
-      photoAlt: 'Um neon, com a faixa azul sobre o vermelho, entre plantas verdes',
-      photoCaption: 'Paracheirodon innesi, o neon',
     },
     sent: {
       title: 'Veja seu e-mail',
@@ -80,13 +83,9 @@ export const ptBR: Messages = {
     },
     login: {
       title: 'Bem-vindo de volta',
-      lead: 'Entre para ver seus aquários.',
       submit: 'Entrar',
-      forgot: 'Esqueceu a senha?',
-      noAccount: 'Ainda não tem conta?',
+      forgot: 'Esqueci a senha',
       unconfirmed: 'Seu e-mail ainda não foi confirmado. Abra o link que enviamos ou peça um novo.',
-      photoAlt: 'Água preta, cor de chá, correndo sobre pedra lisa, com a mata na outra margem',
-      photoCaption: 'Água preta sobre a pedra. Cachoeira das Lajes, Amazonas',
     },
     forgot: {
       title: 'Esqueceu a senha?',

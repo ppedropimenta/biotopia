@@ -12,12 +12,12 @@ export const en = {
       logOut: 'Log out',
       credits: 'Credits',
     },
+    plate: { plate: 'Plate', fig: 'Fig.' },
     skip: 'Skip to content',
     breadcrumb: 'Breadcrumb',
   },
   nav: {
     login: 'Log in',
-    signup: 'Sign up',
   },
   home: {
     title: 'Your aquarium’s logbook',
@@ -61,14 +61,17 @@ export const en = {
     email: 'Email',
     password: 'Password',
     working: 'One moment…',
+    tabs: { label: 'Log in or create an account', login: 'Log in', signup: 'Create account' },
+    frame: {
+      tagline: 'Every measurement, every tank —',
+      taglineEmphasis: 'in the same notebook.',
+      habitat: 'floodplain',
+      privacy: 'Your records are yours alone.',
+    },
     signup: {
       title: 'Start your logbook',
-      lead: 'An account keeps your tanks private, and the same on every device.',
       passwordHint: 'At least 8 characters.',
       submit: 'Create account',
-      haveAccount: 'Already have an account?',
-      photoAlt: 'A neon tetra, blue stripe over red, among green plants',
-      photoCaption: 'Paracheirodon innesi, the neon tetra',
     },
     sent: {
       title: 'Check your email',
@@ -78,13 +81,9 @@ export const en = {
     },
     login: {
       title: 'Welcome back',
-      lead: 'Log in to your tanks.',
       submit: 'Log in',
-      forgot: 'Forgot your password?',
-      noAccount: 'No account yet?',
+      forgot: 'Forgot my password',
       unconfirmed: 'Your email is not confirmed yet. Open the link we sent you, or ask for a new one.',
-      photoAlt: 'Tea-coloured blackwater running over flat rock, with forest on the far bank',
-      photoCaption: 'Blackwater over rock. Cachoeira das Lajes, Amazonas',
     },
     forgot: {
       title: 'Forgot your password?',

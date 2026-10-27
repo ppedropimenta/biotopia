@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Measurement, ParameterCode } from './measurements'
-import { plateValues } from './plates'
+import { plateNumber, plateValues } from './plates'
 
 const measurement = (parameter: ParameterCode, value: number): Measurement => ({
   id: `${parameter}-1`,
@@ -35,5 +35,18 @@ describe('plateValues', () => {
 
   it('keeps a measured 0 as 0', () => {
     expect(plateValues([measurement('total_ammonia', 0)]).map((v) => v.value)).toEqual([null, null, 0])
+  })
+})
+
+describe('plateNumber', () => {
+  const tanks = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+
+  it('is the tank’s place in the creation-ordered list, counting from 1', () => {
+    expect(plateNumber(tanks, 'a')).toBe(1)
+    expect(plateNumber(tanks, 'c')).toBe(3)
+  })
+
+  it('is null for a tank that is not in the list', () => {
+    expect(plateNumber(tanks, 'z')).toBeNull()
   })
 })

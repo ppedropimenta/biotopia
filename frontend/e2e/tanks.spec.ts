@@ -22,11 +22,15 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await page.getByRole('button', { name: 'Save tank' }).click()
 
   await expect(page.getByRole('heading', { name: 'Blackwater 120' })).toBeVisible()
-  await expect(page.getByText('Since March 1, 2025')).toBeVisible()
+  await expect(page.getByText('March 1, 2025')).toBeVisible()
+  await expect(page.getByText('98.5 L')).toBeVisible()
   await expect(page.getByText('Peat filter')).toBeVisible()
+  // The plate says which one it is and how long the tank has been running, from the start date.
+  await expect(page.getByRole('figure')).toContainText('Plate I')
+  await expect(page.getByRole('figure')).toContainText(/\d+ weeks running/)
 
   // The list shows the tank, with its Net Volume as the figure.
-  await page.getByRole('link', { name: 'My tanks' }).click()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My tanks' }).click()
   const card = page.getByRole('link', { name: /Blackwater 120/ })
   await expect(card).toContainText('98.5')
   await expect(card).toContainText('Plate I')
@@ -40,7 +44,7 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
 
   // Editing shows the number the way it is typed in this language, and refuses the other notation.
   await card.click()
-  await page.getByRole('link', { name: 'Editar aquário' }).click()
+  await page.getByRole('link', { name: 'Editar', exact: true }).click()
   await expect(page.getByLabel('Volume líquido (litros)')).toHaveValue('98,5')
   await page.getByLabel('Volume líquido (litros)').fill('101.5')
   await page.getByRole('button', { name: 'Salvar aquário' }).click()
@@ -51,7 +55,8 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await page.getByRole('button', { name: 'Salvar aquário' }).click()
   await expect(page.getByRole('heading', { name: 'Blackwater 125' })).toBeVisible()
   await expect(page.getByText('101,5')).toBeVisible()
-  await expect(page.getByText('Desde 1 de março de 2025')).toBeVisible()
+  await expect(page.getByText('1 de março de 2025')).toBeVisible()
+  await expect(page.getByRole('figure')).toContainText(/Montado há \d+ semanas/)
 })
 
 test('someone else’s tank looks like a tank that does not exist', async ({ page, browser }) => {

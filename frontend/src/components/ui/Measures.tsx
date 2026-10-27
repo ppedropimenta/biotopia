@@ -116,6 +116,7 @@ export function ParamTile({
   scale,
   rulerValue,
   rulerLabel,
+  note,
   className,
 }: {
   name: string
@@ -127,6 +128,8 @@ export function ParamTile({
   /** The plain number, for the position of the triangle on the ruler. */
   rulerValue?: number
   rulerLabel: string
+  /** A line under the ruler, such as when it was measured. */
+  note?: string
   className?: string
 }) {
   return (
@@ -134,8 +137,11 @@ export function ParamTile({
       <div className="flex justify-between gap-2 font-mono text-[0.71875rem] text-ink-muted">
         <span>{name}</span>
         {change && (
-          <span aria-label={change.label}>
-            {change.symbol} {change.text}
+          <span>
+            <span aria-hidden="true">
+              {change.symbol} {change.text}
+            </span>
+            <span className="sr-only">{change.label}</span>
           </span>
         )}
       </div>
@@ -144,6 +150,7 @@ export function ParamTile({
         {unit && <span className="font-mono text-[0.8125rem]">{unit}</span>}
       </div>
       <RangeRuler scale={scale} value={rulerValue} ariaLabel={rulerLabel} />
+      {note && <span className="font-mono text-[0.71875rem] text-ink-muted">{note}</span>}
     </div>
   )
 }

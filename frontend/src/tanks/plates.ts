@@ -12,3 +12,9 @@ export function plateValues(latest: Measurement[]): PlateValue[] {
     value: latest.find((measurement) => measurement.parameter === parameter)?.value ?? null,
   }))
 }
+
+/** A tank's plate number: its place in the list the API gives, which is by creation, counting from 1. */
+export function plateNumber(tanks: readonly { id: string }[], id: string): number | null {
+  const index = tanks.findIndex((tank) => tank.id === id)
+  return index === -1 ? null : index + 1
+}

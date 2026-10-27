@@ -1,104 +1,123 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { api } from '../auth/api'
-import { paperButton } from '../auth/classes'
-import { formatDay } from '../tanks/dates'
+import { Illustration } from '../components/ui/Brand'
+import { ButtonLink } from '../components/ui/Button'
+import { Handwritten } from '../components/ui/Paper'
+import { PlateCorners } from '../components/ui/Plate'
+import { plateClasses } from '../components/ui/plateClasses'
+import { Breadcrumbs } from '../components/ui/Structure'
+import { roman } from '../lib/roman'
+import { formatDay, weeksRunning } from '../tanks/dates'
 import { LoadError } from '../tanks/LoadError'
 import { MeasurementSections } from '../tanks/MeasurementSections'
 import { formatNumber } from '../tanks/numbers'
+import { plateNumber } from '../tanks/plates'
+import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 
-/** One tank. For now it shows the details; the logbook grows on this page in the next tickets. */
+/** One tank as its page in the notebook: the drawn plate with the record card, then its water. */
 export function TankPage() {
   const { t } = useTranslation()
-  const language = useLanguage()
   const { id = '' } = useParams()
-  const tank = useLoad(() => api.tank(id), id)
+  // The tanks list is only for the plate number: the API lists them by creation, which is the order of the plates.
+  const loaded = useLoad(async () => {
+    const [tank, tanks] = await Promise.all([api.tank(id), api.tanks()])
+    return { tank, tanks, today: new Date() }
+  }, id)
 
-  if (tank.status === 'loading') return null
-  if (tank.status === 'error') {
+  if (loaded.status === 'loading') return null
+  if (loaded.status === 'error') {
     return (
-      <div className="px-5 pt-10 pb-24 sm:px-8 lg:pt-16">
-        <BackLink />
-        <div className="mt-8">
-          <LoadError error={tank.error} />
-        </div>
-      </div>
+      <>
+        <Breadcrumbs items={[{ label: t('ui.nav.myTanks'), to: '/tanks' }]} />
+        <LoadError error={loaded.error} />
+      </>
     )
   }
 
-  const { data } = tank
-  const figure = (value: number | null, unit: string) =>
-    value === null ? (
-      <span className="font-display text-[30px] text-on-tannin-muted">—</span>
-    ) : (
-      <>
-        <span className="font-display text-[clamp(40px,5vw,64px)] leading-none text-neon-glow tabular-nums">
-          {formatNumber(value, language)}
-        </span>{' '}
-        <span className="text-[15px] text-on-tannin-muted">{unit}</span>
-      </>
-    )
-
+  const { tank, tanks, today } = loaded.data
   return (
     <>
-      <div className="px-5 pt-10 pb-14 sm:px-8 lg:pt-16">
-        <BackLink />
-        <div className="rise mt-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
-          <div>
-            <h1 className="font-display text-[clamp(40px,7vw,104px)] leading-[0.95] tracking-[-0.02em] [overflow-wrap:anywhere]">
-              {data.name}
-            </h1>
-            <p className="mt-4 text-[18px]">{t('tanks.since', { date: formatDay(data.startDate, language) })}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link to={`/tanks/${data.id}/edit`} className="underline underline-offset-4 hover:text-muted">
-              {t('tanks.page.edit')}
-            </Link>
-            <Link to={`/tanks/${data.id}/measure`} className={paperButton}>
-              {t('measurements.record')}
-            </Link>
-          </div>
+      <header className="flex flex-col gap-4.5">
+        <Breadcrumbs items={[{ label: t('ui.nav.myTanks'), to: '/tanks' }, { label: tank.name }]} />
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-center gap-8">
+          <TankPlate tank={tank} number={plateNumber(tanks, tank.id)} today={today} />
+          <RecordCard tank={tank} />
         </div>
-      </div>
-
-      <MeasurementSections tankId={data.id} />
-
-      <section className="mb-16 bg-tannin px-5 py-14 text-on-tannin sm:px-8 lg:mb-24 lg:py-20">
-        <h2 className="rise font-display text-[30px] italic">{t('tanks.page.details')}</h2>
-        <dl className="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          <Detail label={t('tanks.netVolume')}>{figure(data.netVolumeLiters, t('tanks.liters'))}</Detail>
-          <Detail label={t('tanks.page.length')}>{figure(data.lengthCm, t('tanks.page.cm'))}</Detail>
-          <Detail label={t('tanks.page.width')}>{figure(data.widthCm, t('tanks.page.cm'))}</Detail>
-          <Detail label={t('tanks.page.height')}>{figure(data.heightCm, t('tanks.page.cm'))}</Detail>
-        </dl>
-        {data.note && (
-          <div className="mt-12 max-w-[60ch]">
-            <h3 className="text-[15px] text-on-tannin-muted">{t('tanks.page.note')}</h3>
-            <p className="mt-2 text-[18px] leading-relaxed whitespace-pre-line [overflow-wrap:anywhere]">{data.note}</p>
-          </div>
-        )}
-      </section>
+      </header>
+      <MeasurementSections tankId={tank.id} />
     </>
   )
 }
 
-function Detail({ label, children }: { label: string; children: ReactNode }) {
+/** The drawn tank. Its corners say the plate number and how long the tank has been running. */
+function TankPlate({ tank, number, today }: { tank: Tank; number: number | null; today: Date }) {
+  const { t } = useTranslation()
+  const corners = [
+    number !== null && `${t('ui.plate.plate')} ${roman(number)}`,
+    t('tanks.page.weeks', { count: weeksRunning(tank.startDate, today) }),
+  ].filter((corner) => corner !== false)
   return (
-    <div className="rise">
-      <dt className="text-[15px] text-on-tannin-muted">{label}</dt>
-      <dd className="mt-2">{children}</dd>
+    <figure className={`${plateClasses('md')} m-0`}>
+      <PlateCorners items={corners} />
+      <Illustration slug="blackwater" decorative className="mt-1.5" />
+    </figure>
+  )
+}
+
+/** The tank's own facts, and the two things to do with it. A fact the keeper left out is not shown. */
+function RecordCard({ tank }: { tank: Tank }) {
+  const { t } = useTranslation()
+  const language = useLanguage()
+  const missing = '—'
+  const sizes = [tank.lengthCm, tank.widthCm, tank.heightCm]
+  const size = (value: number | null) => (value === null ? missing : formatNumber(value, language))
+  const facts: Array<[label: string, value: string]> = []
+  if (tank.netVolumeLiters !== null) {
+    facts.push([t('tanks.netVolume'), `${formatNumber(tank.netVolumeLiters, language)} L`])
+  }
+  if (sizes.some((value) => value !== null)) {
+    facts.push([t('tanks.page.dimensions'), t('tanks.plate.size', { length: size(sizes[0]), width: size(sizes[1]), height: size(sizes[2]) })])
+  }
+  facts.push([t('tanks.form.startDate'), formatDay(tank.startDate, language)])
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h1 className="m-0 text-[3.375rem] leading-none font-normal tracking-[-0.015em] [overflow-wrap:anywhere]">{tank.name}</h1>
+      <dl className="m-0 grid grid-cols-[max-content_1fr] gap-x-4.5 gap-y-1.5 border-t border-ink/35 pt-3 text-base">
+        {facts.map(([label, value]) => (
+          <Fact key={label} label={label}>
+            {value}
+          </Fact>
+        ))}
+        {tank.note && (
+          <Fact label={t('tanks.page.note')}>
+            <Handwritten as="p" className="m-0 whitespace-pre-line [overflow-wrap:anywhere]">
+              {tank.note}
+            </Handwritten>
+          </Fact>
+        )}
+      </dl>
+      <div className="flex flex-wrap gap-2.5">
+        <ButtonLink to={`/tanks/${tank.id}/measure`} icon="plus" aria-label={t('tanks.page.addMeasurement')}>
+          {t('tanks.page.measurement')}
+        </ButtonLink>
+        <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
+          {t('tanks.page.edit')}
+        </ButtonLink>
+      </div>
     </div>
   )
 }
 
-function BackLink() {
-  const { t } = useTranslation()
+function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <Link to="/tanks" className="rise text-[15px] underline underline-offset-4 hover:text-muted">
-      ← {t('tanks.page.back')}
-    </Link>
+    <div className="contents">
+      <dt className="pt-0.5 font-mono text-xs tracking-[0.1em] text-ink-muted uppercase">{label}</dt>
+      <dd className="m-0">{children}</dd>
+    </div>
   )
 }

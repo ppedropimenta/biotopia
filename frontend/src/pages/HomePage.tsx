@@ -67,7 +67,7 @@ export function HomePage() {
                   key={key}
                   className={`rise grid gap-x-8 gap-y-2 px-5 py-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:px-8 ${rowTones[index]}`}
                 >
-                  <p className="font-display text-[clamp(56px,5.4vw,88px)] leading-[0.9] tracking-[-0.03em] text-neon">
+                  <p className="font-display text-[clamp(56px,5.4vw,88px)] leading-[0.9] tracking-[-0.03em] text-neon-glow">
                     {t(`home.logged.${key}.figure`)}
                   </p>
                   <div>

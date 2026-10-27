@@ -1,18 +1,25 @@
 import type { Messages } from './en'
 
 export const ptBR: Messages = {
-  app: {
-    name: 'aquarium',
+  ui: {
+    brand: { name: 'Biotopia', tagline: 'Caderno de aquário' },
+    language: { label: 'Idioma' },
+    nav: {
+      label: 'Navegação principal',
+      menu: 'Menu',
+      myTanks: 'Meus aquários',
+      overview: 'Visão geral',
+      logMeasurement: 'Registrar medição',
+      logIn: 'Entrar',
+      logOut: 'Sair',
+      credits: 'Créditos',
+    },
+    skip: 'Pular para o conteúdo',
+    breadcrumb: 'Trilha',
   },
   nav: {
-    credits: 'Créditos',
     login: 'Entrar',
     signup: 'Criar conta',
-    logout: 'Sair',
-    tanks: 'Seus aquários',
-  },
-  language: {
-    label: 'Idioma',
   },
   home: {
     title: 'O diário do seu aquário',

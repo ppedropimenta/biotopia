@@ -1,52 +1,39 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/instrument-sans/wght.css';
-@import '@fontsource-variable/newsreader/opsz.css';
-@import '@fontsource-variable/newsreader/opsz-italic.css';
+@import './styles/biotopia.css';
 
 /*
- * Colour and type for the whole app. Components use these through Tailwind classes
- * (bg-paper, text-muted, font-display...), never raw values.
- *
- * Two worlds side by side: an old naturalist's notebook (aged paper, brown ink, a plate) and a
- * blackwater river (tea-dark fields, the neon tetra's blue on the figures). No shadows, no
- * gradients; surfaces change by tone.
+ * Tokens of the look before the Biotopia redesign. The pages that were not redesigned yet still use
+ * them, so they stay until ticket 08 of the redesign removes the last user. Where a name is also in
+ * the Biotopia theme (paper, ink), the theme wins; the old neon moved to neon-glow. The old fonts are
+ * mapped to Fraunces, so these pages keep working without the old font packages.
  */
 @theme {
-  --color-paper: #ece6d6;
   --color-paper-deep: #e2dac5;
-  --color-ink: #24170e;
   --color-muted: #5c4a3a;
   --color-tannin: #24130a;
   --color-tannin-2: #301a0d;
   --color-tannin-3: #3d2211;
   --color-on-tannin: #f3e6cc;
   --color-on-tannin-muted: #cdb491;
-  --color-neon: #3fe0e6;
+  --color-neon-glow: #3fe0e6;
   --color-neon-red: #ff5a47;
   --color-positive: #2e6b3a;
   --color-negative: #a8321f;
   --color-warning: #8a5a0b;
 
-  --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
-  --font-display: 'Newsreader Variable', Georgia, serif;
+  --font-sans: var(--font-serif);
+  --font-display: var(--font-serif);
 }
 
 @layer base {
-  html {
-    background: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
-
   :focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 3px;
   }
 
   ::selection {
-    background: var(--color-neon);
-    color: var(--color-tannin);
+    background: var(--color-amber);
+    color: var(--color-blackwater);
   }
 }
 

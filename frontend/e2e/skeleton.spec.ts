@@ -6,9 +6,11 @@ test('a visitor switches to Portuguese and opens the credits page', async ({ pag
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Your aquarium’s logbook' })).toBeVisible()
 
-  await page.getByLabel('Language').selectOption('pt-BR')
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'O diário do seu aquário' })).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
+  await expect(page.getByRole('button', { name: 'PT', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('button', { name: 'EN', exact: true })).toHaveAttribute('aria-pressed', 'false')
 
   await page.getByRole('contentinfo').getByRole('link', { name: 'Créditos e licenças' }).click()
   await expect(page).toHaveURL(/\/credits$/)

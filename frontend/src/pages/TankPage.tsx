@@ -35,7 +35,7 @@ export function TankPage() {
       <span className="font-display text-[30px] text-on-tannin-muted">—</span>
     ) : (
       <>
-        <span className="font-display text-[clamp(40px,5vw,64px)] leading-none text-neon tabular-nums">
+        <span className="font-display text-[clamp(40px,5vw,64px)] leading-none text-neon-glow tabular-nums">
           {formatNumber(value, language)}
         </span>{' '}
         <span className="text-[15px] text-on-tannin-muted">{unit}</span>

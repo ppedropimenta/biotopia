@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthProvider'
 import { RequireAuth } from './auth/RequireAuth'
@@ -15,11 +16,20 @@ import { TankFormPage } from './pages/TankFormPage'
 import { TankPage } from './pages/TankPage'
 import { TanksPage } from './pages/TanksPage'
 
+// The component showcase exists only in development builds: in a production build this is null and the
+// import below is dropped with it.
+const KitPage = import.meta.env.DEV ? lazy(() => import('./dev/KitPage')) : null
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {KitPage && <Route path="dev/kit" element={
+                <Suspense>
+                  <KitPage />
+                </Suspense>
+              } />}
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
             <Route path="credits" element={<CreditsPage />} />

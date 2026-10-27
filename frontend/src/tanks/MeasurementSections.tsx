@@ -66,7 +66,7 @@ function LatestValues({ tankId, parameters, latest }: { tankId: string; paramete
             <li key={measurement.id} className="rise">
               <p className="text-[15px] text-on-tannin-muted">{t(`parameters.${measurement.parameter}`)}</p>
               <p className="mt-2">
-                <span className="font-display text-[clamp(40px,5vw,64px)] leading-none text-neon tabular-nums">
+                <span className="font-display text-[clamp(40px,5vw,64px)] leading-none text-neon-glow tabular-nums">
                   {shown(measurement, language)}
                 </span>{' '}
                 <span className="text-[15px] text-on-tannin-muted">{unitOf(parameters, measurement)}</span>

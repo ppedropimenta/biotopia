@@ -1,0 +1,175 @@
+/*
+ * The Biotopia theme: a field notebook of a blackwater stream (see docs/ui.md).
+ *
+ * Colour, type, shadows and textures are Tailwind theme tokens. Components use the generated
+ * utilities (bg-paper, text-ink, font-serif, shadow-plate, texture-river...), never raw values.
+ * A new colour goes in here with its contrast noted in a comment.
+ */
+
+@theme {
+  /* ---------- Paper (light surfaces) ---------- */
+  --color-paper: #ece2cb; /* page background */
+  --color-paper-card: #f6f0e1; /* plates, cards, fields */
+  --color-paper-photo: #fbf7ee; /* polaroid frame, labels */
+
+  /* ---------- Ink (text on paper) ---------- */
+  --color-ink: #241a11; /* main text, borders, primary button: 13:1 on paper */
+  --color-ink-soft: #3d3022; /* supporting text, long paragraphs: 9.9:1 */
+  --color-ink-muted: #5b4a36; /* mono labels, metadata: 6.6:1 */
+  --color-ink-blue: #1f3550; /* handwritten notes (Caveat): 9.7:1 */
+
+  /* ---------- Blackwater (dark surfaces) ---------- */
+  --color-blackwater: #2b1d12; /* side menu, public header, dark bands */
+  --color-blackwater-deep: #22170e; /* stage of the 3D planner */
+  --color-blackwater-raised: #3a2818; /* avatar and raised surfaces on dark */
+  --color-river-text: #e6dac0; /* text on blackwater: 11.8:1 */
+  --color-river-bright: #f1e7d0; /* headings on blackwater */
+  --color-river-muted: #b9a27c; /* group labels in the menu: 6.6:1 */
+  --color-river-caption: #cdbb98; /* captions on dark: 8.7:1 */
+
+  /* ---------- Accents ---------- */
+  --color-amber: #e9b66a; /* main action on blackwater (text blackwater, 8.8:1) */
+  --color-amber-soft: #d9a95b; /* mono labels on dark */
+  --color-cardinal: #b3362a; /* the cardinal's red: out of target, conflict, errors: 4.7:1 */
+  --color-neon: #23628a; /* neon blue: links, water change stamp: 5.1:1 */
+  --color-forest: #3e5a2a; /* forest green: target band, ok status, pruning: 6.0:1 */
+  --color-ochre: #7a5418; /* warning text, leaves stamp: 5.2:1 */
+  --color-ochre-icon: #9a6a1e; /* warning icon (icon only, 3.7:1) */
+
+  /* ---------- Water types (Sioli's classification): marks and seals only ---------- */
+  --color-water-black: #3b2414;
+  --color-water-white: #b48650;
+  --color-water-clear: #3f8a80; /* never text (3.2:1) */
+
+  /* ---------- Sticky tape on photos ---------- */
+  --color-tape: #e2ce98d9;
+
+  /* ---------- Type (Fontsource, self-hosted) ---------- */
+  --font-serif: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-hand: 'Caveat Variable', 'Segoe Print', 'Bradley Hand', cursive;
+
+  --text-caption: 0.6875rem; /* 11px: plate corners, units */
+  --text-caption--line-height: 1.4;
+  --text-label: 0.78125rem; /* 12.5px: mono labels */
+  --text-label--line-height: 1.45;
+  --text-lead: 1.125rem; /* 18px: subtitles */
+  --text-lead--line-height: 1.5;
+  --text-hand: 1.4375rem; /* 23px: handwritten notes */
+  --text-hand--line-height: 1.2;
+  --text-h3: 1.5rem; /* 24px */
+  --text-h3--line-height: 1.2;
+  --text-h2: 1.875rem; /* 30px: section title */
+  --text-h2--line-height: 1.15;
+  --text-h1: 3.25rem; /* 52px: page title in the app */
+  --text-h1--line-height: 1;
+  --text-display: 2.875rem; /* 46px: titles on the landing page */
+  --text-display--line-height: 1.06;
+  --text-hero: clamp(3rem, 6.4vw, 5.25rem); /* 48-84px: hero title */
+  --text-hero--line-height: 0.98;
+
+  --tracking-label: 0.14em; /* mono labels, uppercase */
+  --tracking-plate: 0.18em; /* plate corners: PLATE I · FIG. 1 */
+
+  /* ---------- Shadows ---------- */
+  --shadow-plate: inset 0 0 0 5px var(--color-paper-card), inset 0 0 0 6px rgb(36 26 17 / 0.45);
+  --shadow-plate-sm: inset 0 0 0 4px var(--color-paper-card), inset 0 0 0 5px rgb(36 26 17 / 0.4);
+  --shadow-photo: 0 8px 18px rgb(36 26 17 / 0.25);
+  --shadow-float: 0 24px 50px rgb(0 0 0 / 0.35);
+  --shadow-tooltip: 0 10px 24px rgb(36 26 17 / 0.25);
+
+  /* ---------- Radius ---------- */
+  --radius-paper: 2px; /* buttons, fields, cards: almost square, like paper */
+
+  /* ---------- Layout ---------- */
+  --container-page: 72.5rem; /* 1160px: widest app content */
+  --container-site: 75rem; /* 1200px: public pages */
+  --spacing-nav: 15.5rem; /* 248px: side menu */
+}
+
+/* ---------- Textures (files in public/textures/) ---------- */
+@utility texture-paper {
+  background-color: var(--color-paper);
+  background-image: url('/textures/paper.svg');
+}
+@utility texture-card {
+  background-color: var(--color-paper-card);
+  background-image: url('/textures/paper.svg');
+}
+@utility texture-river {
+  background-color: var(--color-blackwater);
+  background-image: url('/textures/river-network.svg');
+  background-size: 520px auto;
+  background-repeat: repeat-y;
+  background-position: left -250px top -80px;
+}
+@utility texture-river-wide {
+  background-color: var(--color-blackwater);
+  background-image: url('/textures/river-network.svg');
+  background-size: 560px auto;
+  background-repeat: repeat-y;
+  background-position: right -60px top -200px;
+}
+@utility texture-stage {
+  background-color: var(--color-blackwater-deep);
+  background-image: url('/textures/river-network.svg');
+  background-size: 620px auto;
+  background-position: right -200px top -300px;
+}
+/* ruled paper for notes */
+@utility ruled {
+  background-image: repeating-linear-gradient(transparent 0 29px, rgb(35 98 138 / 0.35) 29px 30px);
+}
+
+/* ---------- Type utilities. The DOM keeps normal case; the capitals are only this transform. ---------- */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+@utility plate-corner {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-plate);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    background-color: var(--color-blackwater);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-optical-sizing: auto;
+  }
+  /* Scientific names are always italic: <i lang="la">Paracheirodon axelrodi</i> */
+  i[lang='la'],
+  em[lang='la'] {
+    font-style: italic;
+  }
+  a {
+    color: var(--color-neon);
+    text-underline-offset: 2px;
+  }
+  a:hover {
+    color: var(--color-cardinal);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}

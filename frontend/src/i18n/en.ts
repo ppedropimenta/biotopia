@@ -1,16 +1,23 @@
 export const en = {
-  app: {
-    name: 'aquarium',
+  ui: {
+    brand: { name: 'Biotopia', tagline: 'Aquarium logbook' },
+    language: { label: 'Language' },
+    nav: {
+      label: 'Main navigation',
+      menu: 'Menu',
+      myTanks: 'My tanks',
+      overview: 'Overview',
+      logMeasurement: 'Log measurement',
+      logIn: 'Log in',
+      logOut: 'Log out',
+      credits: 'Credits',
+    },
+    skip: 'Skip to content',
+    breadcrumb: 'Breadcrumb',
   },
   nav: {
-    credits: 'Credits',
     login: 'Log in',
     signup: 'Sign up',
-    logout: 'Log out',
-    tanks: 'Your tanks',
-  },
-  language: {
-    label: 'Language',
   },
   home: {
     title: 'Your aquarium’s logbook',

@@ -26,12 +26,12 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await expect(page.getByText('Peat filter')).toBeVisible()
 
   // The list shows the tank, with its Net Volume as the figure.
-  await page.getByRole('link', { name: 'Your tanks' }).first().click()
+  await page.getByRole('link', { name: 'My tanks' }).click()
   const card = page.getByRole('link', { name: /Blackwater 120/ })
   await expect(card).toContainText('98.5')
 
   // In Brazilian Portuguese the same number is written with a decimal comma.
-  await page.getByLabel('Language').selectOption('pt-BR')
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
   await expect(card).toContainText('98,5')
 
   // Editing shows the number the way it is typed in this language, and refuses the other notation.

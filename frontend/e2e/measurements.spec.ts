@@ -79,7 +79,7 @@ test('a keeper records several measurements at once, sees the latest values, edi
 
 test('in Brazilian Portuguese the decimal comma is typed and shown, and the point is refused', async ({ page }) => {
   await keeperWithATank(page)
-  await page.getByLabel('Language').selectOption('pt-BR')
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
   await page.getByRole('link', { name: 'Registrar as primeiras medições' }).click()
 
   await page.getByLabel('pH', { exact: true }).fill('6.8')

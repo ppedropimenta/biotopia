@@ -42,12 +42,12 @@ test('a visitor signs up, confirms the email and logs in', async ({ page }) => {
   await page.getByRole('link', { name: 'Log in' }).last().click()
   await logIn(page, address)
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
-  await expect(page.getByText(address)).toBeVisible()
+  await expect(page.getByRole('navigation').getByText(address)).toBeVisible()
 
   // The session lasts: a reload keeps the visitor logged in, and logging out ends it.
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
-  await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Log out' }).click()
   await page.goto('/tanks')
   await expect(page).toHaveURL(/\/login$/)
 })
@@ -61,9 +61,9 @@ test('the language chosen in the app is saved on the account and restored on log
   await logIn(page, address)
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
 
-  await page.getByLabel('Language').selectOption('pt-BR')
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Seus aquários' })).toBeVisible()
-  await page.getByRole('banner').getByRole('button', { name: 'Sair' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Sair' }).click()
 
   // A browser that remembers nothing: only the account can say which language this person chose.
   await page.evaluate(() => localStorage.clear())
@@ -104,7 +104,7 @@ test('someone who forgot the password gets a link, sets a new one, and the link 
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
 
   // Opening the same link again gets a way to ask for a new one.
-  await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Log out' }).click()
   await page.goto(link)
   await page.getByLabel('Password').fill('yet another passphrase')
   await page.getByRole('button', { name: 'Save password' }).click()

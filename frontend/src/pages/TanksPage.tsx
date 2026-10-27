@@ -86,7 +86,7 @@ function TankCard({ tank }: { tank: Tank }) {
           <>
             <p className="text-[15px] text-on-tannin-muted">{t('tanks.netVolume')}</p>
             <p className="mt-1 flex items-baseline gap-2">
-              <span className="font-display text-[56px] leading-none text-neon tabular-nums">
+              <span className="font-display text-[56px] leading-none text-neon-glow tabular-nums">
                 {formatNumber(tank.netVolumeLiters, language)}
               </span>
               <span className="text-[15px] text-on-tannin-muted">{t('tanks.liters')}</span>

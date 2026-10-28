@@ -52,7 +52,22 @@ test('a keeper records several measurements at once, sees the latest values, edi
 
   // Later measurements take over the latest value of the Parameters it covers; the others stay.
   await page.getByRole('link', { name: 'Add measurement' }).click()
-  await expect(page.getByRole('heading', { name: 'Record measurements' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Log measurement', level: 1 })).toBeVisible()
+
+  // The form shows the last value beside each Parameter that has one, and nothing for the others.
+  await expect(page.getByText('last: 20 mg/L')).toBeVisible()
+  await expect(page.getByText('last: 6.8')).toBeVisible()
+  await expect(page.getByText(/^last:/)).toHaveCount(3)
+
+  // Temperature, GH and KH have − and + buttons; the others do not.
+  await page.getByRole('button', { name: 'Increase Temperature' }).click()
+  await expect(page.getByLabel('Temperature', { exact: true })).toHaveValue('25.5')
+  await page.getByRole('button', { name: 'Decrease Temperature' }).click()
+  await page.getByRole('button', { name: 'Decrease Temperature' }).click()
+  await expect(page.getByLabel('Temperature', { exact: true })).toHaveValue('24.5')
+  await expect(page.getByRole('button', { name: /^(Increase|Decrease)/ })).toHaveCount(6)
+  await page.getByLabel('Temperature', { exact: true }).fill('')
+
   await page.getByLabel(/^Nitrate/).fill('35')
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await expect(figure(latestValues(page), '35')).toBeVisible()
@@ -100,6 +115,9 @@ test('in Brazilian Portuguese the decimal comma is typed and shown, and the poin
   await expect(page.getByText('Digite um número com no máximo 4 casas decimais, como 6,8.')).toBeVisible()
 
   await page.getByLabel('pH', { exact: true }).fill('6,8')
+  await page.getByLabel(/^Temperatura/).fill('25,5')
+  await page.getByRole('button', { name: 'Aumentar Temperatura' }).click()
+  await expect(page.getByLabel(/^Temperatura/)).toHaveValue('26')
   await page.getByLabel(/^Temperatura/).fill('25,5')
   await page.getByRole('button', { name: 'Salvar medições' }).click()
 

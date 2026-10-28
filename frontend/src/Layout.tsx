@@ -25,7 +25,7 @@ export function Layout() {
         nav={
           <SideNav
             groups={navGroups(t, tank)}
-            cta={tank && <LogMeasurementCta to={`/tanks/${tank.id}/measure`} />}
+            cta={<LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />}
             footer={
               <>
                 <p className="m-0 text-[0.78125rem] break-all text-river-caption">{state.account.email}</p>

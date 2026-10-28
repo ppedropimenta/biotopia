@@ -15,18 +15,36 @@ export function TextField({
   unit,
   hint,
   error,
+  nudge,
+  keepCase = false,
   className,
   inputClassName,
   ...input
-}: { label: string; unit?: string; hint?: ReactNode; error?: string; inputClassName?: string } & ComponentProps<'input'>) {
+}: {
+  label: string
+  unit?: string
+  hint?: ReactNode
+  error?: string
+  /** − and + buttons beside the input, for values that move in steps. The labels are in the chosen language. */
+  nudge?: { onNudge: (direction: 1 | -1) => void; decrementLabel: string; incrementLabel: string }
+  /** Keeps the label's own capitals, for a name whose case means something (pH, Fe). */
+  keepCase?: boolean
+  inputClassName?: string
+} & ComponentProps<'input'>) {
   const id = useId()
   const noteId = `${id}-note`
+  const nudgeButton = 'flex size-11 flex-none cursor-pointer items-center justify-center bg-transparent text-[22px] text-ink hover:bg-paper-card'
   return (
     <div className={cx('flex flex-col gap-1', className)}>
-      <label htmlFor={id} className={labelClasses}>
+      <label htmlFor={id} className={cx(labelClasses, keepCase && 'normal-case')}>
         {label}
       </label>
-      <span className="flex items-baseline gap-1 border-b-[1.5px] border-ink">
+      <span className={cx('flex gap-1 border-b-[1.5px] border-ink', nudge ? 'items-center' : 'items-baseline')}>
+        {nudge && (
+          <button type="button" aria-label={nudge.decrementLabel} className={nudgeButton} onClick={() => nudge.onNudge(-1)}>
+            −
+          </button>
+        )}
         <input
           id={id}
           aria-invalid={error ? true : undefined}
@@ -38,6 +56,11 @@ export function TextField({
           {...input}
         />
         {unit && <span className="font-mono text-xs">{unit}</span>}
+        {nudge && (
+          <button type="button" aria-label={nudge.incrementLabel} className={nudgeButton} onClick={() => nudge.onNudge(1)}>
+            +
+          </button>
+        )}
       </span>
       {error ? (
         <span id={noteId} role="alert" className="flex items-center gap-2 font-mono text-xs text-cardinal">

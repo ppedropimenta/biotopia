@@ -1,18 +1,25 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { api } from '../auth/api'
-import { fieldButton, fieldLink } from '../auth/classes'
-import { Field, TextAreaField } from '../auth/Field'
+import { FormError } from '../auth/FormError'
+import { Button, ButtonLink } from '../components/ui/Button'
+import { NoteField, TextField } from '../components/ui/Field'
 import { LoadError } from '../tanks/LoadError'
+import { MeasurementHeader } from '../tanks/MeasurementHeader'
 import {
   describeMeasurementError,
   toLocalInput,
   toNewMeasurements,
+  valueDecimals,
   type FormErrors,
+  type Measurement,
   type Parameter,
   type RecordForm,
 } from '../tanks/measurements'
+import { formatNumber } from '../tanks/numbers'
+import { nudge, nudgeable } from '../tanks/nudge'
+import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 import { useMeasurementMessage } from '../tanks/useMeasurementMessage'
@@ -20,20 +27,18 @@ import { useMeasurementMessage } from '../tanks/useMeasurementMessage'
 /** Records several Measurements at one moment: every Parameter has a field, and only the filled ones are sent. */
 export function MeasurementFormPage() {
   const { id = '' } = useParams()
-  const loaded = useLoad(() => Promise.all([api.tank(id), api.parameters()]), `measure-${id}`)
+  const loaded = useLoad(
+    () => Promise.all([api.tank(id), api.parameters(), api.latestMeasurements(id)]),
+    `measure-${id}`,
+  )
 
   if (loaded.status === 'loading') return null
-  if (loaded.status === 'error') {
-    return (
-      <div className="px-5 pt-10 pb-24 sm:px-8 lg:pt-16">
-        <LoadError error={loaded.error} />
-      </div>
-    )
-  }
-  return <RecordScreen tankId={id} tankName={loaded.data[0].name} parameters={loaded.data[1]} />
+  if (loaded.status === 'error') return <LoadError error={loaded.error} />
+  const [tank, parameters, latest] = loaded.data
+  return <RecordScreen tank={tank} parameters={parameters} latest={latest} />
 }
 
-function RecordScreen({ tankId, tankName, parameters }: { tankId: string; tankName: string; parameters: Parameter[] }) {
+function RecordScreen({ tank, parameters, latest }: { tank: Tank; parameters: Parameter[]; latest: Measurement[] }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const navigate = useNavigate()
@@ -48,6 +53,10 @@ function RecordScreen({ tankId, tankName, parameters }: { tankId: string; tankNa
   const [errors, setErrors] = useState<FormErrors>({})
   const [saving, setSaving] = useState(false)
 
+  const lastOf = (parameter: Parameter) => latest.find((m) => m.parameter === parameter.code)?.value ?? null
+  const setValue = (parameter: Parameter, text: string) =>
+    setForm({ ...form, values: { ...form.values, [parameter.code]: text } })
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     const checked = toNewMeasurements(form, parameters, language)
@@ -58,8 +67,8 @@ function RecordScreen({ tankId, tankName, parameters }: { tankId: string; tankNa
     setSaving(true)
     setErrors({})
     try {
-      await api.recordMeasurements(tankId, checked.request)
-      navigate(`/tanks/${tankId}`)
+      await api.recordMeasurements(tank.id, checked.request)
+      navigate(`/tanks/${tank.id}`)
     } catch (error) {
       setErrors(describeMeasurementError(error))
       setSaving(false)
@@ -67,81 +76,73 @@ function RecordScreen({ tankId, tankName, parameters }: { tankId: string; tankNa
   }
 
   return (
-    <>
-      <div className="px-5 pt-10 pb-14 sm:px-8 lg:pt-16">
-        <Link to={`/tanks/${tankId}`} className="rise text-[15px] underline underline-offset-4 hover:text-muted">
-          ← {tankName}
-        </Link>
-        <h1 className="rise mt-6 font-display text-[clamp(40px,6vw,88px)] leading-[0.95] tracking-[-0.02em]">
-          {t('measurements.form.title')}
-        </h1>
-        <p className="rise mt-5 max-w-[52ch] text-[18px] leading-relaxed">{t('measurements.form.lead')}</p>
-      </div>
+    <div className="mx-auto w-full max-w-[520px]">
+      <MeasurementHeader tank={tank} title={t('measurements.form.title')} />
+      <form onSubmit={submit} noValidate aria-busy={saving} className="flex flex-col gap-5 pt-5">
+        <p className="m-0 text-ink-soft">{t('measurements.form.lead')}</p>
 
-      <section className="mb-16 bg-tannin px-5 py-14 text-on-tannin sm:px-8 lg:mb-24 lg:py-20">
-        <form onSubmit={submit} noValidate className="grid gap-12 lg:grid-cols-[2fr_1fr] lg:gap-x-20">
-          <div className="lg:col-start-2 lg:row-start-1">
-            <Field
-              id="moment"
-              name="moment"
-              type="datetime-local"
-              label={t('measurements.form.moment')}
-              hint={t('measurements.form.momentHint')}
-              value={form.moment}
-              error={message(errors.moment)}
-              onChange={(event) => setForm({ ...form, moment: event.target.value, momentChanged: true })}
+        {parameters.map((parameter) => {
+          const last = lastOf(parameter)
+          const name = t(`parameters.${parameter.code}`)
+          return (
+            <TextField
+              key={parameter.code}
+              name={parameter.code}
+              inputMode="decimal"
+              autoComplete="off"
+              label={name}
+              keepCase={parameter.code === 'ph' || parameter.code === 'iron'}
+              unit={parameter.unit}
+              hint={
+                last !== null &&
+                t('measurements.form.last', {
+                  value: `${formatNumber(last, language, { maxDecimals: valueDecimals })} ${parameter.unit}`.trim(),
+                })
+              }
+              error={message(errors[parameter.code], parameter)}
+              value={form.values[parameter.code] ?? ''}
+              onChange={(event) => setValue(parameter, event.target.value)}
+              nudge={
+                nudgeable(parameter.code)
+                  ? {
+                      onNudge: (direction) =>
+                        setValue(parameter, nudge(form.values[parameter.code] ?? '', direction, parameter, last, language)),
+                      decrementLabel: t('measurements.form.decrease', { name }),
+                      incrementLabel: t('measurements.form.increase', { name }),
+                    }
+                  : undefined
+              }
             />
-          </div>
+          )
+        })}
 
-          <fieldset className="lg:col-start-1 lg:row-span-3 lg:row-start-1">
-            <legend className="font-display text-[30px] italic">{t('measurements.form.valuesTitle')}</legend>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {parameters.map((parameter) => (
-                <Field
-                  key={parameter.code}
-                  id={parameter.code}
-                  name={parameter.code}
-                  inputMode="decimal"
-                  autoComplete="off"
-                  label={parameter.unit ? `${t(`parameters.${parameter.code}`)} (${parameter.unit})` : t(`parameters.${parameter.code}`)}
-                  value={form.values[parameter.code] ?? ''}
-                  error={message(errors[parameter.code], parameter)}
-                  onChange={(event) =>
-                    setForm({ ...form, values: { ...form.values, [parameter.code]: event.target.value } })
-                  }
-                />
-              ))}
-            </div>
-          </fieldset>
+        <TextField
+          name="moment"
+          type="datetime-local"
+          label={t('measurements.form.moment')}
+          hint={t('measurements.form.momentHint')}
+          error={message(errors.moment)}
+          value={form.moment}
+          onChange={(event) => setForm({ ...form, moment: event.target.value, momentChanged: true })}
+        />
+        <NoteField
+          name="note"
+          label={t('measurements.form.note')}
+          error={message(errors.note)}
+          value={form.note}
+          onChange={(event) => setForm({ ...form, note: event.target.value })}
+        />
 
-          <div className="lg:col-start-2 lg:row-start-2">
-            <TextAreaField
-              id="note"
-              name="note"
-              label={t('measurements.form.note')}
-              value={form.note}
-              error={message(errors.note)}
-              onChange={(event) => setForm({ ...form, note: event.target.value })}
-            />
-          </div>
-
-          <div className="grid content-start gap-6 lg:col-start-2 lg:row-start-3">
-            {errors.general && (
-              <p role="alert" className="text-[15px] text-neon-red">
-                {message(errors.general)}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <button type="submit" disabled={saving} className={fieldButton}>
-                {saving ? t('measurements.form.saving') : t('measurements.form.save')}
-              </button>
-              <Link to={`/tanks/${tankId}`} className={fieldLink}>
-                {t('measurements.form.cancel')}
-              </Link>
-            </div>
-          </div>
-        </form>
-      </section>
-    </>
+        {errors.general && <FormError>{message(errors.general)}</FormError>}
+        <div className="flex flex-wrap items-center gap-3 pb-4">
+          <Button type="submit" size="lg" icon="check" disabled={saving} className="flex-1">
+            {saving ? t('measurements.form.saving') : t('measurements.form.save')}
+          </Button>
+          <ButtonLink to={`/tanks/${tank.id}`} variant="secondary" size="lg">
+            {t('measurements.form.cancel')}
+          </ButtonLink>
+        </div>
+      </form>
+    </div>
   )
 }

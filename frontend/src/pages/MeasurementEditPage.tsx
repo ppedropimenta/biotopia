@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { api } from '../auth/api'
-import { fieldButton, fieldLink } from '../auth/classes'
-import { Field, TextAreaField } from '../auth/Field'
+import { FormError } from '../auth/FormError'
+import { Button, ButtonLink } from '../components/ui/Button'
+import { NoteField, TextField } from '../components/ui/Field'
 import { LoadError } from '../tanks/LoadError'
+import { MeasurementHeader } from '../tanks/MeasurementHeader'
 import {
   describeMeasurementError,
   toChange,
@@ -16,6 +18,8 @@ import {
   type Parameter,
 } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
+import { nudge, nudgeable } from '../tanks/nudge'
+import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 import { useMeasurementMessage } from '../tanks/useMeasurementMessage'
@@ -24,25 +28,19 @@ import { useMeasurementMessage } from '../tanks/useMeasurementMessage'
 export function MeasurementEditPage() {
   const { id = '', measurementId = '' } = useParams()
   const loaded = useLoad(
-    () => Promise.all([api.measurement(id, measurementId), api.parameters()]),
+    () => Promise.all([api.measurement(id, measurementId), api.parameters(), api.tank(id)]),
     `measurement-${id}-${measurementId}`,
   )
 
   if (loaded.status === 'loading') return null
-  if (loaded.status === 'error') {
-    return (
-      <div className="px-5 pt-10 pb-24 sm:px-8 lg:pt-16">
-        <LoadError error={loaded.error} />
-      </div>
-    )
-  }
-  const [measurement, parameters] = loaded.data
+  if (loaded.status === 'error') return <LoadError error={loaded.error} />
+  const [measurement, parameters, tank] = loaded.data
   const parameter = parameters.find((p) => p.code === measurement.parameter)
   if (!parameter) return null
-  return <EditScreen tankId={id} measurement={measurement} parameter={parameter} />
+  return <EditScreen tank={tank} measurement={measurement} parameter={parameter} />
 }
 
-function EditScreen({ tankId, measurement, parameter }: { tankId: string; measurement: Measurement; parameter: Parameter }) {
+function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement: Measurement; parameter: Parameter }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const navigate = useNavigate()
@@ -71,8 +69,8 @@ function EditScreen({ tankId, measurement, parameter }: { tankId: string; measur
     const momentUntouched = form.moment === toLocalInput(measurement.measuredAt)
     const change = momentUntouched ? { ...checked.change, measuredAt: measurement.measuredAt } : checked.change
     try {
-      await api.editMeasurement(tankId, measurement.id, change)
-      navigate(`/tanks/${tankId}`)
+      await api.editMeasurement(tank.id, measurement.id, change)
+      navigate(`/tanks/${tank.id}`)
     } catch (error) {
       setErrors(describeMeasurementError(error))
       setBusy(false)
@@ -82,8 +80,8 @@ function EditScreen({ tankId, measurement, parameter }: { tankId: string; measur
   async function remove() {
     setBusy(true)
     try {
-      await api.deleteMeasurement(tankId, measurement.id)
-      navigate(`/tanks/${tankId}`)
+      await api.deleteMeasurement(tank.id, measurement.id)
+      navigate(`/tanks/${tank.id}`)
     } catch (error) {
       setErrors(describeMeasurementError(error))
       setConfirming(false)
@@ -92,80 +90,74 @@ function EditScreen({ tankId, measurement, parameter }: { tankId: string; measur
   }
 
   return (
-    <>
-      <div className="px-5 pt-10 pb-14 sm:px-8 lg:pt-16">
-        <h1 className="rise font-display text-[clamp(40px,6vw,88px)] leading-[0.95] tracking-[-0.02em]">
-          {t('measurements.edit.title')}
-        </h1>
-        <p className="rise mt-5 text-[18px]">{name}</p>
-      </div>
+    <div className="mx-auto w-full max-w-[520px]">
+      <MeasurementHeader tank={tank} title={t('measurements.edit.title')} />
+      <form onSubmit={submit} noValidate aria-busy={busy} className="flex flex-col gap-5 pt-5">
+        <p className="m-0 text-lead">{name}</p>
+        <TextField
+          name="value"
+          inputMode="decimal"
+          autoComplete="off"
+          label={t('measurements.edit.value')}
+          unit={parameter.unit}
+          error={message(errors.value, parameter)}
+          value={form.value}
+          onChange={(event) => setForm({ ...form, value: event.target.value })}
+          nudge={
+            nudgeable(parameter.code)
+              ? {
+                  onNudge: (direction) =>
+                    setForm({ ...form, value: nudge(form.value, direction, parameter, measurement.value, language) }),
+                  decrementLabel: t('measurements.form.decrease', { name }),
+                  incrementLabel: t('measurements.form.increase', { name }),
+                }
+              : undefined
+          }
+        />
+        <TextField
+          name="moment"
+          type="datetime-local"
+          label={t('measurements.form.moment')}
+          error={message(errors.moment)}
+          value={form.moment}
+          onChange={(event) => setForm({ ...form, moment: event.target.value })}
+        />
+        <NoteField
+          name="note"
+          label={t('measurements.form.note')}
+          error={message(errors.note)}
+          value={form.note}
+          onChange={(event) => setForm({ ...form, note: event.target.value })}
+        />
 
-      <section className="mb-16 bg-tannin px-5 py-14 text-on-tannin sm:px-8 lg:mb-24 lg:py-20">
-        <form onSubmit={submit} noValidate className="grid gap-12 lg:grid-cols-2 lg:gap-x-20">
-          <div className="grid content-start gap-6 sm:grid-cols-2">
-            <Field
-              id="value"
-              name="value"
-              inputMode="decimal"
-              autoComplete="off"
-              label={parameter.unit ? `${t('measurements.edit.value')} (${parameter.unit})` : t('measurements.edit.value')}
-              value={form.value}
-              error={message(errors.value, parameter)}
-              onChange={(event) => setForm({ ...form, value: event.target.value })}
-            />
-            <Field
-              id="moment"
-              name="moment"
-              type="datetime-local"
-              label={t('measurements.form.moment')}
-              value={form.moment}
-              error={message(errors.moment)}
-              onChange={(event) => setForm({ ...form, moment: event.target.value })}
-            />
-          </div>
+        {errors.general && <FormError>{message(errors.general)}</FormError>}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" size="lg" icon="check" disabled={busy} className="flex-1">
+            {busy ? t('measurements.form.saving') : t('measurements.edit.save')}
+          </Button>
+          <ButtonLink to={`/tanks/${tank.id}`} variant="secondary" size="lg">
+            {t('measurements.form.cancel')}
+          </ButtonLink>
+        </div>
 
-          <div className="grid content-start gap-12">
-            <TextAreaField
-              id="note"
-              name="note"
-              label={t('measurements.form.note')}
-              value={form.note}
-              error={message(errors.note)}
-              onChange={(event) => setForm({ ...form, note: event.target.value })}
-            />
-            {errors.general && (
-              <p role="alert" className="text-[15px] text-neon-red">
-                {message(errors.general)}
-              </p>
-            )}
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <button type="submit" disabled={busy} className={fieldButton}>
-                {busy ? t('measurements.form.saving') : t('measurements.edit.save')}
-              </button>
-              <Link to={`/tanks/${tankId}`} className={fieldLink}>
-                {t('measurements.form.cancel')}
-              </Link>
+        <div className="border-t border-dashed border-ink/45 pt-4 pb-4">
+          {confirming ? (
+            <div className="flex flex-wrap items-center gap-3" role="group" aria-label={t('measurements.edit.confirmDelete')}>
+              <span className="text-lead">{t('measurements.edit.confirmDelete')}</span>
+              <Button type="button" variant="secondary" disabled={busy} onClick={remove}>
+                {t('measurements.edit.confirmYes')}
+              </Button>
+              <Button type="button" variant="dashed" onClick={() => setConfirming(false)}>
+                {t('measurements.edit.confirmNo')}
+              </Button>
             </div>
-            <div>
-              {confirming ? (
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-3" role="group" aria-label={t('measurements.edit.confirmDelete')}>
-                  <span className="text-[18px]">{t('measurements.edit.confirmDelete')}</span>
-                  <button type="button" disabled={busy} onClick={remove} className="cursor-pointer text-neon-red underline underline-offset-4">
-                    {t('measurements.edit.confirmYes')}
-                  </button>
-                  <button type="button" onClick={() => setConfirming(false)} className={`cursor-pointer ${fieldLink}`}>
-                    {t('measurements.edit.confirmNo')}
-                  </button>
-                </div>
-              ) : (
-                <button type="button" onClick={() => setConfirming(true)} className="cursor-pointer text-on-tannin-muted underline underline-offset-4 hover:text-neon-red">
-                  {t('measurements.edit.delete')}
-                </button>
-              )}
-            </div>
-          </div>
-        </form>
-      </section>
-    </>
+          ) : (
+            <Button type="button" variant="dashed" onClick={() => setConfirming(true)}>
+              {t('measurements.edit.delete')}
+            </Button>
+          )}
+        </div>
+      </form>
+    </div>
   )
 }

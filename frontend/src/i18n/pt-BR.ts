@@ -267,7 +267,8 @@ export const ptBR: Messages = {
   credits: {
     title: 'Créditos e licenças',
     intro:
-      'Imagens e dados feitos por outras pessoas aparecem aqui com a sua licença. Este site é gratuito e não tem anúncios.',
+      'Fontes tipográficas, imagens e dados feitos por outras pessoas aparecem aqui com a sua licença. Os peixes, plantas e aquários desenhados foram feitos para este projeto. Este site é gratuito e não tem anúncios.',
+    fonts: 'Fontes tipográficas',
     pictures: 'Imagens',
     by: 'Autor',
     licence: 'Licença',

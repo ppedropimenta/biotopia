@@ -7,7 +7,7 @@ export function LoadError({ error }: { error: unknown }) {
   return (
     <h1
       role="alert"
-      className="font-display text-[clamp(30px,4vw,56px)] leading-tight tracking-[-0.02em] [overflow-wrap:anywhere]"
+      className="font-serif text-[clamp(30px,4vw,56px)] leading-tight tracking-[-0.02em] [overflow-wrap:anywhere]"
     >
       {t(describeTankError(error).general ?? 'tanks.errors.generic')}
     </h1>

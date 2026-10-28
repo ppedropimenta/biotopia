@@ -265,7 +265,8 @@ export const en = {
   credits: {
     title: 'Credits and licences',
     intro:
-      'Pictures and data made by other people are listed here with their licence. This site is free and has no ads.',
+      'Fonts, pictures and data made by other people are listed here with their licence. The drawn fish, plants and tanks were made for this project. This site is free and has no ads.',
+    fonts: 'Fonts',
     pictures: 'Pictures',
     by: 'By',
     licence: 'Licence',

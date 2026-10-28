@@ -1,95 +1,105 @@
 # UI
 
 How the app looks, and the few rules that keep new screens consistent. The values live in
-`frontend/src/index.css`; components use them through Tailwind classes (`bg-paper`, `bg-tannin`,
-`text-neon`, `font-display`), never as raw colours or sizes.
+`frontend/src/styles/biotopia.css`; components use them through Tailwind classes (`bg-paper`, `text-ink`,
+`font-serif`, `shadow-plate`), never as raw colours or sizes. The shared pieces are in
+`frontend/src/components/ui` and `frontend/src/components/layout`; in a development build, `/dev/kit` shows
+all of them on one page.
 
 ## Priorities
 
-- Two audiences count equally: fishkeepers who log every week, and first-time visitors who open the
-  demo tank without an account.
-- Phone and desktop count equally. Logging usually happens on a phone next to the tank; charts are read
-  on a bigger screen.
-- The tank page is the most important screen. It is also what the demo tank shows.
-- It should feel like fishkeeping and river life, with colour, not like a generic blog.
-- The app is built around freshwater tanks, but the interface does not shut anyone out: no "freshwater
-  only" wording on the pages.
+- Two audiences count equally: fishkeepers who log every week, and first-time visitors who read the landing
+  page and, once it exists, open the Demo Tank without an account.
+- Phone and desktop count equally. Logging usually happens on a phone next to the tank, so the measurement
+  form is designed for a narrow screen first. Charts are read on a bigger screen.
+- The tank page is the most important screen. It is also what the Demo Tank shows.
+- It should feel like fishkeeping and river life, with colour and drawn animals and plants, not like a
+  generic dashboard.
+- The interface does not shut anyone out: no wording on the pages says the app is for only one kind of tank.
 
 ## The idea
 
-Two worlds side by side. An old naturalist's notebook: aged paper, brown ink, a hand-coloured plate,
-a book serif. And a blackwater river: tea-dark fields, real photographs of the Amazon, and the neon
-tetra's blue on the figures. Plates are used sparingly, as a touch of the notebook, not as a gallery.
+A field notebook of a blackwater stream. The pages are aged paper written in sepia ink. Each tank is a
+numbered plate, like the plates of a naturalist's book, with a drawn tank on it. Fish and plants are drawn
+in the same hand. Around the pages is the stream itself: the side menu and the public header are
+tea-dark water with the lines of tributaries running through it. Handwriting appears only where the
+keeper "wrote" something.
 
 ## Colour
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `paper` | `#ece6d6` | Page ground (aged paper) |
-| `paper-deep` | `#e2dac5` | Controls and panels on paper |
-| `ink` | `#24170e` | All running text on paper; the primary action |
-| `muted` | `#5c4a3a` | Labels only, never running text |
-| `tannin`, `tannin-2`, `tannin-3` | `#24130a`, `#301a0d`, `#3d2211` | Blackwater fields, stepping in tone |
-| `on-tannin` / `on-tannin-muted` | `#f3e6cc` / `#cdb491` | Text and secondary notes on blackwater |
-| `neon` | `#3fe0e6` | Figures and highlights on blackwater only |
-| `neon-red` | `#ff5a47` | A value that needs attention, on blackwater |
-| `positive` / `negative` / `warning` | green / red / amber | Status on paper, never decoration |
+Colours have roles. Use the role, not the shade you like.
 
-The paper is deliberately warm. The design tooling flags cream grounds as a generated-page cliché; here
-it is a choice, because aged paper is the point.
+| Role | Tokens | Use |
+| --- | --- | --- |
+| Paper | `paper`, `paper-card`, `paper-photo` | Page ground, plates and fields, polaroid frames and labels |
+| Ink | `ink`, `ink-soft`, `ink-muted` | Running text and borders; supporting text; labels and metadata. Muted is never running text |
+| Handwriting | `ink-blue` | Notes the keeper wrote |
+| Blackwater | `blackwater` and `river-*` | Side menu, public header, dark bands and the dark header of the measurement form |
+| Amber | `amber`, `amber-soft` | The main action on blackwater, the brand's second line, highlights on dark |
+| Cardinal | `cardinal` | Out of range, errors and alerts. Nothing else |
+| Forest, ochre | `forest`, `ochre` | Good or neutral status; warnings. Never decoration |
+
+The contrast of a token on its ground is noted next to the token in `biotopia.css`. Status never depends on colour
+alone: a symbol or a word goes with it (▲ ▼ =, "Not measured").
 
 ## Type
 
-- **Newsreader** for titles, names, big figures and captions. Captions and titles on blackwater are
-  italic.
-- **Instrument Sans** for running text, labels, controls and numbers in tables (tabular figures).
-- Five sizes do the work: 15 (labels), 18 (text), 30 (small titles), a display size up to 88 and the
-  footer name.
-- Both fonts are self-hosted (Fontsource), so visitors' browsers never call a third-party font server.
+- **Fraunces** for titles, names, running text and captions.
+- **DM Mono** for data: field and parameter names, numbers, dates, table headers, buttons and the brand
+  line.
+- **Caveat** for handwriting only: a note the keeper wrote, the "start a new plate" hint, the note on the
+  landing page.
+- Self-hosted through Fontsource, so a visitor's browser never calls a third-party font server. The fonts
+  and their licence are on the credits page.
+- Capitals are a CSS transform. The text in the translation files and in the page stays in normal case, so
+  screen readers and tests read it normally.
+- Numbers and dates follow the language of the page (decimal comma in Portuguese).
 
 ## Shapes
 
-- Square corners everywhere: photos, plates, fields, controls.
-- No shadows on things at rest, no gradients, no thin divider lines between sections. Surfaces change
-  by a step in tone, or by a whole blackwater field.
-- Sentence case everywhere. No small uppercase labels above headings.
+- Corners are almost square (2px): buttons, fields, cards.
+- Plates have a double rule inside the border and a soft shadow; polaroids have a frame and a shadow. A
+  plate or a note may sit a degree or two off level. Other shadows are only for things lifted off the page,
+  such as the plates of the landing hero.
+- Cards sit on paper with a thin ink border. Dashed borders mean "add" or "optional".
+- Small uppercase mono labels belong to data and controls: field names, parameter names, plate headers
+  ("Plate I · Fig. 1"), table headers, buttons and the brand line. They are never a line above a heading:
+  a heading stands on its own.
 
 ## Pictures
 
-- Real pictures only: photographs of rivers and fish, and old plates. Every one has a caption that says
-  what it is.
-- Plates blend into the paper with `mix-blend-mode: multiply`; their figure has the paper background
-  behind it, because an animated parent isolates blending.
+- Drawn illustrations: fish, plants and tanks, in `frontend/src/assets/illustrations`, found by slug in
+  `frontend/src/lib/illustrations.ts`. They were made for this project and are not credited.
+- A tank has the same drawn tank until it has photos of its own.
+- A drawing of a species is named by its scientific name (in the caption or the `alt`). A decorative
+  drawing has an empty `alt`.
+- Show only data that exists. A chart or value drawn for illustration says that it is an example.
 - Every picture made by someone else goes in `frontend/src/credits.ts`, which the credits page renders.
-- The demo tank's own photos will take the lead once they exist.
 
 ## Layout
 
-- One pair of side margins on every page: 20px on a phone, 32px from 640px up.
-- Every page has one `h1` and a heading on every section.
-- Neighbouring sections change composition and ground: paper, then blackwater, then paper, then a
-  full-width photograph.
-- The footer is a blackwater field with the name set large.
+- Logged in: a 248px blackwater side menu with the tanks, the current tank's overview and the main action
+  "Log measurement". The foot has the account email, Credits, Log out and the PT / EN switch. Below 768px the
+  menu is a strip at the top with a Menu button. The menu links only to screens that exist.
+- Public pages: a blackwater header with the brand, PT / EN and Log in, a paper body up to 1200px wide, and
+  a blackwater footer with the credits link.
+- A page starts with one `h1`; every section has a heading. A "Skip to content" link comes first.
+- Touch targets are at least 44px high.
 
 ## Motion
 
-Parts of a section rise into place once, in reading order (`rise`); a lead picture settles in from
-slightly larger (`settle`); the hero river photo drifts very slowly (`drift`). Only transform and
-opacity animate, and nothing moves when the visitor asks for reduced motion.
+Nothing moves on its own. Buttons and links change colour on hover and focus. If something animates later,
+it uses only transform and opacity and stops when the visitor asks for reduced motion.
 
 ## Account screens
 
-Sign up, log in, email confirmation and password reset share one frame (`frontend/src/auth/AuthScreen.tsx`): the form on a
-blackwater field, a river photograph beside it, the photograph's caption above it so the picture runs
-straight into the footer. On a phone the form comes first, then the photograph.
+Log in and sign up are one screen with a switch between the two, and each keeps its own address. The
+email confirmation, forgot password and reset password pages use the same frame
+(`frontend/src/auth/AuthScreen.tsx`): a blackwater panel with a plate of a giant water lily on the left,
+the form on paper on the right. On a phone the plate gives way to a dark strip and the form comes first.
 
-- Fields are a step lighter than the field they sit on (`tannin-3`), with the label above in `on-tannin-muted`.
-  No outlined boxes.
-- The one filled action on blackwater is `neon` on `tannin`; on paper it is `ink` on `paper`.
-- Messages come from the API as codes and are written in the chosen language. Forms use `noValidate` so the
-  browser's own validation messages (in the browser's language) never appear.
-- The header on a phone holds only the name, Log in (or Log out) and the language; Sign up is offered on the
-  home page and on the login page. The language list says "Português", not "Português (Brasil)", to fit.
-- These are working screens with one photograph, so the landing-page rules (a minimum number of pictures,
-  a motion count) do not apply to them. The remaining judgement calls are the same choices as elsewhere:
-  warm paper, a large title for a first visit, and the form centred in a full-height field.
+- "Keep me logged in" is ticked by default; unticked, the session ends when the browser closes.
+- "Forgot my password" shows on the log in side only.
+- Messages come from the API as codes and are written in the chosen language, under the field they are
+  about. Forms use `noValidate` so the browser's own validation messages (in the browser's language) never
+  appear.

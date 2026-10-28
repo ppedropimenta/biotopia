@@ -4,10 +4,10 @@ test.use({ locale: 'en-US' })
 
 test('a visitor switches to Portuguese and opens the credits page', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Your aquarium’s logbook' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your tank, over time.' })).toBeVisible()
 
   await page.getByRole('button', { name: 'PT', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'O diário do seu aquário' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Seu aquário, ao longo do tempo.' })).toBeVisible()
   await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
   await expect(page.getByRole('button', { name: 'PT', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('button', { name: 'EN', exact: true })).toHaveAttribute('aria-pressed', 'false')
@@ -20,11 +20,28 @@ test('a visitor switches to Portuguese and opens the credits page', async ({ pag
   await expect(page.getByRole('heading', { name: 'Créditos e licenças' })).toBeVisible()
 })
 
+test('the landing page offers an account and a log in, and no demo yet', async ({ page }) => {
+  await page.goto('/')
+  const main = page.getByRole('main')
+
+  await main.getByRole('link', { name: 'Create an account' }).click()
+  await expect(page).toHaveURL(/\/signup$/)
+
+  await page.goBack()
+  await main.getByRole('link', { name: 'Log in' }).click()
+  await expect(page).toHaveURL(/\/login$/)
+
+  await page.goBack()
+  await expect(main.getByRole('heading', { name: 'Five tributaries, one river.' })).toBeVisible()
+  await expect(main.getByRole('listitem').filter({ hasText: 'In progress' })).toHaveCount(1)
+  await expect(page.getByRole('link', { name: /demo/i })).toHaveCount(0)
+})
+
 test.describe('with a Portuguese browser', () => {
   test.use({ locale: 'pt-BR' })
 
   test('the app starts in Portuguese', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: 'O diário do seu aquário' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Seu aquário, ao longo do tempo.' })).toBeVisible()
   })
 })

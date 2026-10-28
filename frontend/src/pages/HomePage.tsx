@@ -1,126 +1,287 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
-import { paperButton } from '../auth/classes'
 import { useAuth } from '../auth/context'
-import { pictures } from '../credits'
+import { Binomial, Illustration } from '../components/ui/Brand'
+import { ButtonLink } from '../components/ui/Button'
+import { Handwritten, Tape } from '../components/ui/Paper'
+import { PlateCorners } from '../components/ui/Plate'
+import { plateClasses } from '../components/ui/plateClasses'
+import { Stamp } from '../components/ui/Stamp'
+import { cx } from '../lib/cx'
+import { formatNumber } from '../tanks/numbers'
+import { useLanguage } from '../tanks/useLanguage'
 
-const logged = ['parameters', 'maintenance', 'photos'] as const
-
-// Rows step down through the blackwater tones.
-const rowTones = ['bg-tannin-2', 'bg-tannin-3', 'bg-tannin-2']
-
+/**
+ * The landing page, after the kit's. It leaves out the kit's demo section and buttons until the Demo Tank
+ * exists (phase 1, ticket 13).
+ */
 export function HomePage() {
-  const { t } = useTranslation()
-  const { state } = useAuth()
-
   return (
     <>
-      <section className="grid items-end gap-10 px-5 pt-4 pb-24 sm:px-8 lg:grid-cols-[5fr_7fr] lg:gap-16">
-        <div className="lg:pb-10">
-          <h1 className="rise font-display text-[clamp(40px,5.4vw,88px)] leading-[0.98] tracking-[-0.02em]">
-            {t('home.title')}
+      <Hero />
+      <Idea />
+      <Features />
+      <Roadmap />
+      <Why />
+    </>
+  )
+}
+
+function Hero() {
+  const { t } = useTranslation()
+  const { state } = useAuth()
+  return (
+    // The header above has the same texture; the hero starts where the header ends, so the roots carry on.
+    <section
+      aria-labelledby="hero-title"
+      className="relative overflow-hidden texture-river-wide bg-position-[right_-60px_top_-280px] text-river-bright"
+    >
+      <Illustration
+        slug="floating-plants"
+        decorative
+        eager
+        className="pointer-events-none absolute top-0 left-0 min-w-[1100px] opacity-90"
+      />
+      <div className="relative mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(480px,100%),1fr))] items-center gap-14 px-6 pt-28 pb-24">
+        <div className="flex flex-col gap-6.5">
+          <h1 id="hero-title" className="m-0 text-hero font-normal tracking-[-0.02em] text-balance">
+            {t('home.title')} <em className="font-light text-amber">{t('home.titleEmphasis')}</em>
           </h1>
-          <p className="rise mt-8 max-w-[34ch] text-[18px] leading-relaxed">{t('home.lead')}</p>
-          {state.status === 'out' && (
-            <p className="rise mt-8">
-              <Link to="/signup" className={paperButton}>
-                {t('home.cta')}
-              </Link>
-            </p>
-          )}
-          <p className="rise mt-6 max-w-[34ch] text-[15px]">{t('home.status')}</p>
-        </div>
-        <figure className="settle">
-          <div className="aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-[72svh]">
-            <img
-              src={pictures.cachoeira.src}
-              width={pictures.cachoeira.width}
-              height={pictures.cachoeira.height}
-              alt={t('home.hero.alt')}
-              className="drift size-full object-cover object-[60%_50%]"
-            />
+          <p className="m-0 max-w-[34ch] text-[1.3125rem] leading-normal text-river-text">{t('home.lead')}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-6 gap-y-3">
+            {state.status === 'in' ? (
+              <ButtonLink to="/tanks" variant="amber" size="lg" iconEnd="arrowRight">
+                {t('home.myTanks')}
+              </ButtonLink>
+            ) : (
+              <>
+                <ButtonLink to="/signup" variant="amber" size="lg" iconEnd="arrowRight">
+                  {t('home.signUp')}
+                </ButtonLink>
+                <Link to="/login" className="inline-flex min-h-11 items-center text-[1.0625rem] text-river-bright">
+                  {t('home.logIn')}
+                </Link>
+              </>
+            )}
           </div>
-          <figcaption className="mt-3 font-display text-[18px] italic">{t('home.hero.caption')}</figcaption>
-        </figure>
-      </section>
+        </div>
 
-      <section aria-labelledby="logged" className="bg-tannin text-on-tannin">
-        <div className="grid lg:grid-cols-12">
-          <figure className="rise lg:col-span-5">
-            <img
-              src={pictures.neon.src}
-              width={pictures.neon.width}
-              height={pictures.neon.height}
-              alt={t('home.logged.neonAlt')}
-              loading="lazy"
-              className="aspect-[4/3] w-full object-cover object-[30%_50%] lg:aspect-auto lg:h-full"
-            />
-            <figcaption className="sr-only">{t('home.logged.neonCaption')}</figcaption>
+        <div className="relative h-[620px]">
+          <figure
+            className={cx(
+              plateClasses('md'),
+              'absolute top-0 right-0 m-0 w-[92%] -rotate-[1.6deg] shadow-[inset_0_0_0_5px_var(--color-paper-card),inset_0_0_0_6px_rgb(36_26_17/0.55),var(--shadow-float)]',
+            )}
+          >
+            <PlateCorners items={[`${t('ui.plate.plate')} I`, t('home.hero.water'), `${t('ui.plate.fig')} 1`]} />
+            <Illustration slug="paracheirodon-axelrodi" decorative eager className="mt-3.5 mb-1.5" />
+            <figcaption className="flex flex-col gap-0.5 border-t border-ink/40 pt-3">
+              <span className="text-[1.625rem]">
+                <Binomial>Paracheirodon axelrodi</Binomial>{' '}
+                <span className="text-[0.9375rem] text-ink-muted">(Schultz, 1956)</span>
+              </span>
+              <span className="font-mono text-[0.78125rem] text-ink-muted">{t('home.hero.caption')}</span>
+            </figcaption>
           </figure>
-          <div className="lg:col-span-7">
-            <h2 id="logged" className="rise px-5 pt-12 pb-8 font-display text-[30px] italic sm:px-8">
-              {t('home.logged.title')}
-            </h2>
-            <ul>
-              {logged.map((key, index) => (
-                <li
-                  key={key}
-                  className={`rise grid gap-x-8 gap-y-2 px-5 py-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:px-8 ${rowTones[index]}`}
-                >
-                  <p className="font-display text-[clamp(56px,5.4vw,88px)] leading-[0.9] tracking-[-0.03em] text-neon-glow">
-                    {t(`home.logged.${key}.figure`)}
-                  </p>
-                  <div>
-                    <h3 className="font-display text-[30px] leading-[1.1]">{t(`home.logged.${key}.label`)}</h3>
-                    <p className="mt-2 max-w-[40ch] text-[18px] leading-relaxed">{t(`home.logged.${key}.note`)}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p aria-hidden="true" className="px-5 py-4 font-display text-[18px] text-on-tannin-muted italic sm:px-8">
-              {t('home.logged.neonCaption')}
-            </p>
-          </div>
+          <figure className={cx(plateClasses('sm'), 'absolute bottom-0 left-0 m-0 w-[46%] rotate-[2.4deg] shadow-float')}>
+            <PlateCorners items={[`${t('ui.plate.fig')} 2`]} />
+            <Illustration slug="symphysodon-aequifasciatus" decorative eager />
+            <figcaption className="text-base">
+              <Binomial>Symphysodon aequifasciatus</Binomial>
+            </figcaption>
+          </figure>
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
 
-      <section aria-labelledby="notes" className="grid items-center gap-10 px-5 py-28 sm:px-8 lg:grid-cols-12 lg:py-40">
-        {/* The paper behind the plate matters: an animated parent isolates the multiply blend. */}
-        <figure className="rise order-last bg-paper lg:order-first lg:col-span-7">
-          <img
-            src={pictures.geophagus.src}
-            width={pictures.geophagus.width}
-            height={pictures.geophagus.height}
-            alt={t('home.notes.plateAlt')}
-            loading="lazy"
-            className="plate h-auto w-full"
-          />
-          <figcaption className="mt-2 font-display text-[18px] italic">{t('home.notes.plateCaption')}</figcaption>
-        </figure>
-        <div className="lg:col-span-5">
-          <h2 id="notes" className="rise font-display text-[clamp(40px,5.4vw,88px)] leading-[0.98] tracking-[-0.02em]">
-            {t('home.notes.title')}
-          </h2>
-          <p className="rise mt-6 max-w-[36ch] text-[18px] leading-relaxed">{t('home.notes.text')}</p>
-        </div>
-      </section>
+/** Made-up points for the picture; the caption says so. */
+const chartPath = 'M40 130 L82 105 L124 80 L166 120 L208 90 L250 55 L292 30 L334 105 L376 120 L418 90 L460 110 L502 100 L544 130'
 
-      {/* Caption above the photo, so the band runs straight into the footer. */}
-      <figure className="flex flex-col-reverse">
-        <div className="h-[56svh] overflow-hidden lg:h-[78svh]">
-          <img
-            src={pictures.igapo.src}
-            width={pictures.igapo.width}
-            height={pictures.igapo.height}
-            alt={t('home.notes.igapoAlt')}
-            loading="lazy"
-            className="size-full object-cover object-[50%_70%]"
-          />
-        </div>
-        <figcaption className="px-5 pb-3 font-display text-[18px] italic sm:px-8">
-          {t('home.notes.igapoCaption')}
+function Idea() {
+  const { t } = useTranslation()
+  return (
+    <section
+      aria-labelledby="idea-title"
+      className="mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(440px,100%),1fr))] items-center gap-14 px-6 pt-24 pb-10"
+    >
+      <div className="flex flex-col gap-4.5">
+        <h2 id="idea-title" className="m-0 text-display font-normal tracking-[-0.015em] text-balance">
+          {t('home.idea.title')}
+        </h2>
+        <p className="m-0 max-w-[46ch] text-ink-soft">{t('home.idea.body')}</p>
+      </div>
+      <figure className={cx(plateClasses('md'), 'm-0')}>
+        <PlateCorners items={[t('home.idea.chartLabel'), t('home.idea.chartRange')]} />
+        <svg aria-hidden="true" viewBox="0 0 560 230" className="mt-2 block h-auto w-full">
+          <path d={chartPath} fill="none" className="stroke-cardinal" strokeWidth="2.6" strokeLinejoin="round" />
+          <path d="M262 206 L322 206" className="stroke-cardinal" strokeWidth="1.4" strokeDasharray="3 4" />
+        </svg>
+        <figcaption className="mt-1 flex flex-wrap justify-between gap-4">
+          <Handwritten tone="red">{t('home.idea.chartNote')} ↑</Handwritten>
+          <span className="self-end font-mono text-[0.71875rem] text-ink-muted">{t('home.idea.chartLegend')}</span>
         </figcaption>
       </figure>
-    </>
+    </section>
+  )
+}
+
+const sample = [
+  { key: 'temperature', value: 27.5 },
+  { key: 'ph', value: 5.8 },
+  { key: 'gh', value: 2 },
+  { key: 'kh', value: 1 },
+  { key: 'nitrite', value: 0 },
+  { key: 'nitrate', value: 10 },
+] as const
+
+const features = ['tanks', 'measurements', 'maintenance', 'photos'] as const
+
+function Features() {
+  const { t } = useTranslation()
+  const language = useLanguage()
+  return (
+    <section aria-labelledby="features-title" className="mx-auto max-w-site px-6 pt-14 pb-20">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-ink pb-3.5">
+        <h2 id="features-title" className="m-0 text-[2.5rem] font-normal">
+          {t('home.features.title')}
+        </h2>
+        <span className="label-mono text-ink-muted">{t('home.features.phase')}</span>
+      </div>
+      <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-l border-ink p-0">
+        {features.map((feature, i) => (
+          <li key={feature} className="flex flex-col gap-3 border-r border-b border-ink px-6 pt-6.5 pb-7.5">
+            <span aria-hidden="true" className="plate-corner">
+              {t('ui.plate.fig')} {'ABCD'[i]}
+            </span>
+            <div aria-hidden="true" className="flex min-h-[150px] items-center justify-center">
+              {feature === 'tanks' && <Illustration slug="blackwater" decorative />}
+              {feature === 'measurements' && (
+                <div className="grid grid-cols-3 gap-1.5">
+                  {sample.map(({ key, value }) => (
+                    <span key={key} className="flex flex-col gap-0.5 border border-ink/60 px-2 py-1.5 font-mono">
+                      <span className="text-caption text-ink-muted">{t(`home.features.measurements.sample.${key}`)}</span>
+                      <span className="text-lg text-ink">{formatNumber(value, language, { maxDecimals: 1 })}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {feature === 'maintenance' && (
+                <div className="flex gap-2.5">
+                  <Stamp
+                    tone="neon"
+                    size="lg"
+                    top={t('home.features.maintenance.waterChange.top')}
+                    main="30%"
+                    bottom={t('home.features.maintenance.waterChange.bottom')}
+                    rotate={-12}
+                  />
+                  <Stamp tone="forest" size="md" main={t('home.features.maintenance.pruning')} rotate={8} />
+                </div>
+              )}
+              {feature === 'photos' && (
+                <Illustration slug="blackwater" decorative className="w-3/4 rotate-[-4deg] bg-paper-photo p-1.5 shadow-photo" />
+              )}
+            </div>
+            <h3 className="m-0 text-h3 font-medium">{t(`home.features.${feature}.title`)}</h3>
+            <p className="m-0 text-base text-ink-soft">{t(`home.features.${feature}.body`)}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+const phases = [
+  { number: 'I', key: 'p1', art: 'paracheirodon-axelrodi', building: true },
+  { number: 'II', key: 'p2', art: 'corydoras-adolfoi', building: false },
+  { number: 'III', key: 'p3', art: 'victoria-amazonica', building: false },
+  { number: 'IV', key: 'p4', art: 'apistogramma-agassizii', building: false },
+  { number: 'V', key: 'p5', art: 'echinodorus', building: false },
+] as const
+
+function Roadmap() {
+  const { t } = useTranslation()
+  return (
+    <section aria-labelledby="roadmap-title" className="mx-auto max-w-site px-6 pt-24 pb-18">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-2.5">
+          <h2 id="roadmap-title" className="m-0 text-display font-normal tracking-[-0.015em]">
+            {t('home.roadmap.title')}
+          </h2>
+          <p className="m-0 max-w-[54ch] text-ink-soft">{t('home.roadmap.lead')}</p>
+        </div>
+        <Stamp tone="cardinal" size="xl" rotate={-10} main={t('home.roadmap.stamp')} />
+      </div>
+      <div className="relative mt-11">
+        <svg aria-hidden="true" viewBox="0 0 1200 60" preserveAspectRatio="none" className="absolute top-1 left-0 h-10 w-full">
+          <path
+            d="M0 30 C120 10 200 50 320 30 S 540 8 660 30 S 900 52 1020 28 S 1160 18 1200 30"
+            fill="none"
+            className="stroke-water-white"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+        </svg>
+        <ol className="relative m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(210px,100%),1fr))] gap-5.5 p-0">
+          {phases.map((phase) => (
+            <li key={phase.key} className="flex flex-col gap-2.5">
+              <span
+                aria-hidden="true"
+                className={cx(
+                  'flex size-12.5 items-center justify-center rounded-full border-2 border-ink text-2xl italic',
+                  phase.building ? 'bg-cardinal text-paper-card' : 'bg-paper-card',
+                )}
+              >
+                {phase.number}
+              </span>
+              <div aria-hidden="true" className="flex h-24 items-end">
+                <Illustration slug={phase.art} decorative fit="contain" className="max-h-[92px] max-w-[86%]" />
+              </div>
+              <h3 className="m-0 text-[1.375rem] leading-[1.15] font-medium">{t(`home.roadmap.phases.${phase.key}.title`)}</h3>
+              <p className="m-0 text-[0.9375rem] text-ink-soft">{t(`home.roadmap.phases.${phase.key}.body`)}</p>
+              <span
+                className={cx(
+                  'self-start px-2 py-1 font-mono text-[0.71875rem] tracking-[0.1em] uppercase',
+                  phase.building ? 'bg-cardinal text-paper-card' : 'border border-ink-muted text-ink-muted',
+                )}
+              >
+                {phase.building ? t('home.roadmap.statusBuilding') : t('home.roadmap.statusPlanned')}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <p className="mt-10 border-t border-dashed border-ink/50 pt-4 font-mono text-[0.8125rem] text-ink-soft">
+        {t('home.roadmap.today')}
+      </p>
+    </section>
+  )
+}
+
+function Why() {
+  const { t } = useTranslation()
+  return (
+    <section
+      aria-labelledby="why-title"
+      className="mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-center gap-14 px-6 pt-6 pb-28"
+    >
+      <Illustration
+        slug="eichhornia-crassipes"
+        decorative
+        className="mx-auto max-w-[330px] [mask-image:linear-gradient(to_right,transparent,#000_22%,#000_78%,transparent)]"
+      />
+      <figure className="relative m-0 rotate-[0.8deg] border border-ink/35 texture-card px-10 pt-10 pb-8.5 shadow-[0_14px_30px_rgb(36_26_17/0.18)]">
+        <Tape className="-top-3.5 left-1/2 -ml-15 w-30" />
+        <h2 id="why-title" className="sr-only">
+          {t('home.why.title')}
+        </h2>
+        <blockquote className="ruled m-0 font-hand text-[1.8125rem] leading-[34px] text-ink-blue [background-size:100%_34px]">
+          {t('home.why.body')}
+        </blockquote>
+        <figcaption className="mt-3.5 text-right font-hand text-[1.625rem] text-ink-blue">{t('home.why.signature')}</figcaption>
+      </figure>
+    </section>
   )
 }

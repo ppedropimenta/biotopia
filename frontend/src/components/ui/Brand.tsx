@@ -90,6 +90,7 @@ export function Illustration({
   decorative = false,
   className,
   fit = 'width',
+  eager = false,
 }: {
   slug: string
   alt?: string
@@ -97,6 +98,8 @@ export function Illustration({
   className?: string
   /** "width": 100% wide and as tall as it needs; "contain": fits the box of its parent. */
   fit?: 'width' | 'contain'
+  /** For a drawing that is on screen at first paint; the others load when they get near. */
+  eager?: boolean
 }) {
   const art = findArt(slug)
   if (!art) return <FishPlaceholder className={className} />
@@ -107,7 +110,7 @@ export function Illustration({
       height={art.height}
       alt={decorative ? '' : alt}
       aria-hidden={decorative || undefined}
-      loading="lazy"
+      loading={eager ? 'eager' : 'lazy'}
       className={cx(fit === 'width' ? 'block h-auto w-full' : 'block max-h-full max-w-full object-contain', className)}
     />
   )

@@ -38,7 +38,7 @@ function Hero() {
         slug="floating-plants"
         decorative
         eager
-        className="pointer-events-none absolute top-0 left-0 min-w-[1100px] opacity-90"
+        className="pointer-events-none absolute -top-4 left-0 min-w-[1100px] opacity-90"
       />
       <div className="relative mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(480px,100%),1fr))] items-center gap-14 px-6 pt-28 pb-24">
         <div className="flex flex-col gap-6.5">

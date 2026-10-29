@@ -7,8 +7,11 @@ import { ChipGroup, Segmented, ToggleChip } from '../components/ui/Chip'
 import { PlateCorners } from '../components/ui/Plate'
 import { plateClasses } from '../components/ui/plateClasses'
 import { PageHeader } from '../components/ui/Structure'
+import { buildHistory, markersIn } from '../tanks/history'
+import { HistoryList } from '../tanks/HistoryList'
 import { LoadError } from '../tanks/LoadError'
-import { formatMoment, valueDecimals, type ParameterCode } from '../tanks/measurements'
+import type { Maintenance } from '../tanks/maintenance'
+import { formatMoment, valueDecimals, type Measurement, type Parameter, type ParameterCode } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import { buildPanels, momentsOf, periods, periodStart, timeRange, type Panel, type Period } from '../tanks/series'
 import { useLanguage } from '../tanks/useLanguage'
@@ -26,15 +29,16 @@ export function TimelinePage() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
   const [search, setSearch] = useSearchParams()
-  const [view, setView] = useState<'chart' | 'table'>('chart')
+  const [view, setView] = useState<'chart' | 'table' | 'history'>('chart')
   const [hidden, setHidden] = useState<ReadonlySet<ParameterCode>>(new Set())
   const loaded = useLoad(async () => {
-    const [tank, parameters, measurements] = await Promise.all([
+    const [tank, parameters, measurements, maintenance] = await Promise.all([
       api.tank(id),
       api.parameters(),
       api.measurements(id, historyCount),
+      api.maintenance(id, { limit: historyCount }),
     ])
-    return { tank, parameters, measurements, now: new Date() }
+    return { tank, parameters, measurements, maintenance, now: new Date() }
   }, `timeline-${id}`)
 
   const crumbs = [{ label: t('ui.nav.myTanks'), to: '/tanks' }]
@@ -48,7 +52,7 @@ export function TimelinePage() {
     )
   }
 
-  const { tank, parameters, measurements, now } = loaded.data
+  const { tank, parameters, measurements, maintenance, now } = loaded.data
   const requested = search.get('period')
   const period = isPeriod(requested) ? requested : defaultPeriod
   const from = periodStart(period, now)
@@ -71,7 +75,7 @@ export function TimelinePage() {
         title={t('timeline.title')}
         subtitle={t('timeline.subtitle', { name: tank.name })}
         actions={
-          panels.length > 0 && (
+          (inPeriod.length > 0 || maintenance.length > 0) && (
             <Segmented
               label={t('timeline.view')}
               value={view}
@@ -79,6 +83,7 @@ export function TimelinePage() {
               options={[
                 { value: 'chart', label: t('timeline.chartView') },
                 { value: 'table', label: t('timeline.tableView') },
+                { value: 'history', label: t('timeline.historyView') },
               ]}
             />
           )
@@ -108,10 +113,18 @@ export function TimelinePage() {
         )}
       </div>
 
-      {panels.length === 0 ? (
+      {view === 'history' ? (
+        <History
+          measurements={measurements}
+          maintenance={maintenance}
+          parameters={parameters}
+          from={from}
+          netVolumeLiters={tank.netVolumeLiters}
+        />
+      ) : panels.length === 0 ? (
         <Empty tankId={tank.id} anyMeasurements={measurements.length > 0} />
       ) : view === 'chart' ? (
-        <ChartPlate panels={panels} from={from} now={now} />
+        <ChartPlate panels={panels} maintenance={maintenance} from={from} now={now} />
       ) : (
         <ValuesTable panels={panels} />
       )}
@@ -136,7 +149,41 @@ function Empty({ tankId, anyMeasurements }: { tankId: string; anyMeasurements: b
   )
 }
 
-function ChartPlate({ panels, from, now }: { panels: Panel[]; from: Date | null; now: Date }) {
+/** Everything that happened in the period, measured or done, day by day. */
+function History({
+  measurements,
+  maintenance,
+  parameters,
+  from,
+  netVolumeLiters,
+}: {
+  measurements: Measurement[]
+  maintenance: Maintenance[]
+  parameters: Parameter[]
+  from: Date | null
+  netVolumeLiters: number | null
+}) {
+  const { t } = useTranslation()
+  const start = from?.getTime() ?? -Infinity
+  const days = buildHistory(
+    measurements.filter((m) => Date.parse(m.measuredAt) >= start),
+    maintenance.filter((m) => Date.parse(m.performedAt) >= start),
+  )
+  if (days.length === 0) return <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('timeline.history.empty')}</p>
+  return <HistoryList days={days} parameters={parameters} netVolumeLiters={netVolumeLiters} />
+}
+
+function ChartPlate({
+  panels,
+  maintenance,
+  from,
+  now,
+}: {
+  panels: Panel[]
+  maintenance: Maintenance[]
+  from: Date | null
+  now: Date
+}) {
   const { t } = useTranslation()
   const [start, end] = timeRange(panels, from, now)
   const names = panels.map((p) => t(`parameters.${p.parameter}`)).join(', ')
@@ -148,6 +195,7 @@ function ChartPlate({ panels, from, now }: { panels: Panel[]; from: Date | null;
         panels={panels}
         from={start}
         to={end}
+        markers={markersIn(maintenance, start, end)}
         description={t('timeline.description', { parameters: names, count: momentsOf(panels).length })}
       />
     </figure>

@@ -8,6 +8,8 @@ import { ParamTile } from '../components/ui/Measures'
 import { Handwritten } from '../components/ui/Paper'
 import { SectionHeader } from '../components/ui/Structure'
 import type { Language } from '../i18n/language'
+import { markersIn } from './history'
+import type { Maintenance } from './maintenance'
 import { latestValues, type Change, type LatestValue } from './latest'
 import { formatMoment, groupByMoment, valueDecimals, type Measurement, type Parameter } from './measurements'
 import { formatNumber } from './numbers'
@@ -32,12 +34,14 @@ export function MeasurementSections({ tankId, children }: { tankId: string; chil
   const { t } = useTranslation()
   const loaded = useLoad(
     async () => {
-      const [parameters, latest, history] = await Promise.all([
+      const [parameters, latest, history, maintenance] = await Promise.all([
         api.parameters(),
         api.latestMeasurements(tankId),
         api.measurements(tankId, historyCount),
+        // The chart is fine without its markers, so a failure here is not the page's failure.
+        api.maintenance(tankId, { limit: historyCount }).catch((): Maintenance[] => []),
       ])
-      return { parameters, latest, history, now: new Date() }
+      return { parameters, latest, history, maintenance, now: new Date() }
     },
     `water-${tankId}`,
   )
@@ -50,11 +54,11 @@ export function MeasurementSections({ tankId, children }: { tankId: string; chil
       </p>
     )
   }
-  const { parameters, latest, history, now } = loaded.data
+  const { parameters, latest, history, maintenance, now } = loaded.data
   return (
     <>
       <LatestMeasurement tankId={tankId} values={latestValues(parameters, latest, history)} />
-      <RecentChart tankId={tankId} parameters={parameters} history={history} now={now} />
+      <RecentChart tankId={tankId} parameters={parameters} history={history} maintenance={maintenance} now={now} />
       {children}
       <MeasurementsTable tankId={tankId} parameters={parameters} measurements={history.slice(0, tableCount)} />
     </>
@@ -136,11 +140,13 @@ function RecentChart({
   tankId,
   parameters,
   history,
+  maintenance,
   now,
 }: {
   tankId: string
   parameters: Parameter[]
   history: Measurement[]
+  maintenance: Maintenance[]
   now: Date
 }) {
   const { t } = useTranslation()
@@ -160,6 +166,7 @@ function RecentChart({
           panels={[panel]}
           from={start}
           to={end}
+          markers={markersIn(maintenance, start, end)}
           size="compact"
           description={t('timeline.description', { parameters: name, count: panel.points.length })}
         />

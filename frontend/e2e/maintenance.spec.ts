@@ -68,7 +68,22 @@ test('a keeper records a water change and other care, edits one, deletes one and
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My tanks' }).click()
   await expect(page.getByText('Last water change: 25% · today')).toBeVisible()
 
+  // A measurement and the maintenance share the history, and the maintenance marks the chart.
+  await page.getByRole('link', { name: /Care log/ }).click()
+  await page.getByRole('link', { name: 'Log measurement' }).first().click()
+  await page.getByLabel(/^Nitrate/).fill('20')
+  await page.getByRole('button', { name: 'Save measurements' }).click()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Timeline' }).click()
+  await expect(page.getByText(/^Water change, /)).toBeAttached()
+  await page.getByRole('button', { name: 'History' }).click()
+  const history = page.locator('main section ol > li')
+  await expect(history).toHaveCount(3)
+  await expect(history.nth(0)).toContainText('Nitrate (NO₃) 20 mg/L')
+  await expect(history.nth(1)).toContainText('Moved the heater')
+  await expect(history.nth(2)).toContainText('Water change')
+
   // Deleting removes only that entry.
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My tanks' }).click()
   await page.getByRole('link', { name: /Care log/ }).click()
   await page.getByRole('link', { name: 'All maintenance' }).click()
   await page.getByRole('link', { name: /^Edit Other from/ }).click()

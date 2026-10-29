@@ -2,6 +2,8 @@ import { useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cx } from '../../lib/cx'
 import { scaleLinear } from '../../lib/ranges'
+import type { Marker } from '../../tanks/history'
+import { stampTones } from '../../tanks/maintenance'
 import { formatMoment, valueDecimals } from '../../tanks/measurements'
 import { formatNumber } from '../../tanks/numbers'
 import { momentsOf, timeTicks, type Panel } from '../../tanks/series'
@@ -18,6 +20,22 @@ const geometry = {
   compact: { width: 560, left: 56, rightPad: 22, panelHeight: 120, minWidth: '' },
 } as const
 
+/** The strokes and fills of the marker tones, written out whole so Tailwind finds them. */
+const markerTone = {
+  neon: { line: 'stroke-neon', glyph: 'fill-neon', text: 'fill-neon' },
+  cardinal: { line: 'stroke-cardinal', glyph: 'fill-cardinal', text: 'fill-cardinal' },
+  forest: { line: 'stroke-forest', glyph: 'fill-forest', text: 'fill-forest' },
+  ochre: { line: 'stroke-ochre', glyph: 'fill-ochre', text: 'fill-ochre' },
+  ink: { line: 'stroke-ink', glyph: 'fill-ink', text: 'fill-ink' },
+  muted: { line: 'stroke-ink-muted', glyph: 'fill-ink-muted', text: 'fill-ink-muted' },
+  amber: { line: 'stroke-amber', glyph: 'fill-amber', text: 'fill-amber' },
+} as const
+
+/** The room a lane of marker labels takes between the last panel and the time axis. */
+const laneHeight = 30
+/** Labels closer than this would overlap, so the later one is left to the list for screen readers. */
+const labelGap = 54
+
 const top = 40
 const panelGap = 40
 const day = 24 * 60 * 60 * 1000
@@ -26,6 +44,7 @@ export function ParameterChart({
   panels,
   from,
   to,
+  markers = [],
   description,
   size = 'full',
   className,
@@ -33,6 +52,8 @@ export function ParameterChart({
   panels: readonly Panel[]
   from: number
   to: number
+  /** Maintenance in the time range: a line through every panel and a label in a lane above the time axis. */
+  markers?: readonly Marker[]
   /** What the chart shows, for a screen reader: the drawing alone says nothing. */
   description: string
   size?: 'full' | 'compact'
@@ -49,7 +70,20 @@ export function ParameterChart({
   const number = (value: number) => formatNumber(value, language, { maxDecimals: valueDecimals })
 
   const panelTop = (i: number) => top + i * (panelHeight + panelGap)
-  const axisY = panelTop(panels.length - 1) + panelHeight + 36
+  // The ids of the markers that get a label: each one at least `labelGap` after the last one that did.
+  const labelled = useMemo(() => {
+    const ids = new Set<string>()
+    let lastX = -Infinity
+    for (const marker of markers) {
+      if (x(marker.at) - lastX >= labelGap) {
+        ids.add(marker.id)
+        lastX = x(marker.at)
+      }
+    }
+    return ids
+  }, [markers, x])
+  const lane = markers.length > 0 ? laneHeight : 0
+  const axisY = panelTop(panels.length - 1) + panelHeight + 36 + lane
   const height = axisY + 34
 
   // The year is added only when the axis is long enough to cross into another one.
@@ -153,6 +187,31 @@ export function ParameterChart({
               )
             })}
 
+            {markers.map((marker) => {
+              const tone = markerTone[stampTones[marker.type]]
+              const mx = x(marker.at)
+              return (
+                <g key={marker.id}>
+                  <line
+                    x1={mx}
+                    y1={top - 6}
+                    x2={mx}
+                    y2={axisY}
+                    className={tone.line}
+                    strokeWidth={1.2}
+                    strokeDasharray="2 4"
+                    strokeOpacity={0.7}
+                  />
+                  <path d={`M${mx} ${axisY - 22} l5 5 l-5 5 l-5 -5 z`} className={tone.glyph} />
+                  {labelled.has(marker.id) && (
+                    <text x={mx} y={axisY - 28} textAnchor="middle" fontSize="10" letterSpacing="0.8" className={`${tone.text} font-mono uppercase`}>
+                      {t(`maintenance.stamps.${marker.type}`)}
+                    </text>
+                  )}
+                </g>
+              )
+            })}
+
             <line x1={left} y1={axisY} x2={right} y2={axisY} className="stroke-ink" strokeWidth={1.2} />
             {timeTicks(from, to, size === 'full' ? 6 : 4).map((instant) => (
               <g key={instant}>
@@ -182,6 +241,18 @@ export function ParameterChart({
         {readout}
       </p>
       <p className="sr-only">{t('timeline.keyboardHint')}</p>
+      {markers.length > 0 && (
+        <ul className="sr-only">
+          {markers.map((marker) => (
+            <li key={marker.id}>
+              {t('timeline.marker', {
+                type: t(`maintenance.types.${marker.type}`),
+                when: formatMoment(new Date(marker.at).toISOString(), language),
+              })}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

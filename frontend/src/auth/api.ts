@@ -1,5 +1,6 @@
 import type { Language } from '../i18n/language'
 import type { Measurement, MeasurementChange, NewMeasurements, Parameter } from '../tanks/measurements'
+import type { Maintenance, MaintenanceDetails, MaintenanceType } from '../tanks/maintenance'
 import type { Tank, TankDetails } from '../tanks/types'
 
 export type Account = { email: string; language: Language }
@@ -92,5 +93,19 @@ export const api = {
     request<Measurement>('PUT', `/api/tanks/${tankId}/measurements/${id}`, change),
   deleteMeasurement: (tankId: string, id: string) =>
     request<void>('DELETE', `/api/tanks/${tankId}/measurements/${id}`),
+  /** The tank's Maintenance, newest first; `type` keeps only that kind. */
+  maintenance: (tankId: string, { type, limit }: { type?: MaintenanceType; limit?: number } = {}) => {
+    const query = new URLSearchParams()
+    if (type) query.set('type', type)
+    if (limit) query.set('limit', String(limit))
+    return request<Maintenance[]>('GET', `/api/tanks/${tankId}/maintenance?${query}`)
+  },
+  maintenanceEntry: (tankId: string, id: string) =>
+    request<Maintenance>('GET', `/api/tanks/${tankId}/maintenance/${id}`),
+  recordMaintenance: (tankId: string, details: MaintenanceDetails) =>
+    request<Maintenance>('POST', `/api/tanks/${tankId}/maintenance`, details),
+  editMaintenance: (tankId: string, id: string, details: MaintenanceDetails) =>
+    request<Maintenance>('PUT', `/api/tanks/${tankId}/maintenance/${id}`, details),
+  deleteMaintenance: (tankId: string, id: string) => request<void>('DELETE', `/api/tanks/${tankId}/maintenance/${id}`),
   saveLanguage: (language: Language) => request<void>('PUT', '/api/me/language', { language }),
 }

@@ -9,6 +9,8 @@ import { CreditsPage } from './pages/CreditsPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { HomePage } from './pages/HomePage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { MaintenanceFormPage } from './pages/MaintenanceFormPage'
+import { MaintenancePage } from './pages/MaintenancePage'
 import { MeasurementEditPage } from './pages/MeasurementEditPage'
 import { MeasurementFormPage } from './pages/MeasurementFormPage'
 import { SignInPage } from './pages/SignInPage'
@@ -47,6 +49,9 @@ export default function App() {
               <Route path="tanks/:id" element={<TankPage />} />
               <Route path="tanks/:id/edit" element={<TankFormPage />} />
               <Route path="tanks/:id/timeline" element={<TimelinePage />} />
+              <Route path="tanks/:id/maintenance" element={<MaintenancePage />} />
+              <Route path="tanks/:id/maintenance/new" element={<MaintenanceFormPage mode="new" />} />
+              <Route path="tanks/:id/maintenance/:maintenanceId/edit" element={<MaintenanceFormPage mode="edit" />} />
               <Route path="tanks/:id/measure" element={<MeasurementFormPage />} />
               <Route path="tanks/:id/measurements/:measurementId/edit" element={<MeasurementEditPage />} />
             </Route>

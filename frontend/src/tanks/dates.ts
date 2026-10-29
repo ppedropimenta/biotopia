@@ -19,3 +19,15 @@ export function weeksRunning(startDate: string, today: Date): number {
   const days = (Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(year, month - 1, day)) / msPerDay
   return Math.max(0, Math.floor(days / 7))
 }
+
+/**
+ * How long ago an instant was, in the language: days for the first two weeks, then weeks for about two months,
+ * then months. A moment a few hours ahead of the clock still reads "today".
+ */
+export function daysAgo(instant: string, now: Date, language: Language): string {
+  const days = Math.max(0, Math.floor((now.getTime() - new Date(instant).getTime()) / msPerDay))
+  const format = new Intl.RelativeTimeFormat(language, { numeric: 'auto' })
+  if (days < 14) return format.format(-days, 'day')
+  if (days < 60) return format.format(-Math.floor(days / 7), 'week')
+  return format.format(-Math.floor(days / 30), 'month')
+}

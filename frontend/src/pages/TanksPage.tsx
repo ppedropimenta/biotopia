@@ -10,7 +10,8 @@ import { Sparkline } from '../components/ui/Measures'
 import { PageHeader } from '../components/ui/Structure'
 import { cx } from '../lib/cx'
 import { roman } from '../lib/roman'
-import { formatDay } from '../tanks/dates'
+import { daysAgo, formatDay } from '../tanks/dates'
+import type { Maintenance } from '../tanks/maintenance'
 import { valueDecimals, type Measurement, type Parameter } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import { plateValues } from '../tanks/plates'
@@ -25,16 +26,17 @@ const sparklineHistory = 100
 /** The values a sparkline draws for a Parameter. */
 const sparklineValues = 12
 
-type Loaded = { tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][]; history: Measurement[][] }
+type Loaded = { now: Date; tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][]; history: Measurement[][]; lastWaterChange: Array<Maintenance | undefined> }
 
 /** The tanks and, for each, its latest Measurements and its recent ones: the plates show values and their trend. */
 async function loadTanks(): Promise<Loaded> {
   const [tanks, parameters] = await Promise.all([api.tanks(), api.parameters()])
-  const [latest, history] = await Promise.all([
+  const [latest, history, lastWaterChange] = await Promise.all([
     Promise.all(tanks.map((tank) => api.latestMeasurements(tank.id))),
     Promise.all(tanks.map((tank) => api.measurements(tank.id, sparklineHistory))),
+    Promise.all(tanks.map(async (tank) => (await api.maintenance(tank.id, { type: 'water_change', limit: 1 }))[0])),
   ])
-  return { tanks, parameters, latest, history }
+  return { tanks, parameters, latest, history, lastWaterChange, now: new Date() }
 }
 
 export function TanksPage() {
@@ -64,7 +66,11 @@ export function TanksPage() {
             <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7 p-0">
               {loaded.data.tanks.map((tank, i) => (
                 <li key={tank.id} className="flex">
-                  <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]} history={loaded.data.history[i]} />
+                  <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]}
+                    history={loaded.data.history[i]}
+                    lastWaterChange={loaded.data.lastWaterChange[i]}
+                    now={loaded.data.now}
+                  />
                 </li>
               ))}
             </ul>
@@ -83,12 +89,16 @@ function TankPlate({
   parameters,
   latest,
   history,
+  lastWaterChange,
+  now,
 }: {
   number: number
   tank: Tank
   parameters: Parameter[]
   latest: Measurement[]
   history: Measurement[]
+  lastWaterChange: Maintenance | undefined
+  now: Date
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
@@ -115,6 +125,14 @@ function TankPlate({
       <div className="flex flex-col gap-0.5">
         <h2 className="m-0 text-[1.6875rem] leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
         <span className="font-mono text-[0.78125rem] text-ink-muted">{facts.join(' · ')}</span>
+        {lastWaterChange?.percent != null && (
+          <span className="font-mono text-[0.78125rem] text-ink-muted">
+            {t('maintenance.lastWaterChange', {
+              percent: formatNumber(lastWaterChange.percent, language),
+              when: daysAgo(lastWaterChange.performedAt, now, language),
+            })}
+          </span>
+        )}
       </div>
       <dl className="m-0 mt-auto grid grid-cols-3 border-y border-ink/35">
         {plateValues(latest).map(({ parameter, value }, i) => (

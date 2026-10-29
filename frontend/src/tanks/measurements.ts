@@ -78,12 +78,12 @@ function readValue(text: string, parameter: Parameter, language: Language): numb
 }
 
 /** A date-and-time field's text as an instant, or null when it is not a date and time. */
-function readMoment(text: string): string | null {
+export function readMoment(text: string): string | null {
   const date = new Date(text)
   return text === '' || Number.isNaN(date.getTime()) ? null : date.toISOString()
 }
 
-const cleanNote = (note: string) => (note.trim() === '' ? null : note.trim())
+export const cleanNote = (note: string) => (note.trim() === '' ? null : note.trim())
 
 /** The request for what was typed, or the problems to show first. Nothing is sent for a Parameter left empty. */
 export function toNewMeasurements(

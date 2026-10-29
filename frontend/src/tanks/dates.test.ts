@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDay, weeksRunning } from './dates'
+import { daysAgo, formatDay, weeksRunning } from './dates'
 
 describe('formatDay', () => {
   it('writes the day the way the language does', () => {
@@ -33,5 +33,21 @@ describe('weeksRunning', () => {
 
   it('is 0 for a tank that starts in the future', () => {
     expect(weeksRunning('2026-12-01', today('2026-10-24'))).toBe(0)
+  })
+})
+
+describe('daysAgo', () => {
+  const now = new Date('2026-03-20T12:00:00Z')
+
+  it('says how long ago an instant was, in the language', () => {
+    expect(daysAgo('2026-03-20T08:00:00Z', now, 'en')).toBe('today')
+    expect(daysAgo('2026-03-19T08:00:00Z', now, 'en')).toBe('yesterday')
+    expect(daysAgo('2026-03-17T08:00:00Z', now, 'en')).toBe('3 days ago')
+    expect(daysAgo('2026-03-17T08:00:00Z', now, 'pt-BR')).toBe('há 3 dias')
+  })
+
+  it('counts weeks and then months for longer spans', () => {
+    expect(daysAgo('2026-03-01T12:00:00Z', now, 'en')).toBe('2 weeks ago')
+    expect(daysAgo('2025-12-20T12:00:00Z', now, 'en')).toBe('3 months ago')
   })
 })

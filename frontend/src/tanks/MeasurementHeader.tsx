@@ -5,8 +5,17 @@ import { formatNumber } from './numbers'
 import type { Tank } from './types'
 import { useLanguage } from './useLanguage'
 
-/** The dark head of the measurement forms: a way back, the title, and the tank's name and Net Volume. */
-export function MeasurementHeader({ tank, title }: { tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters'>; title: string }) {
+/** The dark head of the measurement and maintenance forms: a way back, the title, and the tank's name and Net Volume. */
+export function MeasurementHeader({
+  tank,
+  title,
+  back,
+}: {
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters'>
+  title: string
+  /** Where the arrow goes and what it says, when not back to the tank. */
+  back?: { to: string; label: string }
+}) {
   const { t } = useTranslation()
   const language = useLanguage()
   const about = [
@@ -18,8 +27,8 @@ export function MeasurementHeader({ tank, title }: { tank: Pick<Tank, 'id' | 'na
   return (
     <header className="flex items-center gap-2 texture-river py-3.5 pr-3 pl-1.5 text-river-bright">
       <Link
-        to={`/tanks/${tank.id}`}
-        aria-label={t('measurements.form.back', { name: tank.name })}
+        to={back?.to ?? `/tanks/${tank.id}`}
+        aria-label={back?.label ?? t('measurements.form.back', { name: tank.name })}
         className="flex size-11 flex-none items-center justify-center text-river-bright"
       >
         <Icon name="arrowLeft" size={22} strokeWidth={2} />

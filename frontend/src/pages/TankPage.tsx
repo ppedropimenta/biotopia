@@ -11,6 +11,7 @@ import { Breadcrumbs } from '../components/ui/Structure'
 import { roman } from '../lib/roman'
 import { formatDay, weeksRunning } from '../tanks/dates'
 import { LoadError } from '../tanks/LoadError'
+import { MaintenanceDiary } from '../tanks/MaintenanceDiary'
 import { MeasurementSections } from '../tanks/MeasurementSections'
 import { formatNumber } from '../tanks/numbers'
 import { plateNumber } from '../tanks/plates'
@@ -48,7 +49,9 @@ export function TankPage() {
           <RecordCard tank={tank} />
         </div>
       </header>
-      <MeasurementSections tankId={tank.id} />
+      <MeasurementSections tankId={tank.id}>
+        <MaintenanceDiary tank={tank} />
+      </MeasurementSections>
     </>
   )
 }
@@ -104,6 +107,9 @@ function RecordCard({ tank }: { tank: Tank }) {
       <div className="flex flex-wrap gap-2.5">
         <ButtonLink to={`/tanks/${tank.id}/measure`} icon="plus" aria-label={t('tanks.page.addMeasurement')}>
           {t('tanks.page.measurement')}
+        </ButtonLink>
+        <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} variant="secondary" icon="plus" aria-label={t('maintenance.recordLabel')}>
+          {t('maintenance.record')}
         </ButtonLink>
         <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
           {t('tanks.page.edit')}

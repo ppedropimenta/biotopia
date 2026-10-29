@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { api } from '../auth/api'
@@ -24,10 +25,10 @@ const dashedCard =
   'flex min-h-30 flex-col items-center justify-center gap-1.5 border-[1.5px] border-dashed border-ink/55 p-3 text-center text-ink-soft no-underline hover:text-ink'
 
 /**
- * The tank page's water: the latest value of each Parameter with how it changed, then the Measurements in a table,
- * each with a way to edit it.
+ * The tank page's water: the latest value of each Parameter with how it changed, a small chart, whatever the page
+ * puts in between (`children`) and then the Measurements in a table, each with a way to edit it.
  */
-export function MeasurementSections({ tankId }: { tankId: string }) {
+export function MeasurementSections({ tankId, children }: { tankId: string; children?: ReactNode }) {
   const { t } = useTranslation()
   const loaded = useLoad(
     async () => {
@@ -54,6 +55,7 @@ export function MeasurementSections({ tankId }: { tankId: string }) {
     <>
       <LatestMeasurement tankId={tankId} values={latestValues(parameters, latest, history)} />
       <RecentChart tankId={tankId} parameters={parameters} history={history} now={now} />
+      {children}
       <MeasurementsTable tankId={tankId} parameters={parameters} measurements={history.slice(0, tableCount)} />
     </>
   )

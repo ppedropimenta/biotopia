@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * Boots the whole app on a random port against a real PostgreSQL. Tests talk to it over HTTP only.
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "app.photos.dir=target/test-photos")
 @Import({ TestcontainersConfiguration.class, TestSubstitutes.class })
 public @interface ApiTest {
 }

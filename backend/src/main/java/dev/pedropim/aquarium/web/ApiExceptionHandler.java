@@ -3,11 +3,13 @@ package dev.pedropim.aquarium.web;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 class ApiExceptionHandler {
@@ -25,6 +27,12 @@ class ApiExceptionHandler {
 			.getFieldErrors()
 			.forEach(error -> fields.putIfAbsent(error.getField(), String.valueOf(error.getDefaultMessage())));
 		return ResponseEntity.badRequest().body(new ApiError("validation_failed", fields));
+	}
+
+	/** An upload over the size the server accepts at all (see {@code spring.servlet.multipart}). */
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	ResponseEntity<ApiError> uploadTooLarge() {
+		return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE).body(new ApiError("validation_failed", Map.of("file", "too_large")));
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)

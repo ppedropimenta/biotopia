@@ -14,6 +14,8 @@ import { daysAgo, formatDay } from '../tanks/dates'
 import type { Maintenance } from '../tanks/maintenance'
 import { valueDecimals, type Measurement, type Parameter } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
+import type { PhotoSummary } from '../tanks/photos'
+import { photoUrl } from '../tanks/photos'
 import { plateValues } from '../tanks/plates'
 import { recentSeries } from '../tanks/series'
 import type { Tank } from '../tanks/types'
@@ -26,17 +28,19 @@ const sparklineHistory = 100
 /** The values a sparkline draws for a Parameter. */
 const sparklineValues = 12
 
-type Loaded = { now: Date; tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][]; history: Measurement[][]; lastWaterChange: Array<Maintenance | undefined> }
+type Loaded = { now: Date; tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][]; history: Measurement[][]; lastWaterChange: Array<Maintenance | undefined>; photos: PhotoSummary[] }
 
 /** The tanks and, for each, its latest Measurements and its recent ones: the plates show values and their trend. */
 async function loadTanks(): Promise<Loaded> {
   const [tanks, parameters] = await Promise.all([api.tanks(), api.parameters()])
-  const [latest, history, lastWaterChange] = await Promise.all([
+  const [latest, history, lastWaterChange, photos] = await Promise.all([
     Promise.all(tanks.map((tank) => api.latestMeasurements(tank.id))),
     Promise.all(tanks.map((tank) => api.measurements(tank.id, sparklineHistory))),
     Promise.all(tanks.map(async (tank) => (await api.maintenance(tank.id, { type: 'water_change', limit: 1 }))[0])),
+    // A tank whose photos cannot be read is shown with its drawing, as one with no photos.
+    Promise.all(tanks.map((tank) => api.photoSummary(tank.id).catch((): PhotoSummary => ({ count: 0, latestId: null })))),
   ])
-  return { tanks, parameters, latest, history, lastWaterChange, now: new Date() }
+  return { tanks, parameters, latest, history, lastWaterChange, photos, now: new Date() }
 }
 
 export function TanksPage() {
@@ -69,6 +73,7 @@ export function TanksPage() {
                   <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]}
                     history={loaded.data.history[i]}
                     lastWaterChange={loaded.data.lastWaterChange[i]}
+                    photos={loaded.data.photos[i]}
                     now={loaded.data.now}
                   />
                 </li>
@@ -90,6 +95,7 @@ function TankPlate({
   latest,
   history,
   lastWaterChange,
+  photos,
   now,
 }: {
   number: number
@@ -98,6 +104,7 @@ function TankPlate({
   latest: Measurement[]
   history: Measurement[]
   lastWaterChange: Maintenance | undefined
+  photos: PhotoSummary
   now: Date
 }) {
   const { t } = useTranslation()
@@ -120,8 +127,20 @@ function TankPlate({
       to={`/tanks/${tank.id}`}
       className={cx(plateClasses('md'), 'flex w-full flex-col gap-3.5 no-underline hover:text-ink')}
     >
-      <PlateCorners items={[`${t('ui.plate.plate')} ${roman(number)}`]} />
-      <Illustration slug="blackwater" decorative />
+      <PlateCorners
+        items={[`${t('ui.plate.plate')} ${roman(number)}`, ...(photos.count > 0 ? [t('photos.count', { count: photos.count })] : [])]}
+      />
+      {photos.latestId ? (
+        // The latest Tank Photo stands in for the tank, in the same frame as the drawing.
+        <img
+          src={photoUrl(tank.id, photos.latestId)}
+          alt={t('photos.latestAlt', { name: tank.name })}
+          loading="lazy"
+          className="block aspect-[4/3] w-full object-cover"
+        />
+      ) : (
+        <Illustration slug="blackwater" decorative />
+      )}
       <div className="flex flex-col gap-0.5">
         <h2 className="m-0 text-[1.6875rem] leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
         <span className="font-mono text-[0.78125rem] text-ink-muted">{facts.join(' · ')}</span>

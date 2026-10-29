@@ -8,9 +8,12 @@ import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 
@@ -48,6 +51,37 @@ public class ApiClient {
 
 	public Response delete(String path) {
 		return send(HttpMethod.DELETE, path, null);
+	}
+
+	/** A multipart form: a part that is a byte array is sent as a file named {@code upload.bin}, the rest as fields. */
+	public Response postForm(String path, Map<String, Object> parts) {
+		MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+		parts.forEach((name, value) -> form.add(name, value instanceof byte[] bytes ? new ByteArrayResource(bytes) {
+			@Override
+			public String getFilename() {
+				return "upload.bin";
+			}
+		} : value));
+		String token = csrfToken();
+		if (token == null) {
+			get("/api/me");
+			token = csrfToken();
+		}
+		return http.post()
+			.uri(path)
+			.header("X-XSRF-TOKEN", token)
+			.contentType(MediaType.MULTIPART_FORM_DATA)
+			.body(form)
+			.exchange((request, response) -> read(response));
+	}
+
+	/** A response that is not JSON: the status, the content type and the bytes. */
+	public Download download(String path) {
+		return http.get().uri(path).exchange((request, response) -> new Download(response.getStatusCode().value(),
+				String.valueOf(response.getHeaders().getContentType()), response.getBody().readAllBytes()));
+	}
+
+	public record Download(int status, String contentType, byte[] bytes) {
 	}
 
 	/** A write without the CSRF header, as a page on another site would send it. */

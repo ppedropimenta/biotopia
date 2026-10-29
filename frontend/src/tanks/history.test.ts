@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildHistory, markersIn } from './history'
 import type { Maintenance } from './maintenance'
 import type { Measurement } from './measurements'
+import type { Photo } from './photos'
 
 let next = 0
 const measurement = (measuredAt: string, parameter: Measurement['parameter'] = 'nitrate'): Measurement => ({
@@ -19,11 +20,14 @@ const care = (performedAt: string, type: Maintenance['type'] = 'water_change'): 
   note: null,
 })
 
+const photo = (takenAt: string): Photo => ({ id: `p${next++}`, takenAt, note: null, width: 400, height: 300 })
+
 describe('buildHistory', () => {
   it('puts Measurements and Maintenance in one list, newest day first and newest entry first within a day', () => {
     const history = buildHistory(
       [measurement('2026-03-01T08:00:00Z'), measurement('2026-02-27T20:00:00Z')],
       [care('2026-03-01T10:00:00Z'), care('2026-02-27T09:00:00Z', 'pruning')],
+      [],
       'UTC',
     )
     expect(history.map((d) => d.day)).toEqual(['2026-03-01', '2026-02-27'])
@@ -35,6 +39,7 @@ describe('buildHistory', () => {
     const history = buildHistory(
       [measurement('2026-03-01T08:00:00Z', 'ph'), measurement('2026-03-01T08:00:00Z', 'nitrate')],
       [],
+      [],
       'UTC',
     )
     expect(history).toHaveLength(1)
@@ -44,12 +49,25 @@ describe('buildHistory', () => {
   })
 
   it('splits days where the person is, not in UTC', () => {
-    const history = buildHistory([], [care('2026-03-01T02:30:00Z')], 'America/Sao_Paulo')
+    const history = buildHistory([], [care('2026-03-01T02:30:00Z')], [], 'America/Sao_Paulo')
     expect(history.map((d) => d.day)).toEqual(['2026-02-28'])
   })
 
+  it('puts Tank Photos in among the rest by their date', () => {
+    const history = buildHistory(
+      [measurement('2026-03-01T08:00:00Z')],
+      [care('2026-03-01T10:00:00Z')],
+      [photo('2026-03-01T09:00:00Z'), photo('2026-02-20T09:00:00Z')],
+      'UTC',
+    )
+    expect(history.map((d) => d.entries.map((e) => e.kind))).toEqual([
+      ['maintenance', 'photo', 'measurements'],
+      ['photo'],
+    ])
+  })
+
   it('is empty when there is nothing', () => {
-    expect(buildHistory([], [], 'UTC')).toEqual([])
+    expect(buildHistory([], [], [], 'UTC')).toEqual([])
   })
 })
 

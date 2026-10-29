@@ -1,13 +1,15 @@
 import type { Maintenance, MaintenanceType } from './maintenance'
 import { groupByMoment, type Measurement, type MomentGroup } from './measurements'
+import type { Photo } from './photos'
 
 /**
  * One thing that happened to a tank. Every kind carries its instant in `at`, so the list is built by sorting on
- * it alone: a new kind (Tank Photos) is one more member of this union and one more list passed to `buildHistory`.
+ * it alone: a new kind is one more member of this union and one more list passed to `buildHistory`.
  */
 export type HistoryEntry =
   | { kind: 'measurements'; at: number; group: MomentGroup }
   | { kind: 'maintenance'; at: number; entry: Maintenance }
+  | { kind: 'photo'; at: number; photo: Photo }
 
 /** The entries of one calendar day (`day` is "2026-03-01"), newest first. */
 export type HistoryDay = { day: string; entries: HistoryEntry[] }
@@ -17,19 +19,21 @@ function dayOf(at: number, timeZone?: string): string {
   return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone }).format(at)
 }
 
-/** Measurements and Maintenance as one history, grouped by day, newest day and newest entry first. */
+/** Measurements, Maintenance and Tank Photos as one history, grouped by day, newest day and newest entry first. */
 export function buildHistory(
   measurements: readonly Measurement[],
   maintenance: readonly Maintenance[],
+  photos: readonly Photo[],
   timeZone?: string,
 ): HistoryDay[] {
   const entries: HistoryEntry[] = [
     ...maintenance.map((entry): HistoryEntry => ({ kind: 'maintenance', at: Date.parse(entry.performedAt), entry })),
+    ...photos.map((photo): HistoryEntry => ({ kind: 'photo', at: Date.parse(photo.takenAt), photo })),
     ...groupByMoment([...measurements]).map(
       (group): HistoryEntry => ({ kind: 'measurements', at: Date.parse(group.measuredAt), group }),
     ),
   ]
-  // Array.sort is stable, so entries at the same instant keep the order above: Maintenance first.
+  // Array.sort is stable, so entries at the same instant keep the order above: Maintenance, photos, Measurements.
   entries.sort((a, b) => b.at - a.at)
 
   const days: HistoryDay[] = []

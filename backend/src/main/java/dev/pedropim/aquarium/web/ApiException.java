@@ -31,6 +31,14 @@ public class ApiException extends RuntimeException {
 		return new ApiException(HttpStatus.BAD_REQUEST, "validation_failed", Map.of(field, code));
 	}
 
+	public String code() {
+		return code;
+	}
+
+	public Map<String, String> fields() {
+		return fields;
+	}
+
 	HttpStatus status() {
 		return status;
 	}

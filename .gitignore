@@ -1,1 +1,4 @@
 .idea/
+
+# Tank Photo files kept by a local run
+/backend/data/

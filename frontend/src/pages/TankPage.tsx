@@ -13,6 +13,7 @@ import { formatDay, weeksRunning } from '../tanks/dates'
 import { LoadError } from '../tanks/LoadError'
 import { MaintenanceDiary } from '../tanks/MaintenanceDiary'
 import { MeasurementSections } from '../tanks/MeasurementSections'
+import { PhotoStrip } from '../tanks/PhotoStrip'
 import { formatNumber } from '../tanks/numbers'
 import { plateNumber } from '../tanks/plates'
 import type { Tank } from '../tanks/types'
@@ -50,6 +51,7 @@ export function TankPage() {
         </div>
       </header>
       <MeasurementSections tankId={tank.id}>
+        <PhotoStrip tank={tank} />
         <MaintenanceDiary tank={tank} />
       </MeasurementSections>
     </>
@@ -110,6 +112,9 @@ function RecordCard({ tank }: { tank: Tank }) {
         </ButtonLink>
         <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} variant="secondary" icon="plus" aria-label={t('maintenance.recordLabel')}>
           {t('maintenance.record')}
+        </ButtonLink>
+        <ButtonLink to={`/tanks/${tank.id}/photos/new`} variant="secondary" icon="plus" aria-label={t('photos.recordLabel')}>
+          {t('photos.record')}
         </ButtonLink>
         <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
           {t('tanks.page.edit')}

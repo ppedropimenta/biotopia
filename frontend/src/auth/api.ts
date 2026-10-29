@@ -1,6 +1,7 @@
 import type { Language } from '../i18n/language'
 import type { Measurement, MeasurementChange, NewMeasurements, Parameter } from '../tanks/measurements'
 import type { Maintenance, MaintenanceDetails, MaintenanceType } from '../tanks/maintenance'
+import type { Photo, PhotoChange, PhotoSummary, PhotoUsage } from '../tanks/photos'
 import type { Tank, TankDetails } from '../tanks/types'
 
 export type Account = { email: string; language: Language }
@@ -43,12 +44,13 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   const headers: Record<string, string> = {}
   if (method !== 'GET') {
     headers['X-XSRF-TOKEN'] = await csrfToken()
-    headers['Content-Type'] = 'application/json'
+    // A form is sent as it is: the browser writes its Content-Type, with the boundary between the parts.
+    if (!(body instanceof FormData)) headers['Content-Type'] = 'application/json'
   }
   const response = await fetch(path, {
     method,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
   })
   const isJson = response.headers.get('content-type')?.includes('json') ?? false
   const data = isJson ? await response.json() : null
@@ -107,5 +109,22 @@ export const api = {
   editMaintenance: (tankId: string, id: string, details: MaintenanceDetails) =>
     request<Maintenance>('PUT', `/api/tanks/${tankId}/maintenance/${id}`, details),
   deleteMaintenance: (tankId: string, id: string) => request<void>('DELETE', `/api/tanks/${tankId}/maintenance/${id}`),
+  /** The tank's Tank Photos, newest (by their date) first. */
+  photos: (tankId: string, { limit }: { limit?: number } = {}) =>
+    request<Photo[]>('GET', `/api/tanks/${tankId}/photos${limit ? `?limit=${limit}` : ''}`),
+  photoSummary: (tankId: string) => request<PhotoSummary>('GET', `/api/tanks/${tankId}/photos/summary`),
+  photo: (tankId: string, id: string) => request<Photo>('GET', `/api/tanks/${tankId}/photos/${id}`),
+  /** `takenAt` null means now, by the server's clock. */
+  uploadPhoto: (tankId: string, file: File, takenAt: string | null, note: string | null) => {
+    const form = new FormData()
+    form.append('file', file)
+    if (takenAt) form.append('takenAt', takenAt)
+    if (note) form.append('note', note)
+    return request<Photo>('POST', `/api/tanks/${tankId}/photos`, form)
+  },
+  editPhoto: (tankId: string, id: string, change: PhotoChange) =>
+    request<Photo>('PUT', `/api/tanks/${tankId}/photos/${id}`, change),
+  deletePhoto: (tankId: string, id: string) => request<void>('DELETE', `/api/tanks/${tankId}/photos/${id}`),
+  photoUsage: () => request<PhotoUsage>('GET', '/api/photo-usage'),
   saveLanguage: (language: Language) => request<void>('PUT', '/api/me/language', { language }),
 }

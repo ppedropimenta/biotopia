@@ -5,20 +5,22 @@ import type { HistoryDay } from './history'
 import { MaintenanceEntry } from './MaintenanceEntry'
 import { formatMoment, valueDecimals, type Parameter } from './measurements'
 import { formatNumber } from './numbers'
+import { PhotoCard } from './PhotoCard'
+import type { Tank } from './types'
 import { useLanguage } from './useLanguage'
 
 /**
  * A tank's history: the days, newest first, and under each day what happened, newest first. A new kind of entry
- * (Tank Photos) is one more branch of the `kind` check below.
+ * is one more branch of the `kind` checks below.
  */
 export function HistoryList({
   days,
   parameters,
-  netVolumeLiters,
+  tank,
 }: {
   days: readonly HistoryDay[]
   parameters: readonly Parameter[]
-  netVolumeLiters: number | null
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters'>
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
@@ -38,9 +40,22 @@ export function HistoryList({
                     key={`c${entry.entry.id}`}
                     entry={entry.entry}
                     index={i}
-                    netVolumeLiters={netVolumeLiters}
+                    netVolumeLiters={tank.netVolumeLiters}
                     size="md"
                   />
+                )
+              }
+              if (entry.kind === 'photo') {
+                return (
+                  <li key={`p${entry.photo.id}`} className="grid grid-cols-[96px_1fr] gap-4 border-b border-dashed border-ink/45 py-3">
+                    <PhotoCard tank={tank} photo={entry.photo} index={i} />
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <span className="font-mono text-xs tracking-[0.08em] text-ink-muted uppercase">
+                        {t('photos.historyLabel')} · {formatMoment(entry.photo.takenAt, language)}
+                      </span>
+                      {entry.photo.note && <span className="text-ink-soft [overflow-wrap:anywhere]">{entry.photo.note}</span>}
+                    </div>
+                  </li>
                 )
               }
               // Adding a kind to HistoryEntry makes this line a type error until it has its own branch.

@@ -128,7 +128,7 @@ export function TimelinePage() {
       ) : panels.length === 0 ? (
         <Empty tankId={tank.id} anyMeasurements={measurements.length > 0} readOnly={tank.readOnly} />
       ) : view === 'chart' ? (
-        <ChartPlate panels={panels} maintenance={maintenance} from={from} now={now} />
+        <ChartPlate panels={panels} maintenance={maintenance} now={now} />
       ) : (
         <ValuesTable panels={panels} />
       )}
@@ -180,19 +180,9 @@ function History({
   return <HistoryList days={days} parameters={parameters} tank={tank} />
 }
 
-function ChartPlate({
-  panels,
-  maintenance,
-  from,
-  now,
-}: {
-  panels: Panel[]
-  maintenance: Maintenance[]
-  from: Date | null
-  now: Date
-}) {
+function ChartPlate({ panels, maintenance, now }: { panels: Panel[]; maintenance: Maintenance[]; now: Date }) {
   const { t } = useTranslation()
-  const [start, end] = timeRange(panels, from, now)
+  const [start, end] = timeRange(panels, now)
   const names = panels.map((p) => t(`parameters.${p.parameter}`)).join(', ')
   return (
     <figure className={`${plateClasses('md')} m-0 pb-2.5`}>

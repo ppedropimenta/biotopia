@@ -105,20 +105,35 @@ describe('recentSeries', () => {
 })
 
 describe('timeRange', () => {
-  const panels = buildPanels([measurement('ph', 7, '2026-02-10T10:00:00Z')], parameters, null)
+  const history = [
+    measurement('ph', 7.2, '2026-02-20T10:00:00Z'),
+    measurement('ph', 7, '2026-02-10T10:00:00Z'),
+    measurement('ph', 6.9, '2026-01-02T10:00:00Z'),
+  ]
 
-  it('runs from the start of the period to now', () => {
-    const from = new Date('2026-02-01T00:00:00Z')
-    expect(timeRange(panels, from, now)).toEqual([from.getTime(), now.getTime()])
+  it('starts at the oldest point, even when the period reaches further back', () => {
+    const from = new Date('2026-01-20T00:00:00Z')
+    const panels = buildPanels(history, parameters, from)
+    expect(timeRange(panels, now)).toEqual([new Date('2026-02-10T10:00:00Z').getTime(), now.getTime()])
+  })
+
+  it('starts at the oldest point of the period when there is older data', () => {
+    const from = new Date('2026-02-15T00:00:00Z')
+    expect(timeRange(buildPanels(history, parameters, from), now)[0]).toBe(new Date('2026-02-20T10:00:00Z').getTime())
   })
 
   it('starts at the oldest point for the whole history', () => {
-    expect(timeRange(panels, null, now)[0]).toBe(new Date('2026-02-10T10:00:00Z').getTime())
+    expect(timeRange(buildPanels(history, parameters, null), now)[0]).toBe(new Date('2026-01-02T10:00:00Z').getTime())
   })
 
   it('is at least a day long, so one point has a place', () => {
     const justNow = [measurement('ph', 7, '2026-03-01T12:00:00Z')]
-    const [start, end] = timeRange(buildPanels(justNow, parameters, null), null, now)
+    const [start, end] = timeRange(buildPanels(justNow, parameters, null), now)
+    expect(end - start).toBe(24 * 60 * 60 * 1000)
+  })
+
+  it('is a day long when there are no points', () => {
+    const [start, end] = timeRange([], now)
     expect(end - start).toBe(24 * 60 * 60 * 1000)
   })
 })

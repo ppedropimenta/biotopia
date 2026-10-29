@@ -100,13 +100,14 @@ export function recentSeries(measurements: readonly Measurement[], parameter: Pa
 }
 
 /**
- * The span the time axis covers: from the start of the period (or the oldest point, for the whole history) to
- * `now`. It is never shorter than a day, so a single point still has a place on the axis.
+ * The span the time axis covers: from the oldest point to `now`, whatever the period, so a period wider than the
+ * data leaves no empty stretch before the line. The panels are already cut to the period. It is never shorter
+ * than a day, so a single point still has a place on the axis.
  */
-export function timeRange(panels: readonly Panel[], from: Date | null, now: Date): [number, number] {
+export function timeRange(panels: readonly Panel[], now: Date): [number, number] {
   const end = now.getTime()
   const oldest = Math.min(end, ...panels.flatMap((p) => p.points.map((point) => point.at)))
-  return [Math.min(from?.getTime() ?? oldest, end - msPerDay), end]
+  return [Math.min(oldest, end - msPerDay), end]
 }
 
 /** The distinct moments of the points, oldest first: where the chart's cursor can stop. */

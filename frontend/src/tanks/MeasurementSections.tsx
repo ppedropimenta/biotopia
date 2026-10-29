@@ -170,7 +170,7 @@ function RecentChart({
   const from = periodStart('w4', now)
   const panel = busiestPanel(buildPanels(history, parameters, from))
   if (!panel) return null
-  const [start, end] = timeRange([panel], from, now)
+  const [start, end] = timeRange([panel], now)
   const name = t(`parameters.${panel.parameter}`)
   return (
     <section className="flex flex-col gap-3.5">

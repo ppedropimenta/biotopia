@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { useParams } from 'react-router'
 import { api } from '../auth/api'
 import { Illustration } from '../components/ui/Brand'
@@ -12,6 +13,7 @@ import { roman } from '../lib/roman'
 import { formatDay, weeksRunning } from '../tanks/dates'
 import { LoadError } from '../tanks/LoadError'
 import { MaintenanceDiary } from '../tanks/MaintenanceDiary'
+import { TankLifecycle } from '../tanks/TankLifecycle'
 import { MeasurementSections } from '../tanks/MeasurementSections'
 import { PhotoStrip } from '../tanks/PhotoStrip'
 import { formatNumber } from '../tanks/numbers'
@@ -24,11 +26,13 @@ import { useLoad } from '../tanks/useLoad'
 export function TankPage() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
+  // Archiving or restoring changes the tank in place, so the page reads it again.
+  const [version, setVersion] = useState(0)
   // The tanks list is only for the plate number: the API lists them by creation, which is the order of the plates.
   const loaded = useLoad(async () => {
     const [tank, tanks] = await Promise.all([api.tank(id), api.tanks()])
     return { tank, tanks, today: new Date() }
-  }, id)
+  }, `${id}-${version}`)
 
   if (loaded.status === 'loading') return null
   if (loaded.status === 'error') {
@@ -53,6 +57,7 @@ export function TankPage() {
       <MeasurementSections tankId={tank.id}>
         <PhotoStrip tank={tank} />
         <MaintenanceDiary tank={tank} />
+        <TankLifecycle tank={tank} onChanged={() => setVersion((v) => v + 1)} />
       </MeasurementSections>
     </>
   )
@@ -77,6 +82,7 @@ function TankPlate({ tank, number, today }: { tank: Tank; number: number | null;
 function RecordCard({ tank }: { tank: Tank }) {
   const { t } = useTranslation()
   const language = useLanguage()
+  const archived = tank.archivedAt !== null
   const missing = '—'
   const sizes = [tank.lengthCm, tank.widthCm, tank.heightCm]
   const size = (value: number | null) => (value === null ? missing : formatNumber(value, language))
@@ -106,16 +112,26 @@ function RecordCard({ tank }: { tank: Tank }) {
           </Fact>
         )}
       </dl>
+      {tank.archivedAt && (
+        <p role="status" className="m-0 border-l-[3px] border-ink pl-3 font-mono text-[0.8125rem] text-ink-soft">
+          <strong className="font-medium uppercase">{t('tanks.lifecycle.archivedBadge')}</strong>{' '}
+          {t('tanks.lifecycle.archivedOn', { date: formatDay(tank.archivedAt.slice(0, 10), language) })}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2.5">
-        <ButtonLink to={`/tanks/${tank.id}/measure`} icon="plus" aria-label={t('tanks.page.addMeasurement')}>
-          {t('tanks.page.measurement')}
-        </ButtonLink>
-        <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} variant="secondary" icon="plus" aria-label={t('maintenance.recordLabel')}>
-          {t('maintenance.record')}
-        </ButtonLink>
-        <ButtonLink to={`/tanks/${tank.id}/photos/new`} variant="secondary" icon="plus" aria-label={t('photos.recordLabel')}>
-          {t('photos.record')}
-        </ButtonLink>
+        {!archived && (
+          <>
+            <ButtonLink to={`/tanks/${tank.id}/measure`} icon="plus" aria-label={t('tanks.page.addMeasurement')}>
+              {t('tanks.page.measurement')}
+            </ButtonLink>
+            <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} variant="secondary" icon="plus" aria-label={t('maintenance.recordLabel')}>
+              {t('maintenance.record')}
+            </ButtonLink>
+            <ButtonLink to={`/tanks/${tank.id}/photos/new`} variant="secondary" icon="plus" aria-label={t('photos.recordLabel')}>
+              {t('photos.record')}
+            </ButtonLink>
+          </>
+        )}
         <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
           {t('tanks.page.edit')}
         </ButtonLink>

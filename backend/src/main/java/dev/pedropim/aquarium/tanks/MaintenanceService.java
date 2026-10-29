@@ -62,7 +62,7 @@ class MaintenanceService {
 
 	@Transactional
 	MaintenanceView record(UUID ownerId, UUID tankId, MaintenanceDetails details) {
-		tanks.requireOwned(ownerId, tankId);
+		tanks.requireActive(ownerId, tankId);
 		Instant now = clock.instant();
 		Instant performedAt = details.performedAt() == null ? now : details.performedAt();
 		MaintenanceType type = check(details, performedAt, now);

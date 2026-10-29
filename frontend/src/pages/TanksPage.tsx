@@ -7,7 +7,7 @@ import { Handwritten } from '../components/ui/Paper'
 import { PlateCorners } from '../components/ui/Plate'
 import { plateClasses } from '../components/ui/plateClasses'
 import { Sparkline } from '../components/ui/Measures'
-import { PageHeader } from '../components/ui/Structure'
+import { PageHeader, SectionHeader } from '../components/ui/Structure'
 import { cx } from '../lib/cx'
 import { roman } from '../lib/roman'
 import { daysAgo, formatDay } from '../tanks/dates'
@@ -66,9 +66,9 @@ export function TanksPage() {
       {loaded.status === 'ready' && (
         <>
           {loaded.data.tanks.length === 0 && <NewPlate first />}
-          {loaded.data.tanks.length > 0 && (
+          {loaded.data.tanks.some((tank) => !tank.archivedAt) && (
             <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7 p-0">
-              {loaded.data.tanks.map((tank, i) => (
+              {loaded.data.tanks.map((tank, i) => tank.archivedAt ? null : (
                 <li key={tank.id} className="flex">
                   <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]}
                     history={loaded.data.history[i]}
@@ -81,6 +81,7 @@ export function TanksPage() {
             </ul>
           )}
           {loaded.data.tanks.length > 0 && <NewPlate />}
+          <ArchivedTanks tanks={loaded.data.tanks} />
         </>
       )}
     </>
@@ -196,5 +197,34 @@ function NewPlate({ first = false }: { first?: boolean }) {
         <span className="font-mono text-[0.78125rem] text-ink-muted">{t('tanks.enough')}</span>
       )}
     </Link>
+  )
+}
+
+/** Archived tanks, apart from the running ones: a plain list, each a way back into its history. */
+function ArchivedTanks({ tanks }: { tanks: Tank[] }) {
+  const { t } = useTranslation()
+  const language = useLanguage()
+  const archived = tanks.filter((tank) => tank.archivedAt)
+  if (archived.length === 0) return null
+  return (
+    <section aria-labelledby="archived-title" className="flex flex-col gap-3 pt-4">
+      <SectionHeader title={<span id="archived-title">{t('tanks.lifecycle.archivedTitle')}</span>} level={3} />
+      <p className="m-0 text-ink-soft">{t('tanks.lifecycle.archivedHint')}</p>
+      <ul className="m-0 flex list-none flex-col p-0">
+        {archived.map((tank) => (
+          <li key={tank.id} className="border-b border-dashed border-ink/45">
+            <Link
+              to={`/tanks/${tank.id}`}
+              className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3 text-ink no-underline hover:bg-paper-card"
+            >
+              <span className="text-[1.375rem] [overflow-wrap:anywhere]">{tank.name}</span>
+              <span className="font-mono text-[0.78125rem] text-ink-muted">
+                {t('tanks.lifecycle.archivedBadge')} · {formatDay(tank.archivedAt!.slice(0, 10), language)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }

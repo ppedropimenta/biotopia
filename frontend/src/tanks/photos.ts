@@ -36,6 +36,7 @@ export type ErrorKey =
   | 'photos.errors.note_too_long'
   | 'photos.errors.quota'
   | 'photos.errors.not_found'
+  | 'photos.errors.archived'
   | 'photos.errors.generic'
 
 export type FormErrors = Partial<Record<'file' | 'moment' | 'note' | 'general', ErrorKey>>
@@ -57,6 +58,7 @@ const fileCodes: Record<string, ErrorKey> = {
 /** Turns the API's stable codes into message keys, so every message is in the language the person chose. */
 export function describePhotoError(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'photos.errors.generic' }
+  if (error.code === 'tank_archived') return { general: 'photos.errors.archived' }
   if (error.code === 'photo_quota_exceeded') return { general: 'photos.errors.quota' }
   if (error.code === 'tank_not_found' || error.code === 'photo_not_found') return { general: 'photos.errors.not_found' }
 

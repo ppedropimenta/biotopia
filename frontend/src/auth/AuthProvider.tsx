@@ -40,6 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ status: 'out' })
   }, [])
 
+  const signedOut = useCallback(() => setState({ status: 'out' }), [])
+
   const chooseLanguage = useCallback(
     async (language: Language) => {
       await changeLanguage(language)
@@ -51,6 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [state],
   )
 
-  const auth = useMemo<Auth>(() => ({ state, logIn, logOut, chooseLanguage }), [state, logIn, logOut, chooseLanguage])
+  const auth = useMemo<Auth>(() => ({ state, logIn, logOut, signedOut, chooseLanguage }), [state, logIn, logOut, signedOut, chooseLanguage])
   return <AuthContext value={auth}>{children}</AuthContext>
 }

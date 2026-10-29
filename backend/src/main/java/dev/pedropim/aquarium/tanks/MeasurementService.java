@@ -67,7 +67,7 @@ class MeasurementService {
 
 	@Transactional
 	List<MeasurementView> record(UUID ownerId, UUID tankId, NewMeasurements request) {
-		tanks.requireOwned(ownerId, tankId);
+		tanks.requireActive(ownerId, tankId);
 		Instant now = clock.instant();
 		Instant measuredAt = request.measuredAt() == null ? now : request.measuredAt();
 		Map<String, String> problems = new TreeMap<>();

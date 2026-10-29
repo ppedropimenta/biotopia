@@ -9,4 +9,5 @@ export type TankDetails = {
   note: string | null
 }
 
-export type Tank = TankDetails & { id: string }
+/** `archivedAt` is when the tank was archived, or null while it is running. */
+export type Tank = TankDetails & { id: string; archivedAt: string | null }

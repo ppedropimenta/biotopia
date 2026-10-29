@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,22 @@ class TankController {
 	TankView edit(@AuthenticationPrincipal SessionUser user, @PathVariable String id,
 			@Valid @RequestBody TankDetails details) {
 		return tanks.edit(user.id(), tankId(id), details);
+	}
+
+	@PostMapping("/{id}/archive")
+	TankView archive(@AuthenticationPrincipal SessionUser user, @PathVariable String id) {
+		return tanks.archive(user.id(), tankId(id));
+	}
+
+	@PostMapping("/{id}/restore")
+	TankView restore(@AuthenticationPrincipal SessionUser user, @PathVariable String id) {
+		return tanks.restore(user.id(), tankId(id));
+	}
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void delete(@AuthenticationPrincipal SessionUser user, @PathVariable String id) {
+		tanks.delete(user.id(), tankId(id));
 	}
 
 	/** An id that is not even a UUID cannot belong to any Tank, so it is just as not found. */

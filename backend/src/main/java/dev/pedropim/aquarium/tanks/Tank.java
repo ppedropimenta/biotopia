@@ -44,6 +44,10 @@ class Tank {
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
+	/** When the Tank was archived; null while it is active. */
+	@Column(name = "archived_at")
+	private Instant archivedAt;
+
 	protected Tank() {
 	}
 
@@ -66,6 +70,25 @@ class Tank {
 
 	TankDetails details() {
 		return new TankDetails(name, startDate, lengthCm, widthCm, heightCm, netVolumeLiters, note);
+	}
+
+	/** Archiving an archived Tank keeps the date it was first archived. */
+	void archive(Instant now) {
+		if (archivedAt == null) {
+			archivedAt = now;
+		}
+	}
+
+	void restore() {
+		archivedAt = null;
+	}
+
+	boolean isArchived() {
+		return archivedAt != null;
+	}
+
+	Instant archivedAt() {
+		return archivedAt;
 	}
 
 	UUID id() {

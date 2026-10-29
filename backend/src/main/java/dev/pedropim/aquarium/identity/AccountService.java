@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import dev.pedropim.aquarium.email.EmailSender;
+import dev.pedropim.aquarium.tanks.TankErasure;
 import dev.pedropim.aquarium.web.ApiException;
 
 @Service
@@ -38,18 +39,21 @@ class AccountService {
 
 	private final EmailSender emailSender;
 
+	private final TankErasure tankErasure;
+
 	private final Clock clock;
 
 	private final String publicUrl;
 
 	AccountService(UserRepository users, ConfirmationTokenRepository tokens,
 			PasswordResetTokenRepository resetTokens, PasswordEncoder passwordEncoder, EmailSender emailSender,
-			Clock clock, @Value("${app.public-url}") String publicUrl) {
+			TankErasure tankErasure, Clock clock, @Value("${app.public-url}") String publicUrl) {
 		this.users = users;
 		this.tokens = tokens;
 		this.resetTokens = resetTokens;
 		this.passwordEncoder = passwordEncoder;
 		this.emailSender = emailSender;
+		this.tankErasure = tankErasure;
 		this.clock = clock;
 		this.publicUrl = publicUrl;
 	}
@@ -132,6 +136,20 @@ class AccountService {
 	@Transactional
 	void changeLanguage(UUID userId, Language language) {
 		users.findById(userId).orElseThrow().changeLanguage(language);
+	}
+
+	/**
+	 * Deletes the account and everything in it. The password is asked again so that a session left open on a shared
+	 * computer cannot do it.
+	 */
+	@Transactional
+	void delete(UUID userId, String password) {
+		User user = users.findById(userId).orElseThrow();
+		if (!passwordEncoder.matches(password, user.passwordHash())) {
+			throw ApiException.invalidField("password", "invalid");
+		}
+		tankErasure.eraseAllOf(userId);
+		users.delete(user);
 	}
 
 	private void sendConfirmationLink(User user) {

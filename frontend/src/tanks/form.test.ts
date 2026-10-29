@@ -87,6 +87,7 @@ describe('formFromTank', () => {
         heightCm: null,
         netVolumeLiters: 98.5,
         note: null,
+        archivedAt: null,
       },
       'pt-BR',
     )

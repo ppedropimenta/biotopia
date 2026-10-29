@@ -64,6 +64,7 @@ export type ErrorKey =
   | 'maintenance.errors.moment_invalid'
   | 'maintenance.errors.in_future'
   | 'maintenance.errors.not_found'
+  | 'maintenance.errors.archived'
   | 'maintenance.errors.generic'
 
 export type FormErrors = Partial<Record<'percent' | 'moment' | 'note' | 'general', ErrorKey>>
@@ -120,6 +121,7 @@ const fieldCodes: Record<string, ErrorKey> = {
 /** Turns the API's stable codes into message keys, so every message is in the language the person chose. */
 export function describeMaintenanceError(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'maintenance.errors.generic' }
+  if (error.code === 'tank_archived') return { general: 'maintenance.errors.archived' }
   if (error.code === 'tank_not_found' || error.code === 'maintenance_not_found') {
     return { general: 'maintenance.errors.not_found' }
   }

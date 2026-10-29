@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.pedropim.aquarium.web.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -111,6 +112,18 @@ class SessionController {
 		accounts.changeLanguage(user.id(), Language.fromCode(request.language()).orElseThrow());
 	}
 
+	@PostMapping("/api/me/deletion")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	void deleteAccount(@AuthenticationPrincipal SessionUser user, @Valid @RequestBody DeletionRequest request,
+			HttpServletRequest httpRequest) {
+		accounts.delete(user.id(), request.password());
+		SecurityContextHolder.clearContext();
+		HttpSession session = httpRequest.getSession(false);
+		if (session != null) {
+			session.invalidate();
+		}
+	}
+
 	private AccountView view(UUID userId) {
 		User user = users.findById(userId).orElseThrow();
 		return new AccountView(user.email(), user.language().code());
@@ -124,6 +137,9 @@ class SessionController {
 			return remember == null || remember;
 		}
 
+	}
+
+	record DeletionRequest(@NotBlank(message = "invalid") String password) {
 	}
 
 	record LanguageRequest(@Pattern(regexp = "en|pt-BR", message = "unsupported") String language) {

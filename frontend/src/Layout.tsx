@@ -26,6 +26,9 @@ export function Layout() {
             footer={
               <>
                 <p className="m-0 text-[0.78125rem] break-all text-river-caption">{state.account.email}</p>
+                <Link to="/account" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                  {t('ui.nav.account')}
+                </Link>
                 <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
                   {t('ui.nav.credits')}
                 </Link>

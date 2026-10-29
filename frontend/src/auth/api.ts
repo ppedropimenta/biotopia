@@ -83,6 +83,11 @@ export const api = {
   tank: (id: string) => request<Tank>('GET', `/api/tanks/${id}`),
   createTank: (details: TankDetails) => request<Tank>('POST', '/api/tanks', details),
   editTank: (id: string, details: TankDetails) => request<Tank>('PUT', `/api/tanks/${id}`, details),
+  archiveTank: (id: string) => request<Tank>('POST', `/api/tanks/${id}/archive`, {}),
+  restoreTank: (id: string) => request<Tank>('POST', `/api/tanks/${id}/restore`, {}),
+  deleteTank: (id: string) => request<void>('DELETE', `/api/tanks/${id}`),
+  /** Deletes the account and everything in it; the password is asked again. */
+  deleteAccount: (password: string) => request<void>('POST', '/api/me/deletion', { password }),
   parameters: () => request<Parameter[]>('GET', '/api/parameters'),
   measurements: (tankId: string, limit: number) =>
     request<Measurement[]>('GET', `/api/tanks/${tankId}/measurements?limit=${limit}`),

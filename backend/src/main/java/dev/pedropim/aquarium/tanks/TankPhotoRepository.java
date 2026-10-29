@@ -1,5 +1,6 @@
 package dev.pedropim.aquarium.tanks;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,5 +31,8 @@ interface TankPhotoRepository extends JpaRepository<TankPhoto, UUID> {
 			where p.tankId in (select t.id from Tank t where t.ownerId = :ownerId)
 			""")
 	long storedBytesOf(UUID ownerId);
+
+	@Query("select p.storageKey from TankPhoto p where p.tankId in :tankIds")
+	List<String> storageKeysOf(Collection<UUID> tankIds);
 
 }

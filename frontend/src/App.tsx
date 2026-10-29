@@ -4,6 +4,7 @@ import { AuthLayout } from './auth/AuthLayout'
 import { AuthProvider } from './auth/AuthProvider'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './Layout'
+import { AccountPage } from './pages/AccountPage'
 import { ConfirmPage } from './pages/ConfirmPage'
 import { CreditsPage } from './pages/CreditsPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
@@ -46,6 +47,7 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="credits" element={<CreditsPage />} />
             <Route element={<RequireAuth />}>
+              <Route path="account" element={<AccountPage />} />
               <Route path="tanks" element={<TanksPage />} />
               <Route path="tanks/new" element={<TankFormPage />} />
               <Route path="tanks/:id" element={<TankPage />} />

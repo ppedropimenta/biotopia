@@ -30,6 +30,7 @@ export type ErrorKey =
   | 'tanks.errors.name_too_long'
   | 'tanks.errors.note_too_long'
   | 'tanks.errors.not_found'
+  | 'tanks.errors.archived'
   | 'tanks.errors.generic'
 
 /** What to say and where: a message under a field, or one for the whole form. */
@@ -87,6 +88,7 @@ export function formFromTank(tank: Tank, language: Language): TankForm {
 /** Turns the API's stable codes into message keys, so every message is in the language the person chose. */
 export function describeTankError(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'tanks.errors.generic' }
+  if (error.code === 'tank_archived') return { general: 'tanks.errors.archived' }
   if (error.code === 'tank_not_found') return { general: 'tanks.errors.not_found' }
 
   if (error.code === 'validation_failed') {

@@ -55,6 +55,7 @@ export type ErrorKey =
   | 'measurements.errors.in_future'
   | 'measurements.errors.note_too_long'
   | 'measurements.errors.not_found'
+  | 'measurements.errors.archived'
   | 'measurements.errors.generic'
 
 /** What to say and where: under a Parameter's field, under the moment or note, or for the whole form. */
@@ -168,6 +169,7 @@ const fieldCodes: Record<string, ErrorKey> = {
 /** Turns the API's stable codes into message keys, so every message is in the language the person chose. */
 export function describeMeasurementError(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'measurements.errors.generic' }
+  if (error.code === 'tank_archived') return { general: 'measurements.errors.archived' }
   if (error.code === 'tank_not_found' || error.code === 'measurement_not_found') {
     return { general: 'measurements.errors.not_found' }
   }

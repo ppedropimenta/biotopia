@@ -8,6 +8,8 @@ export type Auth = {
   state: AuthState
   logIn: (email: string, password: string, remember: boolean) => Promise<void>
   logOut: () => Promise<void>
+  /** The server has already ended the session (the account was deleted): forget it here. */
+  signedOut: () => void
   /** Switches the app language and, when someone is logged in, saves it on their account. */
   chooseLanguage: (language: Language) => Promise<void>
 }

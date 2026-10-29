@@ -92,7 +92,7 @@ class TankPhotoService {
 	 */
 	@Transactional
 	PhotoView upload(UUID ownerId, UUID tankId, byte[] original, String takenAtText, String note) {
-		tanks.requireOwned(ownerId, tankId);
+		tanks.requireActive(ownerId, tankId);
 		Instant now = clock.instant();
 		Instant takenAt = readMoment(takenAtText, now);
 		checkDetails(takenAt, note, now);

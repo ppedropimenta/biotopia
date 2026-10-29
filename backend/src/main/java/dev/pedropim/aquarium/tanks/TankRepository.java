@@ -14,4 +14,7 @@ interface TankRepository extends JpaRepository<Tank, UUID> {
 	@Query("select t from Tank t where t.ownerId = :ownerId order by t.createdAt, t.id")
 	List<Tank> findOwnedBy(UUID ownerId);
 
+	@Query("select t.id from Tank t where t.ownerId = :ownerId")
+	List<UUID> idsOwnedBy(UUID ownerId);
+
 }

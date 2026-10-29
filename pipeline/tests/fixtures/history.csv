@@ -1,0 +1,11 @@
+kind,when,parameter,value,unit,type,percent,note
+measurement,2025-03-01 18:30,ph,6.2,,,,after the water change
+measurement,2025-03-01 18:30,temperature,78.8,F,,,
+measurement,2025-03-01,gh,35.7,ppm,,,
+maintenance,2025-03-02 10:00,,,,water_change,30,
+maintenance,2025-03-03T09:15:00-03:00,,,,other,,Replaced the lid
+measurement,2025-03-04 08:00,salinity,1.02,,,,
+measurement,not a date,ph,6.0,,,,
+maintenance,2025-03-05 08:00,,,,water_change,,
+measurement,2025-03-06 08:00,nitrate,abc,,,,
+dive,2025-03-07 08:00,,,,,,

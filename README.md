@@ -1,6 +1,6 @@
 # aquarium-app
 
-A web app for freshwater fishkeepers. You log your tanks, water tests, maintenance and photos in one
+A web app for fishkeepers. You log your tanks, water tests, maintenance and photos in one
 place, and see how things change over time.
 
 I keep a freshwater tank myself. My records were split between a phone app and the photo gallery, and I
@@ -29,7 +29,7 @@ The project grows in phases. Each one should be usable on its own.
    there is no source, it says it does not know.
 5. **Simple 3D planner**: lay out a tank in low-poly 3D, checked against the library and the rules.
 
-Only freshwater is covered. The reasons are in [ADR 0001](docs/adr/0001-freshwater-only.md).
+Focus on freshwater. The reasons are in [ADR 0001](docs/adr/0001-freshwater-only.md).
 
 ## Stack
 

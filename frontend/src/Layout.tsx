@@ -31,7 +31,6 @@ export function Layout() {
             cta={<LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />}
             footer={
               <>
-                <p className="m-0 text-[0.78125rem] break-all text-river-caption">{state.account.email}</p>
                 <Link to="/account" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
                   {t('ui.nav.account')}
                 </Link>

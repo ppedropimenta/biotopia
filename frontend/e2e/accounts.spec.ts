@@ -58,7 +58,12 @@ test('a visitor signs up, confirms the email and logs in', async ({ page }) => {
   await page.getByRole('link', { name: 'Log in' }).last().click()
   await logIn(page, address)
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
-  await expect(page.getByRole('navigation').getByText(address)).toBeVisible()
+  // The menu does not repeat the address; the account page has it.
+  await expect(page.getByRole('navigation').getByText(address)).toHaveCount(0)
+  await page.getByRole('navigation').getByRole('link', { name: 'Account', exact: true }).click()
+  await expect(page.getByText(address)).toBeVisible()
+  await page.getByRole('navigation').getByRole('link', { name: 'My tanks' }).click()
+  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
 
   // The session lasts: a reload keeps the visitor logged in, and logging out ends it.
   await page.reload()

@@ -16,9 +16,9 @@ export function HomePage() {
   return (
     <>
       <Hero />
-      <Demo />
       <Idea />
       <Features />
+      <Demo />
       <Roadmap />
       <Why />
     </>
@@ -95,7 +95,7 @@ function Hero() {
   )
 }
 
-/** The demo section: a dark band between the hero and the idea, with the way into the Demo Tank. */
+/** The demo section: a dark band right after "what fits in the logbook", with the way into the Demo Tank. */
 function Demo() {
   const { t } = useTranslation()
   return (

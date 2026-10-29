@@ -3,6 +3,21 @@ import { loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
+test('a keeper who is logged in sees the landing page in the public frame, with My tanks in the header', async ({ page }) => {
+  await loggedInKeeper(page)
+
+  await page.goto('/')
+  const header = page.getByRole('banner')
+  await expect(page.getByRole('heading', { name: 'Your tank, over time.' })).toBeVisible()
+  // No side menu (its Account link is part of it) and no Log in: only the way back to the tanks.
+  await expect(page.getByRole('link', { name: 'Account', exact: true })).toHaveCount(0)
+  await expect(header.getByRole('link', { name: 'Log in' })).toHaveCount(0)
+
+  await header.getByRole('link', { name: 'My tanks' }).click()
+  await expect(page).toHaveURL(/\/tanks$/)
+  await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+})
+
 test('a keeper adds a tank, finds it in the list and edits it, with numbers in their language', async ({ page }) => {
   await loggedInKeeper(page)
 

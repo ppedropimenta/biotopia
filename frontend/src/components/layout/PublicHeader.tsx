@@ -3,13 +3,18 @@ import { Link } from 'react-router'
 import { LanguageToggle, Wordmark } from '../ui/Brand'
 import { buttonClasses } from '../ui/buttonClasses'
 
-/** The bar of the public pages on blackwater: the brand, PT / EN and Log in. */
+/**
+ * The bar of the public pages on blackwater: the brand, PT / EN and Log in. For a keeper who is logged in
+ * (`signedIn`) the last button is "My tanks" instead.
+ */
 export function PublicHeader({
   links = [],
   logInTo = '/login',
+  signedIn = false,
 }: {
   links?: ReadonlyArray<{ to: string; label: string }>
   logInTo?: string
+  signedIn?: boolean
 }) {
   const { t } = useTranslation()
   return (
@@ -24,8 +29,8 @@ export function PublicHeader({
             </Link>
           ))}
           <LanguageToggle tone="dark" />
-          <Link to={logInTo} className={buttonClasses('onDark')}>
-            {t('ui.nav.logIn')}
+          <Link to={signedIn ? '/tanks' : logInTo} className={buttonClasses('onDark')}>
+            {t(signedIn ? 'ui.nav.myTanks' : 'ui.nav.logIn')}
           </Link>
         </div>
       </nav>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Link, Outlet } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 import { useAuth } from './auth/context'
 import { AppShell, LogMeasurementCta, SideNav, SkipLink } from './components/layout/AppShell'
 import { DemoBanner } from './components/layout/DemoBanner'
@@ -8,16 +8,21 @@ import { PublicHeader } from './components/layout/PublicHeader'
 import { Button, ButtonLink } from './components/ui/Button'
 import { useCurrentTank } from './tanks/useCurrentTank'
 
-/** The frame of every page: the app shell for a keeper who is logged in, the public header for anyone else. */
+/**
+ * The frame of every page: the app shell for a keeper who is logged in, the public header for anyone else. The
+ * landing page is the exception: it is a page to read, so a keeper gets it in the public frame, with My tanks in
+ * the header.
+ */
 export function Layout() {
   const { t } = useTranslation()
   const { state, logOut } = useAuth()
   const tank = useCurrentTank()
+  const onLanding = useLocation().pathname === '/'
 
   // While the session is being checked neither frame is known, so show the blackwater and nothing else.
   if (state.status === 'loading') return <div className="min-h-svh texture-river" />
 
-  if (state.status === 'in') {
+  if (state.status === 'in' && !onLanding) {
     return (
       <AppShell
         nav={
@@ -81,7 +86,7 @@ export function Layout() {
   return (
     <div className="flex min-h-svh flex-col">
       <SkipLink />
-      <PublicHeader links={[{ to: '/demo', label: t('home.navDemo') }]} />
+      <PublicHeader links={[{ to: '/demo', label: t('home.navDemo') }]} signedIn={state.status === 'in'} />
       <main id="content" tabIndex={-1} className="flex-1 texture-paper font-serif text-ink">
         <Outlet />
       </main>

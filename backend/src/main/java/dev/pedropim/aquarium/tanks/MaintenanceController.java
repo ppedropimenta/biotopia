@@ -51,6 +51,13 @@ class MaintenanceController {
 		return maintenance.record(user.id(), TankController.tankId(tankId), request);
 	}
 
+	@PostMapping("/batch")
+	@ResponseStatus(HttpStatus.CREATED)
+	List<MaintenanceView> recordAll(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
+			@RequestBody List<MaintenanceDetails> request) {
+		return maintenance.recordAll(user.id(), TankController.tankId(tankId), request);
+	}
+
 	@PutMapping("/{id}")
 	MaintenanceView edit(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@PathVariable String id, @RequestBody MaintenanceDetails request) {

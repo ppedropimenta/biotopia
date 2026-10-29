@@ -50,7 +50,8 @@ _Avoid_: Ammonia, NH3, NH4
 
 **Maintenance**:
 A record of care work already done on a tank. Its type is one of Water Change, Top-up, Filter Cleaning,
-Fertilizing, Pruning, Substrate Cleaning or Other; Other always says what was done.
+Fertilizing, Pruning, Substrate Cleaning or Other; Other always says what was done. A session that did several
+things (a water change and a filter cleaning) is several Maintenance at the same moment, one for each type.
 _Avoid_: Task, chore, schedule, reminder
 
 **Water Change**:

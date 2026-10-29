@@ -374,6 +374,7 @@ export const en = {
       lead: 'What did you do? Past dates are fine.',
       back: 'Back to maintenance',
       type: 'What was done',
+      typeHint: 'Pick everything you did. Each one is saved as its own record.',
       percent: 'Water replaced',
       percentHint: 'The part of the water you replaced, from above 0 to 100.',
       moment: 'When',
@@ -392,6 +393,7 @@ export const en = {
       confirmNo: 'Keep it',
     },
     errors: {
+      type_required: 'Pick at least one thing that was done.',
       percent_required: 'Enter the percentage of water replaced.',
       percent_out_of_range: 'Enter a percentage above 0 and up to 100.',
       number_invalid: 'Enter a number with at most 2 decimals, like {{example}}.',

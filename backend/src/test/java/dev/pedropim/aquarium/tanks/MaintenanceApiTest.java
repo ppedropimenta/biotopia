@@ -3,7 +3,9 @@ package dev.pedropim.aquarium.tanks;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -204,6 +206,66 @@ class MaintenanceApiTest {
 		assertThat(refused.field("fields")).isEqualTo(Map.of("percent", "out_of_range", "performedAt", "in_future"));
 		assertThat(keeper.get(maintenance(tankId)).items()).hasSize(1);
 		assertThat(keeper.get(maintenance(tankId)).items().getFirst().get("type")).isEqualTo("top_up");
+	}
+
+	@Test
+	void severalMaintenanceDoneTogetherAreRecordedAtTheSameMoment() {
+		Instant now = clock.instant();
+
+		Response response = keeper.post(maintenance(tankId) + "/batch", List.of(
+				Map.of("type", "water_change", "percent", 30, "note", "RO water"),
+				Map.of("type", "substrate_cleaning"),
+				Map.of("type", "filter_cleaning")));
+
+		assertThat(response.status()).isEqualTo(201);
+		assertThat(response.items()).extracting(m -> m.get("type"))
+			.containsExactly("water_change", "substrate_cleaning", "filter_cleaning");
+		assertThat(response.items()).extracting(m -> m.get("performedAt")).containsOnly(now.toString());
+		assertThat(keeper.get(maintenance(tankId)).items()).hasSize(3);
+	}
+
+	@Test
+	void aBatchKeepsTheMomentTheKeeperGave() {
+		Response response = keeper.post(maintenance(tankId) + "/batch", List.of(
+				Map.of("type", "top_up", "performedAt", "2026-01-10T08:30:00Z"),
+				Map.of("type", "pruning", "performedAt", "2026-01-10T08:30:00Z")));
+
+		assertThat(response.status()).isEqualTo(201);
+		assertThat(response.items()).extracting(m -> m.get("performedAt")).containsOnly("2026-01-10T08:30:00Z");
+	}
+
+	@Test
+	void aBatchWithOneBadEntryRecordsNothing() {
+		Response response = keeper.post(maintenance(tankId) + "/batch", List.of(
+				Map.of("type", "pruning"),
+				Map.of("type", "water_change", "percent", 400)));
+
+		assertThat(response.status()).isEqualTo(400);
+		assertThat(response.field("code")).isEqualTo("validation_failed");
+		assertThat(response.field("fields")).isEqualTo(Map.of("percent", "out_of_range"));
+		assertThat(keeper.get(maintenance(tankId)).items()).isEmpty();
+	}
+
+	@Test
+	void aBatchNeedsAtLeastOneEntryAndHasALimit() {
+		Response empty = keeper.post(maintenance(tankId) + "/batch", List.of());
+		Response tooMany = keeper.post(maintenance(tankId) + "/batch", Collections.nCopies(11, Map.of("type", "pruning")));
+
+		assertThat(empty.status()).isEqualTo(400);
+		assertThat(empty.field("fields")).isEqualTo(Map.of("entries", "required"));
+		assertThat(tooMany.status()).isEqualTo(400);
+		assertThat(tooMany.field("fields")).isEqualTo(Map.of("entries", "too_many"));
+		assertThat(keeper.get(maintenance(tankId)).items()).isEmpty();
+	}
+
+	@Test
+	void aBatchOnAnotherKeepersTankIsNotFound() {
+		ApiClient intruder = Accounts.loggedInBrowser(port, mail);
+
+		Response response = intruder.post(maintenance(tankId) + "/batch", List.of(Map.of("type", "pruning")));
+
+		assertThat(response.status()).isEqualTo(404);
+		assertThat(keeper.get(maintenance(tankId)).items()).isEmpty();
 	}
 
 	@Test

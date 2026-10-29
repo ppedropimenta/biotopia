@@ -15,6 +15,7 @@ import {
   type FormErrors,
   type Maintenance,
   type MaintenanceForm,
+  type MaintenanceType,
 } from '../tanks/maintenance'
 import { MeasurementHeader } from '../tanks/MeasurementHeader'
 import { toLocalInput } from '../tanks/measurements'
@@ -44,7 +45,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const list = `/tanks/${tank.id}/maintenance`
   // "Now" is only prefilled for the person to see; a new record sends no moment unless they change it.
   const [form, setForm] = useState<MaintenanceForm>(() => ({
-    type: entry?.type ?? 'water_change',
+    types: [entry?.type ?? 'water_change'],
     percent: entry?.percent == null ? '' : formatNumber(entry.percent, language, { grouping: false }),
     moment: toLocalInput(entry?.performedAt ?? new Date().toISOString()),
     momentChanged: false,
@@ -67,13 +68,20 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
     setBusy(true)
     setErrors({})
     try {
-      if (entry) await api.editMaintenance(tank.id, entry.id, checked.details)
+      if (entry) await api.editMaintenance(tank.id, entry.id, checked.details[0])
       else await api.recordMaintenance(tank.id, checked.details)
       navigate(list)
     } catch (error) {
       setErrors(describeMaintenanceError(error))
       setBusy(false)
     }
+  }
+
+  /** A new record can combine types; an edit changes the one type the record has. */
+  function pick(type: MaintenanceType) {
+    if (entry) return setForm({ ...form, types: [type] })
+    const types = form.types.includes(type) ? form.types.filter((picked) => picked !== type) : [...form.types, type]
+    setForm({ ...form, types })
   }
 
   async function remove() {
@@ -111,16 +119,21 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
               <ToggleChip
                 key={type}
                 variant="accent"
-                pressed={form.type === type}
-                onClick={() => setForm({ ...form, type })}
+                pressed={form.types.includes(type)}
+                onClick={() => pick(type)}
               >
                 {t(`maintenance.types.${type}`)}
               </ToggleChip>
             ))}
           </div>
+          {errors.type ? (
+            <FormError>{message(errors.type)}</FormError>
+          ) : (
+            !entry && <span className="font-mono text-xs text-ink-muted">{t('maintenance.form.typeHint')}</span>
+          )}
         </div>
 
-        {form.type === 'water_change' && (
+        {form.types.includes('water_change') && (
           <TextField
             name="percent"
             inputMode="decimal"
@@ -145,7 +158,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
         />
         <NoteField
           name="note"
-          label={t(form.type === 'other' ? 'maintenance.form.noteOther' : 'maintenance.form.note')}
+          label={t(form.types.includes('other') ? 'maintenance.form.noteOther' : 'maintenance.form.note')}
           error={message(errors.note)}
           value={form.note}
           onChange={(event) => setForm({ ...form, note: event.target.value })}

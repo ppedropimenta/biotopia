@@ -28,6 +28,9 @@ class MaintenanceService {
 
 	private static final int MAX_LIST = 1000;
 
+	/** The most Maintenance one submission records together. */
+	private static final int MAX_BATCH = 10;
+
 	private final TankService tanks;
 
 	private final MaintenanceRepository maintenance;
@@ -63,11 +66,31 @@ class MaintenanceService {
 	@Transactional
 	MaintenanceView record(UUID ownerId, UUID tankId, MaintenanceDetails details) {
 		tanks.requireActive(ownerId, tankId);
-		Instant now = clock.instant();
+		return save(tankId, details, clock.instant());
+	}
+
+	private MaintenanceView save(UUID tankId, MaintenanceDetails details, Instant now) {
 		Instant performedAt = details.performedAt() == null ? now : details.performedAt();
 		MaintenanceType type = check(details, performedAt, now);
 		return MaintenanceView.of(maintenance
 			.save(new Maintenance(tankId, type, details.percent(), performedAt, cleanNote(details.note()), now)));
+	}
+
+	/**
+	 * Several Maintenance done together, such as a water change and a filter cleaning. All of them are recorded or
+	 * none is, and the ones without a moment share the same "now".
+	 */
+	@Transactional
+	List<MaintenanceView> recordAll(UUID ownerId, UUID tankId, List<MaintenanceDetails> entries) {
+		tanks.requireActive(ownerId, tankId);
+		if (entries == null || entries.isEmpty()) {
+			throw ApiException.invalidField("entries", "required");
+		}
+		if (entries.size() > MAX_BATCH) {
+			throw ApiException.invalidField("entries", "too_many");
+		}
+		Instant now = clock.instant();
+		return entries.stream().map(entry -> save(tankId, entry, now)).toList();
 	}
 
 	@Transactional

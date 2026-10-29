@@ -45,9 +45,12 @@ export type MaintenanceDetails = {
   note: string | null
 }
 
-/** The form as typed: every value is text. `moment` is a date-and-time field's text, local time. */
+/**
+ * The form as typed: every value is text. `moment` is a date-and-time field's text, local time. A new record can
+ * have several `types` (one record each); an edit has exactly one.
+ */
 export type MaintenanceForm = {
-  type: MaintenanceType
+  types: MaintenanceType[]
   percent: string
   moment: string
   /** False while `moment` is still the prefilled one: the request then keeps the moment it had (none, when new). */
@@ -56,6 +59,7 @@ export type MaintenanceForm = {
 }
 
 export type ErrorKey =
+  | 'maintenance.errors.type_required'
   | 'maintenance.errors.percent_required'
   | 'maintenance.errors.percent_out_of_range'
   | 'maintenance.errors.number_invalid'
@@ -67,7 +71,7 @@ export type ErrorKey =
   | 'maintenance.errors.archived'
   | 'maintenance.errors.generic'
 
-export type FormErrors = Partial<Record<'percent' | 'moment' | 'note' | 'general', ErrorKey>>
+export type FormErrors = Partial<Record<'type' | 'percent' | 'moment' | 'note' | 'general', ErrorKey>>
 
 /** The decimals the API keeps for a percentage. */
 const percentDecimals = 2
@@ -82,25 +86,30 @@ function readPercent(text: string, language: Language): number | ErrorKey {
 }
 
 /**
- * The request for what was typed, or the problems to show first. `keptMoment` is the moment to send when the
- * field was left alone: null for a new record (the server uses now), the instant it already has for an edit.
+ * The requests for what was typed, one for each type picked, or the problems to show first. `keptMoment` is the
+ * moment to send when the field was left alone: null for a new record (the server uses now, the same one for all
+ * of them), the instant it already has for an edit. The note goes on Other when it is picked, because Other needs
+ * it, and otherwise on the first record, so a diary does not repeat it.
  */
 export function toDetails(
   form: MaintenanceForm,
   language: Language,
   keptMoment: string | null,
-): { details: MaintenanceDetails } | { errors: FormErrors } {
+): { details: MaintenanceDetails[] } | { errors: FormErrors } {
   const errors: FormErrors = {}
+  // The order of the type list, whatever order they were picked in.
+  const types = maintenanceTypes.filter((type) => form.types.includes(type))
+  if (types.length === 0) errors.type = 'maintenance.errors.type_required'
 
   let percent: number | null = null
-  if (form.type === 'water_change') {
+  if (types.includes('water_change')) {
     const read = readPercent(form.percent, language)
     if (typeof read === 'string') errors.percent = read
     else percent = read
   }
 
   const note = cleanNote(form.note)
-  if (form.type === 'other' && note === null) errors.note = 'maintenance.errors.note_required'
+  if (types.includes('other') && note === null) errors.note = 'maintenance.errors.note_required'
 
   let performedAt = keptMoment
   if (form.momentChanged) {
@@ -109,7 +118,15 @@ export function toDetails(
   }
 
   if (Object.keys(errors).length > 0) return { errors }
-  return { details: { type: form.type, percent, performedAt, note } }
+  const noteGoesOn = types.includes('other') ? 'other' : types[0]
+  return {
+    details: types.map((type) => ({
+      type,
+      percent: type === 'water_change' ? percent : null,
+      performedAt,
+      note: type === noteGoesOn ? note : null,
+    })),
+  }
 }
 
 const fieldCodes: Record<string, ErrorKey> = {

@@ -39,6 +39,7 @@ test('a keeper records a water change and other care, edits one, deletes one and
 
   // Other has no percentage and needs a note.
   await page.getByRole('main').getByRole('link', { name: 'Maintenance', exact: true }).click()
+  await page.getByRole('button', { name: 'Water change', pressed: true }).click()
   await page.getByRole('button', { name: 'Other', pressed: false }).click()
   await expect(page.getByLabel('Water replaced')).toHaveCount(0)
   await page.getByRole('button', { name: 'Save maintenance' }).click()
@@ -91,6 +92,36 @@ test('a keeper records a water change and other care, edits one, deletes one and
   await page.getByRole('button', { name: 'Yes, delete' }).click()
   await expect(page.getByText('Moved the heater')).toHaveCount(0)
   await expect(page.getByText('Water change · 25% of the water')).toBeVisible()
+})
+
+test('a keeper records a water change, a filter cleaning and a substrate cleaning in one go', async ({ page }) => {
+  await loggedInKeeper(page)
+  await page.getByRole('link', { name: 'Start a new plate' }).click()
+  await page.getByLabel('Name').fill('Weekly care')
+  await page.getByLabel('Start date').fill('2025-03-01')
+  await page.getByLabel('Net volume (liters)').fill('100')
+  await page.getByRole('button', { name: 'Save tank' }).click()
+  await expect(page.getByRole('heading', { name: 'Weekly care', level: 1 })).toBeVisible()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Maintenance' }).click()
+  await page.getByRole('link', { name: 'Record the first maintenance' }).click()
+
+  // At least one type is needed.
+  await page.getByRole('button', { name: 'Water change', pressed: true }).click()
+  await page.getByRole('button', { name: 'Save maintenance' }).click()
+  await expect(page.getByText('Pick at least one thing that was done.')).toBeVisible()
+
+  // Water change, filter and substrate together: the percentage is for the water change only.
+  await page.getByRole('button', { name: 'Water change', pressed: false }).click()
+  await page.getByRole('button', { name: 'Filter cleaning', pressed: false }).click()
+  await page.getByRole('button', { name: 'Substrate cleaning', pressed: false }).click()
+  await page.getByLabel('Water replaced').fill('30')
+  await page.getByRole('button', { name: 'Save maintenance' }).click()
+
+  const entries = page.getByRole('listitem').filter({ has: page.getByRole('link', { name: /^Edit / }) })
+  await expect(entries).toHaveCount(3)
+  await expect(page.getByText('Water change · 30% of the water')).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Edit Filter cleaning from/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Edit Substrate cleaning from/ })).toBeVisible()
 })
 
 test('in Brazilian Portuguese the type names and the decimal comma are in Portuguese', async ({ page }) => {

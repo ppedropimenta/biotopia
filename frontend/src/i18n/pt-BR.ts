@@ -376,6 +376,7 @@ export const ptBR: Messages = {
       lead: 'O que você fez? Datas passadas são bem-vindas.',
       back: 'Voltar à manutenção',
       type: 'O que foi feito',
+      typeHint: 'Marque tudo o que você fez. Cada item é salvo como um registro.',
       percent: 'Água trocada',
       percentHint: 'A parte da água que você trocou, de acima de 0 até 100.',
       moment: 'Quando',
@@ -394,6 +395,7 @@ export const ptBR: Messages = {
       confirmNo: 'Manter',
     },
     errors: {
+      type_required: 'Marque pelo menos uma coisa que foi feita.',
       percent_required: 'Digite a porcentagem de água trocada.',
       percent_out_of_range: 'Digite uma porcentagem acima de 0 e até 100.',
       number_invalid: 'Digite um número com no máximo 2 casas decimais, como {{example}}.',

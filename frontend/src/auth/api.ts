@@ -118,8 +118,9 @@ export const api = {
   },
   maintenanceEntry: (tankId: string, id: string) =>
     request<Maintenance>('GET', `/api/tanks/${tankId}/maintenance/${id}`),
-  recordMaintenance: (tankId: string, details: MaintenanceDetails) =>
-    request<Maintenance>('POST', `/api/tanks/${tankId}/maintenance`, details),
+  /** One or several Maintenance done together: all are recorded, at the same moment, or none. */
+  recordMaintenance: (tankId: string, details: MaintenanceDetails[]) =>
+    request<Maintenance[]>('POST', `/api/tanks/${tankId}/maintenance/batch`, details),
   editMaintenance: (tankId: string, id: string, details: MaintenanceDetails) =>
     request<Maintenance>('PUT', `/api/tanks/${tankId}/maintenance/${id}`, details),
   deleteMaintenance: (tankId: string, id: string) => request<void>('DELETE', `/api/tanks/${tankId}/maintenance/${id}`),

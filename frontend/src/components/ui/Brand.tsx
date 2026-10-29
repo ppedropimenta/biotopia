@@ -27,7 +27,7 @@ export function Wordmark({
       to={to}
       className={cx(
         'flex min-h-11 text-river-bright no-underline hover:text-river-bright',
-        stacked ? 'flex-col justify-center gap-0.5' : 'items-center gap-2.5',
+        stacked ? 'flex-col justify-center gap-0.5' : 'items-baseline gap-2.5 py-2',
         className,
       )}
     >

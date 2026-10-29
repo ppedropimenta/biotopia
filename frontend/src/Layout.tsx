@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link, Outlet, useLocation } from 'react-router'
 import { useAuth } from './auth/context'
-import { AppShell, LogMeasurementCta, SideNav, SkipLink } from './components/layout/AppShell'
+import { AppShell, LogMeasurementCta, NavFooterLink, SideNav, SkipLink } from './components/layout/AppShell'
 import { DemoBanner } from './components/layout/DemoBanner'
 import { demoNavGroups, navGroups } from './components/layout/navGroups'
 import { PublicHeader } from './components/layout/PublicHeader'
@@ -31,12 +31,8 @@ export function Layout() {
             cta={<LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />}
             footer={
               <>
-                <Link to="/account" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
-                  {t('ui.nav.account')}
-                </Link>
-                <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
-                  {t('ui.nav.credits')}
-                </Link>
+                <NavFooterLink to="/account">{t('ui.nav.account')}</NavFooterLink>
+                <NavFooterLink to="/credits">{t('ui.nav.credits')}</NavFooterLink>
                 <Button variant="onDark" onClick={logOut} className="self-start">
                   {t('ui.nav.logOut')}
                 </Button>
@@ -65,12 +61,8 @@ export function Layout() {
             }
             footer={
               <>
-                <Link to="/login" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
-                  {t('ui.nav.logIn')}
-                </Link>
-                <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
-                  {t('ui.nav.credits')}
-                </Link>
+                <NavFooterLink to="/login">{t('ui.nav.logIn')}</NavFooterLink>
+                <NavFooterLink to="/credits">{t('ui.nav.credits')}</NavFooterLink>
               </>
             }
           />

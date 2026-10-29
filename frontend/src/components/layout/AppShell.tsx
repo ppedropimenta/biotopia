@@ -1,6 +1,6 @@
 import { useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
 import { LanguageToggle, Wordmark } from '../ui/Brand'
 import { ButtonLink } from '../ui/Button'
@@ -18,6 +18,15 @@ export type NavGroup = {
   /** The group label in mono (the name of the tank). */
   label?: string
   items: NavItem[]
+}
+
+/** A text link at the foot of the menu, indented like the items above it so their text lines up. */
+export function NavFooterLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link to={to} className="inline-flex min-h-11 items-center px-3.5 text-river-text hover:text-river-bright">
+      {children}
+    </Link>
+  )
 }
 
 /**

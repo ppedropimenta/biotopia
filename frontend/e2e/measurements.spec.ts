@@ -127,3 +127,68 @@ test('in Brazilian Portuguese the decimal comma is typed and shown, and the poin
   await expect(latest).toContainText('Temperatura')
   await expect(latest).toContainText('°C')
 })
+
+/** A date-and-time field's text for a moment some days ago. */
+function daysAgo(days: number): string {
+  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+  const two = (n: number) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}-${two(date.getMonth() + 1)}-${two(date.getDate())}T08:30`
+}
+
+async function record(page: Page, daysBack: number, values: Record<string, string>) {
+  await page.getByRole('link', { name: 'Add measurement' }).click()
+  for (const [label, value] of Object.entries(values)) await page.getByLabel(label === 'pH' ? 'pH' : new RegExp('^' + label), { exact: label === 'pH' }).fill(value)
+  await page.getByLabel('When').fill(daysAgo(daysBack))
+  await page.getByRole('button', { name: 'Save measurements' }).click()
+  await expect(page.getByRole('heading', { name: 'Water tests', level: 1 })).toBeVisible()
+}
+
+test('a keeper reads the water over time: a chart for each parameter, a period to pick and a table', async ({ page }) => {
+  await keeperWithATank(page)
+
+  // No measurements: no chart to draw, and an invitation instead.
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Timeline' }).click()
+  await expect(page.getByRole('heading', { name: 'Timeline', level: 1 })).toBeVisible()
+  await expect(page.getByText('Nothing measured yet.')).toBeVisible()
+
+  await page.getByRole('link', { name: 'Log the first measurement' }).click()
+  await page.getByLabel(/^Nitrate/).fill('5')
+  await page.getByLabel('When').fill(daysAgo(200))
+  await page.getByRole('button', { name: 'Save measurements' }).click()
+  await record(page, 20, { Nitrate: '20', pH: '6.8' })
+  await record(page, 3, { Nitrate: '35' })
+
+  // The tank page has a small chart of the last 4 weeks, and a way to all of them.
+  await expect(page.getByRole('heading', { name: 'Last 4 weeks' })).toBeVisible()
+  await page.getByRole('link', { name: 'All charts' }).click()
+
+  // 12 weeks is the default period: the measurement from 200 days ago is not in it. One chart for each parameter.
+  await expect(page.getByRole('button', { name: '12 weeks' })).toHaveAttribute('aria-pressed', 'true')
+  const chart = page.getByRole('group', { name: /pH, Nitrate \(NO₃\), over time, from 2 measurement dates/ })
+  await expect(chart).toBeVisible()
+  await expect(chart.locator('svg text', { hasText: 'pH' }).first()).toBeAttached()
+
+  // The arrow keys walk the measurement dates and the values are read out.
+  await chart.focus()
+  await chart.press('ArrowRight')
+  await expect(page.getByText(/pH 6\.8 · Nitrate \(NO₃\) 20 mg\/L/)).toBeVisible()
+  await chart.press('ArrowRight')
+  await expect(page.getByText(/Nitrate \(NO₃\) 35 mg\/L/)).toBeVisible()
+  await chart.press('Escape')
+  await expect(page.getByText(/Nitrate \(NO₃\) 35 mg\/L/)).toHaveCount(0)
+
+  // The same numbers as a table; the whole history brings the oldest value in.
+  await page.getByRole('button', { name: 'Table' }).click()
+  const table = page.getByRole('table')
+  await expect(table.getByRole('row')).toHaveCount(3)
+  await page.getByRole('button', { name: 'All', exact: true }).click()
+  await expect(page).toHaveURL(/period=all/)
+  await expect(table.getByRole('row')).toHaveCount(4)
+  await expect(table.getByRole('cell', { name: '5', exact: true })).toBeVisible()
+
+  // Back to the chart, in Portuguese.
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Linha do tempo', level: 1 })).toBeVisible()
+  await page.getByRole('button', { name: 'Gráfico' }).click()
+  await expect(page.getByRole('group', { name: /pH, Nitrato \(NO₃\), ao longo do tempo, a partir de 3 datas de medição/ })).toBeVisible()
+})

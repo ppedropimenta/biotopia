@@ -6,6 +6,7 @@ import { ButtonLink } from '../components/ui/Button'
 import { Handwritten } from '../components/ui/Paper'
 import { PlateCorners } from '../components/ui/Plate'
 import { plateClasses } from '../components/ui/plateClasses'
+import { Sparkline } from '../components/ui/Measures'
 import { PageHeader } from '../components/ui/Structure'
 import { cx } from '../lib/cx'
 import { roman } from '../lib/roman'
@@ -13,17 +14,27 @@ import { formatDay } from '../tanks/dates'
 import { valueDecimals, type Measurement, type Parameter } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import { plateValues } from '../tanks/plates'
+import { recentSeries } from '../tanks/series'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 
-type Loaded = { tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][] }
+/** How many of each tank's newest Measurements are read for the small lines on its plate. */
+const sparklineHistory = 100
 
-/** The tanks and, for each, its latest Measurements: the plates show values, not only names. */
+/** The values a sparkline draws for a Parameter. */
+const sparklineValues = 12
+
+type Loaded = { tanks: Tank[]; parameters: Parameter[]; latest: Measurement[][]; history: Measurement[][] }
+
+/** The tanks and, for each, its latest Measurements and its recent ones: the plates show values and their trend. */
 async function loadTanks(): Promise<Loaded> {
   const [tanks, parameters] = await Promise.all([api.tanks(), api.parameters()])
-  const latest = await Promise.all(tanks.map((tank) => api.latestMeasurements(tank.id)))
-  return { tanks, parameters, latest }
+  const [latest, history] = await Promise.all([
+    Promise.all(tanks.map((tank) => api.latestMeasurements(tank.id))),
+    Promise.all(tanks.map((tank) => api.measurements(tank.id, sparklineHistory))),
+  ])
+  return { tanks, parameters, latest, history }
 }
 
 export function TanksPage() {
@@ -53,7 +64,7 @@ export function TanksPage() {
             <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7 p-0">
               {loaded.data.tanks.map((tank, i) => (
                 <li key={tank.id} className="flex">
-                  <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]} />
+                  <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]} history={loaded.data.history[i]} />
                 </li>
               ))}
             </ul>
@@ -71,11 +82,13 @@ function TankPlate({
   tank,
   parameters,
   latest,
+  history,
 }: {
   number: number
   tank: Tank
   parameters: Parameter[]
   latest: Measurement[]
+  history: Measurement[]
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
@@ -121,6 +134,7 @@ function TankPlate({
               ) : (
                 formatNumber(value, language, { maxDecimals: valueDecimals })
               )}
+              <Sparkline values={recentSeries(history, parameter, sparklineValues)} className="mt-1" />
             </dd>
           </div>
         ))}

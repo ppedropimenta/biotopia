@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { api } from '../auth/api'
+import { ParameterChart } from '../components/charts/ParameterChart'
 import { ParamTile } from '../components/ui/Measures'
 import { Handwritten } from '../components/ui/Paper'
 import { SectionHeader } from '../components/ui/Structure'
@@ -9,6 +10,7 @@ import type { Language } from '../i18n/language'
 import { latestValues, type Change, type LatestValue } from './latest'
 import { formatMoment, groupByMoment, valueDecimals, type Measurement, type Parameter } from './measurements'
 import { formatNumber } from './numbers'
+import { buildPanels, busiestPanel, periodStart, timeRange } from './series'
 import { useLanguage } from './useLanguage'
 import { useLoad } from './useLoad'
 
@@ -28,7 +30,14 @@ const dashedCard =
 export function MeasurementSections({ tankId }: { tankId: string }) {
   const { t } = useTranslation()
   const loaded = useLoad(
-    () => Promise.all([api.parameters(), api.latestMeasurements(tankId), api.measurements(tankId, historyCount)]),
+    async () => {
+      const [parameters, latest, history] = await Promise.all([
+        api.parameters(),
+        api.latestMeasurements(tankId),
+        api.measurements(tankId, historyCount),
+      ])
+      return { parameters, latest, history, now: new Date() }
+    },
     `water-${tankId}`,
   )
 
@@ -40,10 +49,11 @@ export function MeasurementSections({ tankId }: { tankId: string }) {
       </p>
     )
   }
-  const [parameters, latest, history] = loaded.data
+  const { parameters, latest, history, now } = loaded.data
   return (
     <>
       <LatestMeasurement tankId={tankId} values={latestValues(parameters, latest, history)} />
+      <RecentChart tankId={tankId} parameters={parameters} history={history} now={now} />
       <MeasurementsTable tankId={tankId} parameters={parameters} measurements={history.slice(0, tableCount)} />
     </>
   )
@@ -111,6 +121,47 @@ function LatestMeasurement({ tankId, values }: { tankId: string; values: LatestV
           </Link>
         </div>
       )}
+    </section>
+  )
+}
+
+/**
+ * The last 4 weeks of one Parameter, the one measured most often in that time, with a link to the charts of all
+ * of them. A small chart has room for one Parameter only: Parameters do not share a value axis. Left out when
+ * nothing was measured in the 4 weeks.
+ */
+function RecentChart({
+  tankId,
+  parameters,
+  history,
+  now,
+}: {
+  tankId: string
+  parameters: Parameter[]
+  history: Measurement[]
+  now: Date
+}) {
+  const { t } = useTranslation()
+  const from = periodStart('w4', now)
+  const panel = busiestPanel(buildPanels(history, parameters, from))
+  if (!panel) return null
+  const [start, end] = timeRange([panel], from, now)
+  const name = t(`parameters.${panel.parameter}`)
+  return (
+    <section className="flex flex-col gap-3.5">
+      <SectionHeader
+        title={t('timeline.recent.title')}
+        aside={<Link to={`/tanks/${tankId}/timeline`}>{t('timeline.recent.seeAll')}</Link>}
+      />
+      <div className="max-w-[640px] border border-ink texture-card p-3">
+        <ParameterChart
+          panels={[panel]}
+          from={start}
+          to={end}
+          size="compact"
+          description={t('timeline.description', { parameters: name, count: panel.points.length })}
+        />
+      </div>
     </section>
   )
 }

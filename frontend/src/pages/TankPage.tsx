@@ -30,7 +30,9 @@ export function TankPage() {
   const [version, setVersion] = useState(0)
   // The tanks list is only for the plate number: the API lists them by creation, which is the order of the plates.
   const loaded = useLoad(async () => {
-    const [tank, tanks] = await Promise.all([api.tank(id), api.tanks()])
+    const tank = await api.tank(id)
+    // A visitor has no list of tanks, and the Demo Tank has no plate number to show them.
+    const tanks = tank.readOnly ? [] : await api.tanks()
     return { tank, tanks, today: new Date() }
   }, `${id}-${version}`)
 
@@ -48,16 +50,16 @@ export function TankPage() {
   return (
     <>
       <header className="flex flex-col gap-4.5">
-        <Breadcrumbs items={[{ label: t('ui.nav.myTanks'), to: '/tanks' }, { label: tank.name }]} />
+        <Breadcrumbs items={tank.readOnly ? [{ label: tank.name }] : [{ label: t('ui.nav.myTanks'), to: '/tanks' }, { label: tank.name }]} />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-center gap-8">
           <TankPlate tank={tank} number={plateNumber(tanks, tank.id)} today={today} />
           <RecordCard tank={tank} />
         </div>
       </header>
-      <MeasurementSections tankId={tank.id}>
+      <MeasurementSections tankId={tank.id} readOnly={tank.readOnly}>
         <PhotoStrip tank={tank} />
         <MaintenanceDiary tank={tank} />
-        <TankLifecycle tank={tank} onChanged={() => setVersion((v) => v + 1)} />
+        {!tank.readOnly && <TankLifecycle tank={tank} onChanged={() => setVersion((v) => v + 1)} />}
       </MeasurementSections>
     </>
   )
@@ -82,7 +84,8 @@ function TankPlate({ tank, number, today }: { tank: Tank; number: number | null;
 function RecordCard({ tank }: { tank: Tank }) {
   const { t } = useTranslation()
   const language = useLanguage()
-  const archived = tank.archivedAt !== null
+  // Nothing can be added to an Archived Tank, nor to one the reader does not own.
+  const archived = tank.archivedAt !== null || tank.readOnly
   const missing = '—'
   const sizes = [tank.lengthCm, tank.widthCm, tank.heightCm]
   const size = (value: number | null) => (value === null ? missing : formatNumber(value, language))
@@ -132,9 +135,11 @@ function RecordCard({ tank }: { tank: Tank }) {
             </ButtonLink>
           </>
         )}
-        <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
-          {t('tanks.page.edit')}
-        </ButtonLink>
+        {!tank.readOnly && (
+          <ButtonLink to={`/tanks/${tank.id}/edit`} variant="secondary">
+            {t('tanks.page.edit')}
+          </ButtonLink>
+        )}
       </div>
     </div>
   )

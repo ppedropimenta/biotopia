@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useMatch } from 'react-router'
 import { api } from '../auth/api'
 
-type CurrentTank = { id: string; name: string }
+type CurrentTank = { id: string; name: string; readOnly: boolean }
 
 /**
  * The tank the keeper is inside (any /tanks/:id page), for the side menu. It reads the tank again on every
@@ -19,7 +19,7 @@ export function useCurrentTank(): CurrentTank | undefined {
     if (!inTank) return
     let current = true
     api.tank(id).then(
-      (found) => current && setTank({ id, name: found.name }),
+      (found) => current && setTank({ id, name: found.name, readOnly: found.readOnly }),
       () => current && setTank(null),
     )
     return () => {

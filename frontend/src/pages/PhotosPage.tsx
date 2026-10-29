@@ -16,7 +16,7 @@ export function PhotosPage() {
   const { t } = useTranslation()
   const language = useLanguage()
   const { id = '' } = useParams()
-  const loaded = useLoad(() => Promise.all([api.tank(id), api.photos(id), api.photoUsage()]), `photos-${id}`)
+  const loaded = useLoad(() => Promise.all([api.tank(id), api.photos(id)]).then(async ([tank, photos]) => [tank, photos, tank.readOnly ? null : await api.photoUsage()] as const), `photos-${id}`)
 
   const crumbs = [{ label: t('ui.nav.myTanks'), to: '/tanks' }]
   if (loaded.status === 'loading') return null
@@ -47,18 +47,22 @@ export function PhotosPage() {
         title={t('photos.title')}
         subtitle={subtitle}
         actions={
-          <ButtonLink to={`/tanks/${tank.id}/photos/new`} icon="plus" aria-label={t('photos.recordLabel')}>
-            {t('photos.record')}
-          </ButtonLink>
+          !tank.readOnly && (
+            <ButtonLink to={`/tanks/${tank.id}/photos/new`} icon="plus" aria-label={t('photos.recordLabel')}>
+              {t('photos.record')}
+            </ButtonLink>
+          )
         }
       />
-      <Usage usage={usage} />
+      {usage && <Usage usage={usage} />}
       {photos.length === 0 ? (
         <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
           <p className="m-0">{t('photos.empty')}</p>
-          <Link to={`/tanks/${tank.id}/photos/new`} className="font-mono text-[0.78125rem] text-ink">
-            {t('photos.emptyCta')}
-          </Link>
+          {!tank.readOnly && (
+            <Link to={`/tanks/${tank.id}/photos/new`} className="font-mono text-[0.78125rem] text-ink">
+              {t('photos.emptyCta')}
+            </Link>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-8">

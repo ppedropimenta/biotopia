@@ -6,8 +6,10 @@ import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './Layout'
 import { AccountPage } from './pages/AccountPage'
 import { ConfirmPage } from './pages/ConfirmPage'
+import { RequireAuthUnlessDemo } from './auth/RequireAuthUnlessDemo'
 import { CreditsPage } from './pages/CreditsPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { DemoPage } from './pages/DemoPage'
 import { HomePage } from './pages/HomePage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { MaintenanceFormPage } from './pages/MaintenanceFormPage'
@@ -46,17 +48,20 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
             <Route path="credits" element={<CreditsPage />} />
+            <Route path="demo" element={<DemoPage />} />
+            <Route element={<RequireAuthUnlessDemo />}>
+              <Route path="tanks/:id" element={<TankPage />} />
+              <Route path="tanks/:id/timeline" element={<TimelinePage />} />
+              <Route path="tanks/:id/maintenance" element={<MaintenancePage />} />
+              <Route path="tanks/:id/photos" element={<PhotosPage />} />
+            </Route>
             <Route element={<RequireAuth />}>
               <Route path="account" element={<AccountPage />} />
               <Route path="tanks" element={<TanksPage />} />
               <Route path="tanks/new" element={<TankFormPage />} />
-              <Route path="tanks/:id" element={<TankPage />} />
               <Route path="tanks/:id/edit" element={<TankFormPage />} />
-              <Route path="tanks/:id/timeline" element={<TimelinePage />} />
-              <Route path="tanks/:id/maintenance" element={<MaintenancePage />} />
               <Route path="tanks/:id/maintenance/new" element={<MaintenanceFormPage mode="new" />} />
               <Route path="tanks/:id/maintenance/:maintenanceId/edit" element={<MaintenanceFormPage mode="edit" />} />
-              <Route path="tanks/:id/photos" element={<PhotosPage />} />
               <Route path="tanks/:id/photos/new" element={<PhotoFormPage mode="new" />} />
               <Route path="tanks/:id/photos/:photoId/edit" element={<PhotoFormPage mode="edit" />} />
               <Route path="tanks/:id/measure" element={<MeasurementFormPage />} />

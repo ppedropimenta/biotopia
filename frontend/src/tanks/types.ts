@@ -9,5 +9,8 @@ export type TankDetails = {
   note: string | null
 }
 
-/** `archivedAt` is when the tank was archived, or null while it is running. */
-export type Tank = TankDetails & { id: string; archivedAt: string | null }
+/**
+ * `archivedAt` is when the tank was archived, or null while it is running. `demo` marks the Demo Tank, and
+ * `readOnly` is true when the reader does not own the tank (a visitor reading the Demo Tank).
+ */
+export type Tank = TankDetails & { id: string; archivedAt: string | null; demo: boolean; readOnly: boolean }

@@ -72,6 +72,10 @@ class SecurityConfig {
 						"/api/auth/resend-confirmation", "/api/auth/login", "/api/auth/forgot-password",
 						"/api/auth/reset-password")
 				.permitAll()
+				// What a visitor may read: the Demo Tank and the fixed Parameter list. A Tank path is open to the
+				// network but answers 401 unless the Tank is the Demo Tank. No write is open.
+				.requestMatchers(HttpMethod.GET, "/api/demo", "/api/parameters", "/api/tanks/*", "/api/tanks/*/**")
+				.permitAll()
 				.requestMatchers("/api/**")
 				.authenticated()
 				.anyRequest()

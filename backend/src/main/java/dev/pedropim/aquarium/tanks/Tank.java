@@ -44,6 +44,10 @@ class Tank {
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
+	/** True for the one Tank anyone may read; set by the operator, never through the API. */
+	@Column(nullable = false)
+	private boolean demo;
+
 	/** When the Tank was archived; null while it is active. */
 	@Column(name = "archived_at")
 	private Instant archivedAt;
@@ -89,6 +93,14 @@ class Tank {
 
 	Instant archivedAt() {
 		return archivedAt;
+	}
+
+	boolean isDemo() {
+		return demo;
+	}
+
+	UUID ownerId() {
+		return ownerId;
 	}
 
 	UUID id() {

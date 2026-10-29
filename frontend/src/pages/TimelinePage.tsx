@@ -126,7 +126,7 @@ export function TimelinePage() {
           tank={tank}
         />
       ) : panels.length === 0 ? (
-        <Empty tankId={tank.id} anyMeasurements={measurements.length > 0} />
+        <Empty tankId={tank.id} anyMeasurements={measurements.length > 0} readOnly={tank.readOnly} />
       ) : view === 'chart' ? (
         <ChartPlate panels={panels} maintenance={maintenance} from={from} now={now} />
       ) : (
@@ -139,12 +139,12 @@ export function TimelinePage() {
   )
 }
 
-function Empty({ tankId, anyMeasurements }: { tankId: string; anyMeasurements: boolean }) {
+function Empty({ tankId, anyMeasurements, readOnly }: { tankId: string; anyMeasurements: boolean; readOnly: boolean }) {
   const { t } = useTranslation()
   return (
     <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
       <p className="m-0">{anyMeasurements ? t('timeline.emptyPeriod') : t('timeline.empty')}</p>
-      {!anyMeasurements && (
+      {!anyMeasurements && !readOnly && (
         <Link to={`/tanks/${tankId}/measure`} className="font-mono text-[0.78125rem] text-ink">
           {t('measurements.latest.emptyCta')}
         </Link>

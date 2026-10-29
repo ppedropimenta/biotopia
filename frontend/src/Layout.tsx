@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { Link, Outlet } from 'react-router'
 import { useAuth } from './auth/context'
 import { AppShell, LogMeasurementCta, SideNav, SkipLink } from './components/layout/AppShell'
-import { navGroups } from './components/layout/navGroups'
+import { DemoBanner } from './components/layout/DemoBanner'
+import { demoNavGroups, navGroups } from './components/layout/navGroups'
 import { PublicHeader } from './components/layout/PublicHeader'
-import { Button } from './components/ui/Button'
+import { Button, ButtonLink } from './components/ui/Button'
 import { useCurrentTank } from './tanks/useCurrentTank'
 
 /** The frame of every page: the app shell for a keeper who is logged in, the public header for anyone else. */
@@ -40,6 +41,38 @@ export function Layout() {
           />
         }
       >
+        {tank?.readOnly && <DemoBanner to="/tanks/new" />}
+        <Outlet />
+      </AppShell>
+    )
+  }
+
+  // A visitor reading the Demo Tank gets its own menu and the banner; any other tank page sends them to log in.
+  if (tank?.readOnly) {
+    return (
+      <AppShell
+        nav={
+          <SideNav
+            groups={demoNavGroups(t, tank)}
+            cta={
+              <ButtonLink to="/signup" variant="amber" className="w-full">
+                {t('ui.nav.createNotebook')}
+              </ButtonLink>
+            }
+            footer={
+              <>
+                <Link to="/login" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                  {t('ui.nav.logIn')}
+                </Link>
+                <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                  {t('ui.nav.credits')}
+                </Link>
+              </>
+            }
+          />
+        }
+      >
+        <DemoBanner to="/signup" />
         <Outlet />
       </AppShell>
     )
@@ -48,7 +81,7 @@ export function Layout() {
   return (
     <div className="flex min-h-svh flex-col">
       <SkipLink />
-      <PublicHeader />
+      <PublicHeader links={[{ to: '/demo', label: t('home.navDemo') }]} />
       <main id="content" tabIndex={-1} className="flex-1 texture-paper font-serif text-ink">
         <Outlet />
       </main>

@@ -11,14 +11,12 @@ import { cx } from '../lib/cx'
 import { formatNumber } from '../tanks/numbers'
 import { useLanguage } from '../tanks/useLanguage'
 
-/**
- * The landing page, after the kit's. It leaves out the kit's demo section and buttons until the Demo Tank
- * exists (phase 1, ticket 13).
- */
+/** The landing page, after the kit's. */
 export function HomePage() {
   return (
     <>
       <Hero />
+      <Demo />
       <Idea />
       <Features />
       <Roadmap />
@@ -55,15 +53,16 @@ function Hero() {
               </ButtonLink>
             ) : (
               <>
-                <ButtonLink to="/signup" variant="amber" size="lg" iconEnd="arrowRight">
-                  {t('home.signUp')}
+                <ButtonLink to="/demo" variant="amber" size="lg" iconEnd="arrowRight">
+                  {t('home.ctaDemo')}
                 </ButtonLink>
-                <Link to="/login" className="inline-flex min-h-11 items-center text-[1.0625rem] text-river-bright">
-                  {t('home.logIn')}
+                <Link to="/signup" className="inline-flex min-h-11 items-center text-[1.0625rem] text-river-bright">
+                  {t('home.ctaSignUp')}
                 </Link>
               </>
             )}
           </div>
+          {state.status !== 'in' && <p className="m-0 font-mono text-[0.78125rem] text-river-caption">{t('home.ctaNote')}</p>}
         </div>
 
         <div className="relative h-[620px]">
@@ -90,6 +89,29 @@ function Hero() {
               <Binomial>Symphysodon aequifasciatus</Binomial>
             </figcaption>
           </figure>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/** The demo section: a dark band between the hero and the idea, with the way into the Demo Tank. */
+function Demo() {
+  const { t } = useTranslation()
+  return (
+    <section id="demo" aria-labelledby="demo-title" className="texture-river-wide text-river-bright">
+      <div className="mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(440px,100%),1fr))] items-center gap-12 px-6 py-18">
+        <Illustration slug="blackwater" decorative className="rounded-paper bg-paper drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]" />
+        <div className="flex flex-col gap-4.5">
+          <h2 id="demo-title" className="m-0 text-[2.75rem] leading-[1.08] font-normal">
+            {t('home.demo.title')}
+          </h2>
+          <p className="m-0 max-w-[44ch] text-river-text">{t('home.demo.body')}</p>
+          <div>
+            <ButtonLink to="/demo" variant="amber" size="lg" iconEnd="arrowRight">
+              {t('home.ctaDemo')}
+            </ButtonLink>
+          </div>
         </div>
       </div>
     </section>

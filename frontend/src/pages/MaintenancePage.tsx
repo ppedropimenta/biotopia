@@ -35,17 +35,21 @@ export function MaintenancePage() {
         title={t('maintenance.title')}
         subtitle={t('maintenance.lead')}
         actions={
-          <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} icon="plus">
-            {t('maintenance.record')}
-          </ButtonLink>
+          !tank.readOnly && (
+            <ButtonLink to={`/tanks/${tank.id}/maintenance/new`} icon="plus">
+              {t('maintenance.record')}
+            </ButtonLink>
+          )
         }
       />
       {entries.length === 0 ? (
         <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
           <p className="m-0">{t('maintenance.list.empty')}</p>
-          <Link to={`/tanks/${tank.id}/maintenance/new`} className="font-mono text-[0.78125rem] text-ink">
-            {t('maintenance.list.emptyCta')}
-          </Link>
+          {!tank.readOnly && (
+            <Link to={`/tanks/${tank.id}/maintenance/new`} className="font-mono text-[0.78125rem] text-ink">
+              {t('maintenance.list.emptyCta')}
+            </Link>
+          )}
         </div>
       ) : (
         <ol className="m-0 flex list-none flex-col p-0">
@@ -55,7 +59,7 @@ export function MaintenancePage() {
               entry={entry}
               index={i}
               netVolumeLiters={tank.netVolumeLiters}
-              editTo={`/tanks/${tank.id}/maintenance/${entry.id}/edit`}
+              editTo={tank.readOnly ? undefined : `/tanks/${tank.id}/maintenance/${entry.id}/edit`}
             />
           ))}
         </ol>

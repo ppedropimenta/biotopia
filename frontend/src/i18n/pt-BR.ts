@@ -17,6 +17,8 @@ export const ptBR: Messages = {
       logOut: 'Sair',
       credits: 'Créditos',
       account: 'Conta',
+      demoGroup: 'Aquário demo',
+      createNotebook: 'Criar meu caderno',
     },
     plate: { plate: 'Prancha', fig: 'Fig.' },
     skip: 'Pular para o conteúdo',
@@ -32,6 +34,14 @@ export const ptBR: Messages = {
     signUp: 'Criar uma conta',
     logIn: 'Entrar',
     myTanks: 'Meus aquários',
+    ctaDemo: 'Abrir o aquário demo',
+    ctaSignUp: 'ou criar uma conta',
+    ctaNote: 'O demo abre sem entrar. Nada para instalar.',
+    navDemo: 'Aquário demo',
+    demo: {
+      title: 'Abra um aquário de verdade, sem criar conta.',
+      body: 'Um aquário real com suas medições, trocas de água e fotos. Navegue pelos gráficos e pela linha do tempo como se fosse o seu.',
+    },
     hero: {
       water: 'Águas pretas',
       caption: 'tetra-cardinal · igarapés do Rio Negro, AM',
@@ -86,6 +96,8 @@ export const ptBR: Messages = {
     email: 'E-mail',
     password: 'Senha',
     working: 'Um instante…',
+    demoTitle: 'Ver o aquário demo',
+    demoHint: 'Somente leitura · sem conta',
     tabs: { label: 'Entrar ou criar uma conta', login: 'Entrar', signup: 'Criar conta' },
     frame: {
       tagline: 'Cada medição, cada aquário —',
@@ -215,6 +227,12 @@ export const ptBR: Messages = {
       archived: 'Este aquário está arquivado e não recebe novos registros. Restaure-o antes.',
       generic: 'Algo deu errado. Tente de novo em instantes.',
     },
+  },
+  demo: {
+    banner: 'Este é o aquário demo: o caderno de um aquário real, somente leitura. Explore à vontade, nada aqui pode ser alterado.',
+    stamp: 'Demo',
+    createOwn: 'Criar o meu',
+    none: 'Não há aquário demo no momento.',
   },
   account: {
     title: 'Sua conta',

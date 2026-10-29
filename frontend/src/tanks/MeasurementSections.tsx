@@ -30,7 +30,15 @@ const dashedCard =
  * The tank page's water: the latest value of each Parameter with how it changed, a small chart, whatever the page
  * puts in between (`children`) and then the Measurements in a table, each with a way to edit it.
  */
-export function MeasurementSections({ tankId, children }: { tankId: string; children?: ReactNode }) {
+export function MeasurementSections({
+  tankId,
+  readOnly = false,
+  children,
+}: {
+  tankId: string
+  readOnly?: boolean
+  children?: ReactNode
+}) {
   const { t } = useTranslation()
   const loaded = useLoad(
     async () => {
@@ -57,10 +65,15 @@ export function MeasurementSections({ tankId, children }: { tankId: string; chil
   const { parameters, latest, history, maintenance, now } = loaded.data
   return (
     <>
-      <LatestMeasurement tankId={tankId} values={latestValues(parameters, latest, history)} />
+      <LatestMeasurement tankId={tankId} readOnly={readOnly} values={latestValues(parameters, latest, history)} />
       <RecentChart tankId={tankId} parameters={parameters} history={history} maintenance={maintenance} now={now} />
       {children}
-      <MeasurementsTable tankId={tankId} parameters={parameters} measurements={history.slice(0, tableCount)} />
+      <MeasurementsTable
+        tankId={tankId}
+        readOnly={readOnly}
+        parameters={parameters}
+        measurements={history.slice(0, tableCount)}
+      />
     </>
   )
 }
@@ -76,7 +89,7 @@ function describeChange(change: Change, language: Language, t: TFunction) {
   return { symbol: symbols[change.direction], text: amount, label: t(`measurements.latest.${change.direction}`, { amount }) }
 }
 
-function LatestMeasurement({ tankId, values }: { tankId: string; values: LatestValue[] }) {
+function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; values: LatestValue[]; readOnly: boolean }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const measure = `/tanks/${tankId}/measure`
@@ -87,7 +100,9 @@ function LatestMeasurement({ tankId, values }: { tankId: string; values: LatestV
         title={t('measurements.latest.title')}
         aside={values.length > 0 && <span className="text-xs text-ink-muted">{t('measurements.latest.legend')}</span>}
       />
-      {values.length === 0 ? (
+      {values.length === 0 && readOnly ? (
+        <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('measurements.latest.empty')}</p>
+      ) : values.length === 0 ? (
         <Link to={measure} className={dashedCard}>
           <span aria-hidden="true" className="text-2xl leading-none">
             +
@@ -119,12 +134,14 @@ function LatestMeasurement({ tankId, values }: { tankId: string; values: LatestV
               />
             )
           })}
-          <Link to={measure} className={dashedCard}>
-            <span aria-hidden="true" className="text-2xl leading-none">
-              +
-            </span>
-            <span className="text-[1.0625rem]">{t('measurements.latest.another')}</span>
-          </Link>
+          {!readOnly && (
+            <Link to={measure} className={dashedCard}>
+              <span aria-hidden="true" className="text-2xl leading-none">
+                +
+              </span>
+              <span className="text-[1.0625rem]">{t('measurements.latest.another')}</span>
+            </Link>
+          )}
         </div>
       )}
     </section>
@@ -179,10 +196,12 @@ const headCell = 'pt-3.5 pb-2.5 font-normal'
 
 function MeasurementsTable({
   tankId,
+  readOnly,
   parameters,
   measurements,
 }: {
   tankId: string
+  readOnly: boolean
   parameters: Parameter[]
   measurements: Measurement[]
 }) {
@@ -214,9 +233,11 @@ function MeasurementsTable({
                 <th scope="col" className={`px-2.5 text-right ${headCell}`}>
                   {t('measurements.recent.value')}
                 </th>
-                <th scope="col" className={`px-4.5 ${headCell}`}>
-                  <span className="sr-only">{t('measurements.recent.actions')}</span>
-                </th>
+                {!readOnly && (
+                  <th scope="col" className={`px-4.5 ${headCell}`}>
+                    <span className="sr-only">{t('measurements.recent.actions')}</span>
+                  </th>
+                )}
               </tr>
             </thead>
             {groups.map((group) => {
@@ -242,15 +263,17 @@ function MeasurementsTable({
                         <td className="px-2.5 py-2.5 text-right tabular-nums">
                           {shown(measurement.value, language)} {unit}
                         </td>
-                        <td className="px-4.5 py-2.5 text-right">
-                          <Link
-                            to={`/tanks/${tankId}/measurements/${measurement.id}/edit`}
-                            aria-label={t('measurements.recent.editLabel', { parameter, moment })}
-                            className="font-mono text-[0.78125rem]"
-                          >
-                            {t('measurements.recent.edit')}
-                          </Link>
-                        </td>
+                        {!readOnly && (
+                          <td className="px-4.5 py-2.5 text-right">
+                            <Link
+                              to={`/tanks/${tankId}/measurements/${measurement.id}/edit`}
+                              aria-label={t('measurements.recent.editLabel', { parameter, moment })}
+                              className="font-mono text-[0.78125rem]"
+                            >
+                              {t('measurements.recent.edit')}
+                            </Link>
+                          </td>
+                        )}
                       </tr>
                     )
                   })}

@@ -79,6 +79,15 @@ export const api = {
   logIn: (email: string, password: string, remember: boolean) =>
     request<Account>('POST', '/api/auth/login', { email, password, remember }),
   logOut: () => request<void>('POST', '/api/auth/logout'),
+  /** The Demo Tank, or null when none is flagged. It needs no session. */
+  async demoTank(): Promise<Tank | null> {
+    try {
+      return await request<Tank>('GET', '/api/demo')
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null
+      throw error
+    }
+  },
   tanks: () => request<Tank[]>('GET', '/api/tanks'),
   tank: (id: string) => request<Tank>('GET', `/api/tanks/${id}`),
   createTank: (details: TankDetails) => request<Tank>('POST', '/api/tanks', details),

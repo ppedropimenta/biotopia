@@ -15,6 +15,8 @@ export const en = {
       logOut: 'Log out',
       credits: 'Credits',
       account: 'Account',
+      demoGroup: 'Demo tank',
+      createNotebook: 'Start my notebook',
     },
     plate: { plate: 'Plate', fig: 'Fig.' },
     skip: 'Skip to content',
@@ -30,6 +32,14 @@ export const en = {
     signUp: 'Create an account',
     logIn: 'Log in',
     myTanks: 'My tanks',
+    ctaDemo: 'Open the demo tank',
+    ctaSignUp: 'or create an account',
+    ctaNote: 'The demo opens without signing in. Nothing to install.',
+    navDemo: 'Demo tank',
+    demo: {
+      title: 'Open a real tank, no account needed.',
+      body: 'A real tank with its measurements, water changes and photos. Browse the charts and the timeline as if it were yours.',
+    },
     hero: {
       water: 'Blackwater',
       caption: 'cardinal tetra · blackwater streams of the Rio Negro, Brazil',
@@ -84,6 +94,8 @@ export const en = {
     email: 'Email',
     password: 'Password',
     working: 'One moment…',
+    demoTitle: 'See the demo tank',
+    demoHint: 'Read-only · no account',
     tabs: { label: 'Log in or create an account', login: 'Log in', signup: 'Create account' },
     frame: {
       tagline: 'Every measurement, every tank —',
@@ -213,6 +225,12 @@ export const en = {
       archived: 'This tank is archived, so it takes no new records. Restore it first.',
       generic: 'Something went wrong. Try again in a moment.',
     },
+  },
+  demo: {
+    banner: 'This is the demo tank: a real tank’s notebook, read-only. Look around freely, nothing here can be changed.',
+    stamp: 'Demo',
+    createOwn: 'Make my own',
+    none: 'There is no demo tank right now.',
   },
   account: {
     title: 'Your account',

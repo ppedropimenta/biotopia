@@ -25,25 +25,28 @@ class MeasurementController {
 
 	private final MeasurementService measurements;
 
-	MeasurementController(MeasurementService measurements) {
+	private final TankService tanks;
+
+	MeasurementController(MeasurementService measurements, TankService tanks) {
 		this.measurements = measurements;
+		this.tanks = tanks;
 	}
 
 	@GetMapping
 	List<MeasurementView> list(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@RequestParam(defaultValue = "1000") int limit) {
-		return measurements.list(user.id(), TankController.tankId(tankId), limit);
+		return measurements.list(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), limit);
 	}
 
 	@GetMapping("/{id}")
 	MeasurementView read(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@PathVariable String id) {
-		return measurements.read(user.id(), TankController.tankId(tankId), measurementId(id));
+		return measurements.read(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), measurementId(id));
 	}
 
 	@GetMapping("/latest")
 	List<MeasurementView> latest(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId) {
-		return measurements.latest(user.id(), TankController.tankId(tankId));
+		return measurements.latest(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId));
 	}
 
 	@PostMapping

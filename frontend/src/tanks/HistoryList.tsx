@@ -20,7 +20,7 @@ export function HistoryList({
 }: {
   days: readonly HistoryDay[]
   parameters: readonly Parameter[]
-  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters'>
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'readOnly'>
 }) {
   const { t } = useTranslation()
   const language = useLanguage()

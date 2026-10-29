@@ -8,6 +8,8 @@ import { describeError, type FormErrors } from '../auth/errors'
 import { FormError } from '../auth/FormError'
 import { ResendLink } from '../auth/ResendLink'
 import { Button, ButtonLink } from '../components/ui/Button'
+import { Illustration } from '../components/ui/Brand'
+import { Icon } from '../components/ui/Icon'
 import { TextField } from '../components/ui/Field'
 import { plateClasses } from '../components/ui/plateClasses'
 import { cx } from '../lib/cx'
@@ -139,6 +141,7 @@ function LogInForm() {
           {submitting ? t('auth.working') : t('auth.login.submit')}
         </Button>
       </form>
+      <DemoLink />
       {unconfirmed && (
         <div className={cx(plateClasses('sm'), 'flex flex-col gap-4')}>
           <p role="alert" className="m-0 text-[1.1875rem] leading-relaxed">
@@ -198,5 +201,22 @@ function SignUpForm({ onSignedUp }: FormProps) {
         {submitting ? t('auth.working') : t('auth.signup.submit')}
       </Button>
     </form>
+  )
+}
+
+/** A way into the Demo Tank for someone who has no account yet. */
+function DemoLink() {
+  const { t } = useTranslation()
+  return (
+    <Link to="/demo" className="flex items-center gap-4 border border-ink texture-card px-4 py-3.5 text-ink no-underline hover:text-ink">
+      <div className="w-28 flex-none">
+        <Illustration slug="blackwater" decorative />
+      </div>
+      <span className="flex flex-col">
+        <span className="text-[1.1875rem]">{t('auth.demoTitle')}</span>
+        <span className="font-mono text-xs text-ink-muted">{t('auth.demoHint')}</span>
+      </span>
+      <Icon name="arrowRight" className="ml-auto flex-none" />
+    </Link>
   )
 }

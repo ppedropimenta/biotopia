@@ -38,8 +38,35 @@ class TankService implements TankErasure {
 		return tanks.findOwnedBy(ownerId).stream().map(TankView::of).toList();
 	}
 
-	TankView find(UUID ownerId, UUID id) {
-		return TankView.of(owned(ownerId, id));
+	/** The Tank as {@code viewerId} (null for a visitor) may read it: their own, or the Demo Tank. */
+	TankView find(UUID viewerId, UUID id) {
+		Tank tank = tanks.findById(id).filter(Tank::isDemo).orElse(null);
+		if (tank != null) {
+			return TankView.of(tank, !tank.ownerId().equals(viewerId));
+		}
+		return TankView.of(owned(requireViewer(viewerId), id));
+	}
+
+	/**
+	 * Whose Tank a read is answered from. Anyone reads the Demo Tank as its owner would; anything else is the
+	 * viewer's own, and a visitor with no session is refused.
+	 */
+	UUID readerOf(UUID viewerId, UUID tankId) {
+		return tanks.findById(tankId).filter(Tank::isDemo).map(Tank::ownerId).orElseGet(() -> requireViewer(viewerId));
+	}
+
+	/** The Demo Tank, if one is flagged. */
+	TankView demo() {
+		return tanks.findByDemoTrue()
+			.map(tank -> TankView.of(tank, true))
+			.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "demo_not_found"));
+	}
+
+	private static UUID requireViewer(UUID viewerId) {
+		if (viewerId == null) {
+			throw new ApiException(HttpStatus.UNAUTHORIZED, "unauthorized");
+		}
+		return viewerId;
 	}
 
 	@Transactional

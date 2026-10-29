@@ -52,6 +52,8 @@ test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and 
   await page.getByRole('link', { name: 'Overview' }).click()
   await expect(page.getByRole('heading', { name: 'Recent photos' })).toBeVisible()
   await expect(page.getByText('First plants in')).toBeVisible()
+  // The overview plate shows the photo as the tank's cover, not the drawing.
+  await expect(page.getByRole('figure').getByRole('img', { name: 'Latest photo of Photo tank' })).toBeVisible()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My tanks' }).click()
   await expect(page.getByRole('img', { name: 'Latest photo of Photo tank' })).toBeVisible()
   await expect(page.getByText('1 photo', { exact: true })).toBeVisible()

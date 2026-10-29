@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { api } from '../auth/api'
-import { Illustration } from '../components/ui/Brand'
 import { ButtonLink } from '../components/ui/Button'
 import { Handwritten } from '../components/ui/Paper'
 import { PlateCorners } from '../components/ui/Plate'
@@ -16,6 +15,8 @@ import { MaintenanceDiary } from '../tanks/MaintenanceDiary'
 import { TankLifecycle } from '../tanks/TankLifecycle'
 import { MeasurementSections } from '../tanks/MeasurementSections'
 import { PhotoStrip } from '../tanks/PhotoStrip'
+import type { PhotoSummary } from '../tanks/photos'
+import { TankCover } from '../tanks/TankCover'
 import { formatNumber } from '../tanks/numbers'
 import { plateNumber } from '../tanks/plates'
 import type { Tank } from '../tanks/types'
@@ -33,7 +34,9 @@ export function TankPage() {
     const tank = await api.tank(id)
     // A visitor has no list of tanks, and the Demo Tank has no plate number to show them.
     const tanks = tank.readOnly ? [] : await api.tanks()
-    return { tank, tanks, today: new Date() }
+    // A tank whose photos cannot be read is shown with its drawing, as one with no photos.
+    const photos = await api.photoSummary(tank.id).catch((): PhotoSummary => ({ count: 0, latestId: null }))
+    return { tank, tanks, photos, today: new Date() }
   }, `${id}-${version}`)
 
   if (loaded.status === 'loading') return null
@@ -46,13 +49,13 @@ export function TankPage() {
     )
   }
 
-  const { tank, tanks, today } = loaded.data
+  const { tank, tanks, photos, today } = loaded.data
   return (
     <>
       <header className="flex flex-col gap-4.5">
         <Breadcrumbs items={tank.readOnly ? [{ label: tank.name }] : [{ label: t('ui.nav.myTanks'), to: '/tanks' }, { label: tank.name }]} />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-center gap-8">
-          <TankPlate tank={tank} number={plateNumber(tanks, tank.id)} today={today} />
+          <TankPlate tank={tank} number={plateNumber(tanks, tank.id)} today={today} latestPhotoId={photos.latestId} />
           <RecordCard tank={tank} />
         </div>
       </header>
@@ -65,8 +68,18 @@ export function TankPage() {
   )
 }
 
-/** The drawn tank. Its corners say the plate number and how long the tank has been running. */
-function TankPlate({ tank, number, today }: { tank: Tank; number: number | null; today: Date }) {
+/** The tank's cover: its latest photo, or the drawing. Its corners say the plate number and how long it has been running. */
+function TankPlate({
+  tank,
+  number,
+  today,
+  latestPhotoId,
+}: {
+  tank: Tank
+  number: number | null
+  today: Date
+  latestPhotoId: string | null
+}) {
   const { t } = useTranslation()
   const corners = [
     number !== null && `${t('ui.plate.plate')} ${roman(number)}`,
@@ -75,7 +88,9 @@ function TankPlate({ tank, number, today }: { tank: Tank; number: number | null;
   return (
     <figure className={`${plateClasses('md')} m-0`}>
       <PlateCorners items={corners} />
-      <Illustration slug="blackwater" decorative className="mt-1.5" />
+      <div className="mt-1.5">
+        <TankCover tank={tank} latestPhotoId={latestPhotoId} />
+      </div>
     </figure>
   )
 }

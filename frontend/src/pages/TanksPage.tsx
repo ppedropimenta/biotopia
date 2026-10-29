@@ -15,7 +15,7 @@ import type { Maintenance } from '../tanks/maintenance'
 import { valueDecimals, type Measurement, type Parameter } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import type { PhotoSummary } from '../tanks/photos'
-import { photoUrl } from '../tanks/photos'
+import { TankCover } from '../tanks/TankCover'
 import { plateValues } from '../tanks/plates'
 import { recentSeries } from '../tanks/series'
 import type { Tank } from '../tanks/types'
@@ -131,17 +131,7 @@ function TankPlate({
       <PlateCorners
         items={[`${t('ui.plate.plate')} ${roman(number)}`, ...(photos.count > 0 ? [t('photos.count', { count: photos.count })] : [])]}
       />
-      {photos.latestId ? (
-        // The latest Tank Photo stands in for the tank, in the same frame as the drawing.
-        <img
-          src={photoUrl(tank.id, photos.latestId)}
-          alt={t('photos.latestAlt', { name: tank.name })}
-          loading="lazy"
-          className="block aspect-[4/3] w-full object-cover"
-        />
-      ) : (
-        <Illustration slug="blackwater" decorative />
-      )}
+      <TankCover tank={tank} latestPhotoId={photos.latestId} />
       <div className="flex flex-col gap-0.5">
         <h2 className="m-0 text-[1.6875rem] leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
         <span className="font-mono text-[0.78125rem] text-ink-muted">{facts.join(' · ')}</span>

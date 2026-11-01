@@ -23,6 +23,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
+      # The server has 2 GB for everything; this caps the Java heap so the backend leaves room for PostgreSQL and Caddy.
+      JAVA_TOOL_OPTIONS: -Xmx640m
       DATABASE_URL: jdbc:postgresql://postgres:5432/aquarium
       DATABASE_USER: aquarium
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}

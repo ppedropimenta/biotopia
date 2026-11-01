@@ -1,0 +1,58 @@
+# Production stack on the server: PostgreSQL, the backend and Caddy (which also serves the SPA).
+# All settings come from deploy/.env on the server (see .env.example); nothing secret lives in the repo.
+# IMAGE_PREFIX and TAG are set by the deploy job, e.g. ghcr.io/<owner>/aquarium-app and the commit sha.
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aquarium
+      POSTGRES_USER: aquarium
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?set DATABASE_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aquarium -d aquarium"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    image: ${IMAGE_PREFIX:?}/backend:${TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/aquarium
+      DATABASE_USER: aquarium
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+      SESSION_COOKIE_SECURE: "true"
+      DEMO_TANK_ID: ${DEMO_TANK_ID:-}
+      SMTP_HOST: ${SMTP_HOST:?set SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:?set SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?set SMTP_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM:?set MAIL_FROM}
+    volumes:
+      - photos:/data/photos
+    # Not published to the internet: only Caddy reaches it, through the compose network.
+
+  web:
+    image: ${IMAGE_PREFIX}/web:${TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # The certificates Caddy gets; losing them means asking Let's Encrypt again.
+      - caddy-data:/data
+
+volumes:
+  postgres-data:
+  photos:
+  caddy-data:

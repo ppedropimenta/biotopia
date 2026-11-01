@@ -1,0 +1,16 @@
+# DOMAIN comes from the environment (the compose file passes it in). With a real domain Caddy asks Let's Encrypt
+# for a certificate and renews it; for local tests set DOMAIN=localhost and Caddy makes its own.
+{$DOMAIN} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	# Everything else is the single-page app: unknown paths fall back to index.html so React Router can handle them.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

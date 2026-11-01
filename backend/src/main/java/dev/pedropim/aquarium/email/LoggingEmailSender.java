@@ -2,7 +2,7 @@ package dev.pedropim.aquarium.email;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,10 +19,10 @@ class LoggingEmailSender implements EmailSender {
 	}
 
 	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnExpression("'${spring.mail.host:}'.isEmpty()")
 	static class Config {
 
 		@Bean
-		@ConditionalOnMissingBean(EmailSender.class)
 		EmailSender loggingEmailSender() {
 			return new LoggingEmailSender();
 		}

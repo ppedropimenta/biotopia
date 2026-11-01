@@ -4,15 +4,15 @@ A web app for fishkeepers. You log your tanks, water tests, maintenance and phot
 place, and see how things change over time.
 
 I keep a freshwater tank myself. My records were split between a phone app and the photo gallery, and I
-could not see measurements, maintenance and photos together over time. This project is my attempt to fix that, and a way to build a full web app from database to
-deploy.
+could not see measurements, maintenance and photos together over time. This project is my attempt to fix
+that, and a way to build a full web app from database to deploy.
 
 The interface is in English and Brazilian Portuguese.
 
 ## Status
 
-Early work. The project skeleton is in place (backend, frontend, database, tests); the first features
-are next. There is no public instance yet.
+Phase 1 is built: accounts, tanks, measurements with charts, a maintenance log, tank photos and a demo
+tank. The next step is putting it online. There is no public instance yet.
 
 ## Plan
 
@@ -45,6 +45,7 @@ Focus on freshwater. The reasons are in [ADR 0001](docs/adr/0001-freshwater-only
 backend/    Spring Boot API
 frontend/   React single-page app
 pipeline/   offline data work in Python
+deploy/     Docker Compose file and settings template for the server
 docs/adr/   architecture decision records
 GLOSSARY.md the words this project uses, and what they mean
 ```

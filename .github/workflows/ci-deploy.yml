@@ -77,20 +77,30 @@ jobs:
   deploy:
     needs: images
     runs-on: ubuntu-latest
+    # Secrets go in as environment variables, not pasted into the scripts below.
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REGISTRY_USER: ${{ github.actor }}
+      IMAGE_PREFIX: ${{ needs.images.outputs.prefix }}
+      TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up the SSH key
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_deploy
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
       - name: Copy the compose file
-        run: scp -i ~/.ssh/id_deploy deploy/compose.yaml "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/opt/aquarium/compose.yaml"
+        run: scp -i ~/.ssh/id_deploy deploy/compose.yaml "$DEPLOY_USER@$DEPLOY_HOST:/opt/aquarium/compose.yaml"
       - name: Pull and restart
+        # The registry login is only needed for this pull; the images stay on the server afterwards.
         run: |
-          ssh -i ~/.ssh/id_deploy "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+          ssh -i ~/.ssh/id_deploy "$DEPLOY_USER@$DEPLOY_HOST" \
             "cd /opt/aquarium \
-             && echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin \
-             && IMAGE_PREFIX='${{ needs.images.outputs.prefix }}' TAG='${{ github.sha }}' docker compose --env-file .env up -d --pull always \
+             && echo '$REGISTRY_TOKEN' | docker login ghcr.io -u '$REGISTRY_USER' --password-stdin \
+             && IMAGE_PREFIX='$IMAGE_PREFIX' TAG='$TAG' docker compose up -d --pull always \
              && docker image prune -f"

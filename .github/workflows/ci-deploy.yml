@@ -73,7 +73,7 @@ jobs:
             ${{ steps.names.outputs.prefix }}/web:latest
 
   # Copies the compose file to the server and starts the new images. Needs three repository secrets:
-  # DEPLOY_HOST, DEPLOY_USER and DEPLOY_SSH_KEY (see docs/deploy.md).
+  # DEPLOY_HOST, DEPLOY_USER and DEPLOY_SSH_KEY.
   deploy:
     needs: images
     runs-on: ubuntu-latest

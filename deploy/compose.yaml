@@ -1,6 +1,6 @@
 # Production stack on the server: PostgreSQL, the backend and Caddy (which also serves the SPA).
 # All settings come from deploy/.env on the server (see .env.example); nothing secret lives in the repo.
-# IMAGE_PREFIX and TAG are set by the deploy job, e.g. ghcr.io/<owner>/aquarium-app and the commit sha.
+# IMAGE_PREFIX and TAG are set by the deploy job, e.g. ghcr.io/<owner>/<repo> (the images are <prefix>/backend and <prefix>/web) and the commit sha.
 services:
   postgres:
     image: pgvector/pgvector:0.8.0-pg17
@@ -39,12 +39,12 @@ services:
     # Not published to the internet: only Caddy reaches it, through the compose network.
 
   web:
-    image: ${IMAGE_PREFIX}/web:${TAG:-latest}
+    image: ${IMAGE_PREFIX:?}/web:${TAG:-latest}
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      DOMAIN: ${DOMAIN}
+      DOMAIN: ${DOMAIN:?set DOMAIN}
     ports:
       - "80:80"
       - "443:443"

@@ -3,7 +3,7 @@ import { fonts, pictures, type Credit, type Picture } from '../credits'
 import { cx } from '../lib/cx'
 import { PageHeader, SectionHeader } from '../components/ui/Structure'
 
-const fontClass: Record<string, string> = { Fraunces: 'font-serif', 'DM Mono': 'font-mono', Caveat: 'font-hand' }
+const fontClass: Record<string, string> = { Fraunces: 'font-serif', 'IBM Plex Mono': 'font-mono', Caveat: 'font-hand' }
 
 export function CreditsPage() {
   const { t } = useTranslation()

@@ -45,7 +45,7 @@ alone: a symbol or a word goes with it (▲ ▼ =, "Not measured").
 ## Type
 
 - **Fraunces** for titles, names, running text and captions.
-- **DM Mono** for data: field and parameter names, numbers, dates, table headers, buttons and the brand
+- **IBM Plex Mono** for data: field and parameter names, numbers, dates, table headers, buttons and the brand
   line.
 - **Caveat** for handwriting only: a note the keeper wrote, the "start a new plate" hint, the note on the
   landing page.

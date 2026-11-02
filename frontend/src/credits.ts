@@ -30,10 +30,10 @@ export const fonts = {
     sourceUrl: 'https://fonts.google.com/specimen/Fraunces',
     ...openFontLicence,
   },
-  dmMono: {
-    title: 'DM Mono',
-    creator: 'Colophon Foundry',
-    sourceUrl: 'https://fonts.google.com/specimen/DM+Mono',
+  plexMono: {
+    title: 'IBM Plex Mono',
+    creator: 'Mike Abbink, IBM',
+    sourceUrl: 'https://fonts.google.com/specimen/IBM+Plex+Mono',
     ...openFontLicence,
   },
   caveat: {

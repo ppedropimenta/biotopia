@@ -18,7 +18,7 @@ export function CreditsPage() {
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-7 p-0">
           {Object.values(fonts).map((font) => (
             <li key={font.title} className="flex flex-col gap-3 border border-ink/35 texture-card px-5 py-5">
-              <h3 className={cx('m-0 text-[2rem] leading-[1.1] font-normal', fontClass[font.title])}>{font.title}</h3>
+              <h3 className={cx('m-0 text-h2 leading-[1.1] font-normal', fontClass[font.title])}>{font.title}</h3>
               <CreditDetails credit={font} />
             </li>
           ))}
@@ -53,7 +53,7 @@ export function CreditsPage() {
 function CreditDetails({ credit }: { credit: Credit }) {
   const { t } = useTranslation()
   return (
-    <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-[0.9375rem]">
+    <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-sm">
       <dt className="label-mono text-ink-muted">{t('credits.by')}</dt>
       <dd className="m-0">{credit.creator}</dd>
       <dt className="label-mono text-ink-muted">{t('credits.licence')}</dt>

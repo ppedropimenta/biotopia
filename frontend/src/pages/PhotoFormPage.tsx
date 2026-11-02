@@ -179,7 +179,7 @@ function FileField({ label, error, onChange }: { label: string; error?: string; 
   const id = 'photo-file'
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="font-mono text-[0.71875rem] tracking-[0.12em] text-ink-muted uppercase">
+      <label htmlFor={id} className="font-mono text-caption tracking-[0.12em] text-ink-muted uppercase">
         {label}
       </label>
       <input

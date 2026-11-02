@@ -47,13 +47,13 @@ export function Wordmark({
     >
       <BrandSymbol className={cx('text-amber', size === 'md' ? 'w-11' : 'w-12')} />
       <span className={cx('flex', stacked ? 'flex-col justify-center gap-0.5' : 'flex-wrap items-baseline gap-x-2.5')}>
-        <span className={cx('font-serif leading-none font-semibold italic', size === 'md' ? 'text-[1.75rem]' : 'text-[1.875rem]')}>
+        <span className={cx('font-serif leading-none font-semibold italic', size === 'md' ? 'text-h3' : 'text-h2')}>
           {t('ui.brand.name')}
         </span>
         {tagline && (
           <>
             <span className="sr-only"> · </span>
-            <span className="font-mono text-[0.65625rem] tracking-[0.16em] text-amber-soft uppercase">{t('ui.brand.tagline')}</span>
+            <span className="font-mono text-caption tracking-[0.16em] text-amber-soft uppercase">{t('ui.brand.tagline')}</span>
           </>
         )}
       </span>
@@ -75,7 +75,7 @@ export function LanguageToggle({ tone = 'dark', className }: { tone?: 'dark' | '
     <div
       role="group"
       aria-label={t('ui.language.label')}
-      className={cx('flex rounded-paper font-mono text-[0.71875rem]', tone === 'dark' ? 'border border-river-muted' : 'border border-ink', className)}
+      className={cx('flex rounded-paper font-mono text-caption', tone === 'dark' ? 'border border-river-muted' : 'border border-ink', className)}
     >
       {[...languages].reverse().map((language) => {
         const on = language === i18n.language

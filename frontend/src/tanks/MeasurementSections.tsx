@@ -107,8 +107,8 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
           <span aria-hidden="true" className="text-2xl leading-none">
             +
           </span>
-          <span className="text-[1.0625rem]">{t('measurements.latest.empty')}</span>
-          <span className="font-mono text-[0.78125rem] text-ink">{t('measurements.latest.emptyCta')}</span>
+          <span className="text-base">{t('measurements.latest.empty')}</span>
+          <span className="font-mono text-label text-ink">{t('measurements.latest.emptyCta')}</span>
         </Link>
       ) : (
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(176px,100%),1fr))] gap-3">
@@ -139,7 +139,7 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
               <span aria-hidden="true" className="text-2xl leading-none">
                 +
               </span>
-              <span className="text-[1.0625rem]">{t('measurements.latest.another')}</span>
+              <span className="text-base">{t('measurements.latest.another')}</span>
             </Link>
           )}
         </div>
@@ -223,7 +223,7 @@ function MeasurementsTable({
         <div className="overflow-x-auto border border-ink texture-card">
           <table className="w-full min-w-[520px] border-collapse text-base">
             <thead>
-              <tr className="text-left font-mono text-[0.6875rem] tracking-[0.14em] text-ink-muted uppercase">
+              <tr className="text-left font-mono text-caption tracking-[0.14em] text-ink-muted uppercase">
                 <th scope="col" className={`w-[250px] px-4.5 ${headCell}`}>
                   {t('measurements.recent.moment')}
                 </th>
@@ -251,7 +251,7 @@ function MeasurementsTable({
                       <tr key={measurement.id} className="align-top">
                         {i === 0 && (
                           <th scope="rowgroup" rowSpan={group.items.length} className="px-4.5 py-3 text-left align-top font-normal">
-                            <span className="font-mono text-[0.8125rem]">{moment}</span>
+                            <span className="font-mono text-sm">{moment}</span>
                             {group.note && (
                               <Handwritten as="p" size="sm" className="m-0 mt-1 whitespace-pre-line [overflow-wrap:anywhere]">
                                 {group.note}
@@ -268,7 +268,7 @@ function MeasurementsTable({
                             <Link
                               to={`/tanks/${tankId}/measurements/${measurement.id}/edit`}
                               aria-label={t('measurements.recent.editLabel', { parameter, moment })}
-                              className="font-mono text-[0.78125rem]"
+                              className="font-mono text-label"
                             >
                               {t('measurements.recent.edit')}
                             </Link>

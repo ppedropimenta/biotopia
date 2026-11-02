@@ -237,7 +237,7 @@ export function ParameterChart({
           </svg>
         </div>
       </div>
-      <p className="m-0 mt-2 min-h-6 font-mono text-[0.78125rem] text-ink" aria-live="polite">
+      <p className="m-0 mt-2 min-h-6 font-mono text-label text-ink" aria-live="polite">
         {readout}
       </p>
       <p className="sr-only">{t('timeline.keyboardHint')}</p>

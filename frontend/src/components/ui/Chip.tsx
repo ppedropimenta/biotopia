@@ -25,7 +25,7 @@ export function ToggleChip({
       type="button"
       aria-pressed={pressed}
       className={cx(
-        'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 font-mono text-[0.78125rem] transition-colors',
+        'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-3 font-mono text-label transition-colors',
         variant === 'solid' &&
           (pressed ? 'border border-ink bg-ink text-paper-card' : 'border border-ink/50 text-ink hover:bg-paper-card'),
         variant === 'check' &&
@@ -50,7 +50,7 @@ export function ToggleChip({
 export function ChipGroup({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
   return (
     <div role="group" aria-label={label} className={cx('flex flex-wrap items-center gap-1.5', className)}>
-      <span aria-hidden="true" className="mr-1 font-mono text-[0.78125rem] tracking-[0.1em] text-ink-muted uppercase">
+      <span aria-hidden="true" className="mr-1 font-mono text-label tracking-[0.1em] text-ink-muted uppercase">
         {label}
       </span>
       {children}
@@ -71,7 +71,7 @@ export function Tag({
   return (
     <span
       className={cx(
-        'inline-flex items-center px-[7px] py-px font-mono text-[0.71875rem]',
+        'inline-flex items-center px-[7px] py-px font-mono text-caption',
         tone === 'default' && 'border border-ink/50',
         tone === 'warn' && 'border border-cardinal text-cardinal',
         tone === 'danger' && 'bg-cardinal text-paper-card',
@@ -102,7 +102,7 @@ export function Segmented<T extends string>({
     <div
       role="group"
       aria-label={label}
-      className={cx('flex rounded-paper border-[1.5px] border-ink font-mono text-[0.8125rem]', className)}
+      className={cx('flex rounded-paper border-[1.5px] border-ink font-mono text-sm', className)}
     >
       {options.map((option, i) => (
         <button

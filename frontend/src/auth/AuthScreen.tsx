@@ -45,12 +45,12 @@ export function AuthScreen({ title, lead, switcher, note, children }: Props) {
           <PlateCorners items={[`${t('ui.plate.plate')} IV`, t('auth.frame.habitat'), `${t('ui.plate.fig')} 7`]} />
           <Illustration slug="victoria-amazonica" decorative className="mt-2.5 mb-1" />
           <figcaption className="flex flex-col border-t border-ink/40 pt-2.5">
-            <span className="text-[1.375rem]">
+            <span className="text-lead">
               <Binomial>Victoria amazonica</Binomial>
             </span>
           </figcaption>
         </figure>
-        <p className="m-0 max-w-[36ch] text-[1.375rem] leading-[1.4] text-river-text">
+        <p className="m-0 max-w-[36ch] text-lead leading-[1.4] text-river-text">
           {t('auth.frame.tagline')} <em className="text-amber">{t('auth.frame.taglineEmphasis')}</em>
         </p>
       </aside>
@@ -64,7 +64,7 @@ export function AuthScreen({ title, lead, switcher, note, children }: Props) {
                 {switcher}
               </>
             ) : (
-              <h1 className="m-0 text-[1.75rem] leading-tight font-normal">{title}</h1>
+              <h1 className="m-0 text-h2 leading-tight font-normal">{title}</h1>
             )}
             <LanguageToggle tone="light" className="flex-none" />
           </div>

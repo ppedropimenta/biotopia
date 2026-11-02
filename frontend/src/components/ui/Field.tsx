@@ -4,7 +4,7 @@ import { formatNumber, parseNumber } from '../../tanks/numbers'
 import { useLanguage } from '../../tanks/useLanguage'
 import { Icon } from './Icon'
 
-const labelClasses = 'font-mono text-[0.71875rem] tracking-[0.12em] text-ink-muted uppercase'
+const labelClasses = 'font-mono text-caption tracking-[0.12em] text-ink-muted uppercase'
 
 /**
  * An underlined field, like a notebook line. A mono label on top; an optional unit on the right. An `error`
@@ -33,7 +33,7 @@ export function TextField({
 } & ComponentProps<'input'>) {
   const id = useId()
   const noteId = `${id}-note`
-  const nudgeButton = 'flex size-11 flex-none cursor-pointer items-center justify-center bg-transparent text-[22px] text-ink hover:bg-paper-card'
+  const nudgeButton = 'flex size-11 flex-none cursor-pointer items-center justify-center bg-transparent text-h3 text-ink hover:bg-paper-card'
   return (
     <div className={cx('flex flex-col gap-1', className)}>
       <label htmlFor={id} className={cx(labelClasses, keepCase && 'normal-case')}>
@@ -50,7 +50,7 @@ export function TextField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error || hint ? noteId : undefined}
           className={cx(
-            'min-h-11 w-full min-w-0 border-0 bg-transparent px-0.5 font-serif text-xl text-ink placeholder:text-ink-muted/70',
+            'min-h-11 w-full min-w-0 border-0 bg-transparent px-0.5 font-serif text-lead text-ink placeholder:text-ink-muted/70',
             inputClassName,
           )}
           {...input}
@@ -155,12 +155,12 @@ export function Stepper({
     if (typeof parsed === 'number') onChange(clamp(parsed))
     setDraft(null)
   }
-  const button = 'flex h-11 w-11 cursor-pointer items-center justify-center bg-transparent font-serif text-[22px] text-ink hover:bg-paper'
+  const button = 'flex h-11 w-11 cursor-pointer items-center justify-center bg-transparent font-serif text-h3 text-ink hover:bg-paper'
   return (
     <div className={cx(layout === 'row' ? 'flex items-center justify-between gap-2.5' : 'flex flex-col gap-1.5', className)}>
       <label htmlFor={id} className="flex flex-col">
-        <span className="text-[1.1875rem]">{label}</span>
-        {hint && <span className="font-mono text-[0.71875rem] text-ink-muted">{hint}</span>}
+        <span className="text-lead">{label}</span>
+        {hint && <span className="font-mono text-caption text-ink-muted">{hint}</span>}
       </label>
       <div className={cx('flex items-center rounded-paper border-[1.5px] border-ink bg-paper-card', layout === 'stack' && 'w-full')}>
         <button type="button" aria-label={decrementLabel} className={cx(button, 'border-r border-ink/40')} onClick={() => onChange(clamp(value - step))}>
@@ -173,7 +173,7 @@ export function Stepper({
           onChange={(event) => setDraft(event.target.value)}
           onBlur={commit}
           onKeyDown={(event) => event.key === 'Enter' && commit()}
-          className={cx('h-11 w-16 min-w-0 border-0 bg-transparent text-center font-serif text-[22px] text-ink', layout === 'stack' && 'flex-1')}
+          className={cx('h-11 w-16 min-w-0 border-0 bg-transparent text-center font-serif text-h3 text-ink', layout === 'stack' && 'flex-1')}
         />
         {unit && <span className="pr-1.5 font-mono text-xs">{unit}</span>}
         <button type="button" aria-label={incrementLabel} className={cx(button, 'border-l border-ink/40')} onClick={() => onChange(clamp(value + step))}>

@@ -34,8 +34,8 @@ export function MeasurementHeader({
         <Icon name="arrowLeft" size={22} strokeWidth={2} />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col">
-        <h1 className="m-0 text-[1.375rem] leading-[1.1] font-normal">{title}</h1>
-        <span className="truncate font-mono text-[0.71875rem] text-amber-soft">{about}</span>
+        <h1 className="m-0 text-h3 leading-[1.1] font-normal">{title}</h1>
+        <span className="truncate font-mono text-caption text-amber-soft">{about}</span>
       </div>
     </header>
   )

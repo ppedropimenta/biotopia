@@ -133,10 +133,10 @@ function TankPlate({
       />
       <TankCover tank={tank} latestPhotoId={photos.latestId} />
       <div className="flex flex-col gap-0.5">
-        <h2 className="m-0 text-[1.6875rem] leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
-        <span className="font-mono text-[0.78125rem] text-ink-muted">{facts.join(' · ')}</span>
+        <h2 className="m-0 text-h3 leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
+        <span className="font-mono text-label text-ink-muted">{facts.join(' · ')}</span>
         {lastWaterChange?.percent != null && (
-          <span className="font-mono text-[0.78125rem] text-ink-muted">
+          <span className="font-mono text-label text-ink-muted">
             {t('maintenance.lastWaterChange', {
               percent: formatNumber(lastWaterChange.percent, language),
               when: daysAgo(lastWaterChange.performedAt, now, language),
@@ -150,7 +150,7 @@ function TankPlate({
             key={parameter}
             className={cx('flex min-w-0 flex-col py-2.5', i === 0 ? 'pr-2' : 'border-l border-dashed border-ink/35 px-2')}
           >
-            <dt className={cx('font-mono text-[0.6875rem] text-ink-muted', parameter !== 'ph' && 'uppercase')}>
+            <dt className={cx('font-mono text-caption text-ink-muted', parameter !== 'ph' && 'uppercase')}>
               {t(`parameters.${parameter}`)} {parameters.find((p) => p.code === parameter)?.unit}
             </dt>
             <dd className="m-0 mt-auto text-2xl leading-[1.1]">
@@ -180,11 +180,11 @@ function NewPlate({ first = false }: { first?: boolean }) {
       className="flex min-h-22 flex-wrap items-center gap-x-6 gap-y-3 border-[1.5px] border-dashed border-ink/55 px-6 py-3.5 text-ink-soft no-underline hover:text-ink"
     >
       <Illustration slug="folhas-secas" decorative fit="contain" className="h-16 w-auto" />
-      <span className="text-[1.375rem]">{t('tanks.newPlate')}</span>
+      <span className="text-h3">{t('tanks.newPlate')}</span>
       {first ? (
         <Handwritten>{t('tanks.empty')}</Handwritten>
       ) : (
-        <span className="font-mono text-[0.78125rem] text-ink-muted">{t('tanks.enough')}</span>
+        <span className="font-mono text-label text-ink-muted">{t('tanks.enough')}</span>
       )}
     </Link>
   )
@@ -207,8 +207,8 @@ function ArchivedTanks({ tanks }: { tanks: Tank[] }) {
               to={`/tanks/${tank.id}`}
               className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3 text-ink no-underline hover:bg-paper-card"
             >
-              <span className="text-[1.375rem] [overflow-wrap:anywhere]">{tank.name}</span>
-              <span className="font-mono text-[0.78125rem] text-ink-muted">
+              <span className="text-h3 [overflow-wrap:anywhere]">{tank.name}</span>
+              <span className="font-mono text-label text-ink-muted">
                 {t('tanks.lifecycle.archivedBadge')} · {formatDay(tank.archivedAt!.slice(0, 10), language)}
               </span>
             </Link>

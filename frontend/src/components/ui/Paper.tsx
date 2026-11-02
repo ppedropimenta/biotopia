@@ -19,9 +19,9 @@ export function Handwritten({
     <Tag
       className={cx(
         'font-hand leading-[1.2]',
-        size === 'sm' && 'text-[1.1875rem]',
+        size === 'sm' && 'text-lead',
         size === 'md' && 'text-hand',
-        size === 'lg' && 'text-[1.8125rem] leading-[1.17]',
+        size === 'lg' && 'text-h2 leading-[1.17]',
         tone === 'blue' && 'text-ink-blue',
         tone === 'red' && 'text-cardinal',
         tone === 'ink' && 'text-ink',
@@ -56,7 +56,7 @@ export function SpecimenLabel({
 }) {
   return (
     <div
-      className={cx('relative max-w-sm border border-ink bg-paper-photo py-3 pr-4 pl-8 text-[0.9375rem] leading-[1.45]', className)}
+      className={cx('relative max-w-sm border border-ink bg-paper-photo py-3 pr-4 pl-8 text-sm leading-[1.45]', className)}
       style={{ transform: `rotate(${rotate}deg)` }}
     >
       <span aria-hidden="true" className="absolute top-1/2 left-2.5 -mt-[5px] size-2.5 rounded-full border border-ink bg-paper" />
@@ -117,7 +117,7 @@ export function Polaroid({
           style={zoom ? { transform: `scale(${zoom.scale})`, transformOrigin: zoom.origin } : undefined}
         />
       </div>
-      {caption && <figcaption className="px-0.5 pt-0.5 font-hand text-[1.3125rem] leading-[1.3]">{caption}</figcaption>}
+      {caption && <figcaption className="px-0.5 pt-0.5 font-hand text-lead leading-[1.3]">{caption}</figcaption>}
     </figure>
   )
 }

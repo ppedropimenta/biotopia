@@ -134,7 +134,7 @@ export function ParamTile({
 }) {
   return (
     <div className={cx('flex flex-col gap-1 border border-ink texture-card px-3.5 pt-3 pb-2.5', className)}>
-      <div className="flex justify-between gap-2 font-mono text-[0.71875rem] text-ink-muted">
+      <div className="flex justify-between gap-2 font-mono text-caption text-ink-muted">
         <span>{name}</span>
         {change && (
           <span>
@@ -146,11 +146,11 @@ export function ParamTile({
         )}
       </div>
       <div className="flex items-baseline gap-1.5">
-        <span className="text-[2.375rem] leading-[1.05]">{value}</span>
-        {unit && <span className="font-mono text-[0.8125rem]">{unit}</span>}
+        <span className="text-h2 leading-[1.05]">{value}</span>
+        {unit && <span className="font-mono text-sm">{unit}</span>}
       </div>
       <RangeRuler scale={scale} value={rulerValue} ariaLabel={rulerLabel} />
-      {note && <span className="font-mono text-[0.71875rem] text-ink-muted">{note}</span>}
+      {note && <span className="font-mono text-caption text-ink-muted">{note}</span>}
     </div>
   )
 }

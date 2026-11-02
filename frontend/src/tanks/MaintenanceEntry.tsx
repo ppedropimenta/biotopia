@@ -56,7 +56,7 @@ export function MaintenanceEntry({
       </span>
       <div className="flex min-w-0 flex-col gap-1">
         <span className="font-mono text-xs tracking-[0.08em] text-ink-muted uppercase">{moment}</span>
-        <span className="text-[1.1875rem]">
+        <span className="text-lead">
           {type}
           {isWaterChange && ` · ${t('maintenance.percentOfWater', { percent })}`}
         </span>
@@ -69,7 +69,7 @@ export function MaintenanceEntry({
           <Link
             to={editTo}
             aria-label={t('maintenance.list.editLabel', { type, moment })}
-            className="inline-flex min-h-11 items-center self-start font-mono text-[0.78125rem]"
+            className="inline-flex min-h-11 items-center self-start font-mono text-label"
           >
             {t('maintenance.list.edit')}
           </Link>

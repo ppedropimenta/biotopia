@@ -8,7 +8,7 @@ export function DemoBanner({ to }: { to: string }) {
   return (
     <div role="note" className="flex flex-wrap items-center gap-x-5.5 gap-y-3 rounded-paper bg-ink px-5 py-3.5 text-river-bright">
       <Stamp tone="amber" size="md" rotate={-10} main={t('demo.stamp')} />
-      <span className="flex-[1_1_360px] text-[1.0625rem]">{t('demo.banner')}</span>
+      <span className="flex-[1_1_360px] text-base">{t('demo.banner')}</span>
       <ButtonLink to={to} variant="amber">
         {t('demo.createOwn')}
       </ButtonLink>

@@ -145,7 +145,7 @@ function Empty({ tankId, anyMeasurements, readOnly }: { tankId: string; anyMeasu
     <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
       <p className="m-0">{anyMeasurements ? t('timeline.emptyPeriod') : t('timeline.empty')}</p>
       {!anyMeasurements && !readOnly && (
-        <Link to={`/tanks/${tankId}/measure`} className="font-mono text-[0.78125rem] text-ink">
+        <Link to={`/tanks/${tankId}/measure`} className="font-mono text-label text-ink">
           {t('measurements.latest.emptyCta')}
         </Link>
       )}
@@ -210,7 +210,7 @@ function ValuesTable({ panels }: { panels: Panel[] }) {
       <table className="w-full min-w-[560px] border-collapse text-base">
         <caption className="sr-only">{t('timeline.title')}</caption>
         <thead>
-          <tr className="text-left font-mono text-[0.6875rem] tracking-[0.12em] text-ink-muted uppercase">
+          <tr className="text-left font-mono text-caption tracking-[0.12em] text-ink-muted uppercase">
             <th scope="col" className="px-4 pt-3.5 pb-2.5 font-normal">
               {t('timeline.when')}
             </th>
@@ -224,7 +224,7 @@ function ValuesTable({ panels }: { panels: Panel[] }) {
         <tbody>
           {moments.map((moment) => (
             <tr key={moment} className="border-t border-dashed border-ink/40">
-              <th scope="row" className="px-4 py-2 text-left font-mono text-[0.8125rem] font-normal">
+              <th scope="row" className="px-4 py-2 text-left font-mono text-sm font-normal">
                 {formatMoment(new Date(moment).toISOString(), language)}
               </th>
               {panels.map((p) => {

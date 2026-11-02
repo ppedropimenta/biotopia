@@ -71,10 +71,10 @@ export default function KitPage() {
         <Plate corners={[`Plate ${roman(1)}`, 'Blackwater', 'Fig. 1']} as="figure">
           <Illustration slug="paracheirodon-axelrodi" alt="Paracheirodon axelrodi" className="my-3" />
           <figcaption className="border-t border-ink/40 pt-3">
-            <span className="text-[1.625rem]">
+            <span className="text-h3">
               <Binomial>Paracheirodon axelrodi</Binomial>
             </span>{' '}
-            <span className="text-[0.9375rem] text-ink-muted">(Schultz, 1956)</span>
+            <span className="text-sm text-ink-muted">(Schultz, 1956)</span>
           </figcaption>
         </Plate>
         <div className="flex flex-col gap-5">

@@ -64,7 +64,7 @@ function ModeSwitch({ mode }: { mode: Mode }) {
           to={`/${m}`}
           aria-current={mode === m ? 'page' : undefined}
           className={cx(
-            'flex min-h-11 items-center border-b-2 text-[1.5rem] whitespace-nowrap no-underline sm:text-[1.75rem]',
+            'flex min-h-11 items-center border-b-2 text-h3 whitespace-nowrap no-underline ',
             mode === m ? 'border-ink text-ink hover:text-ink' : 'border-transparent text-ink-muted hover:text-ink',
           )}
         >
@@ -123,7 +123,7 @@ function LogInForm() {
             onChange={(event) => setPassword(event.target.value)}
             error={errors.password && t(errors.password)}
           />
-          <Link to="/forgot-password" className="absolute top-0 right-0 text-[0.9375rem]">
+          <Link to="/forgot-password" className="absolute top-0 right-0 text-sm">
             {t('auth.login.forgot')}
           </Link>
         </div>
@@ -144,7 +144,7 @@ function LogInForm() {
       <DemoLink />
       {unconfirmed && (
         <div className={cx(plateClasses('sm'), 'flex flex-col gap-4')}>
-          <p role="alert" className="m-0 text-[1.1875rem] leading-relaxed">
+          <p role="alert" className="m-0 text-lead leading-relaxed">
             {t('auth.login.unconfirmed')}
           </p>
           <ResendLink email={email.trim()} />
@@ -213,7 +213,7 @@ function DemoLink() {
         <Illustration slug="blackwater" decorative />
       </div>
       <span className="flex flex-col">
-        <span className="text-[1.1875rem]">{t('auth.demoTitle')}</span>
+        <span className="text-lead">{t('auth.demoTitle')}</span>
         <span className="font-mono text-xs text-ink-muted">{t('auth.demoHint')}</span>
       </span>
       <Icon name="arrowRight" className="ml-auto flex-none" />

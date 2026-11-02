@@ -110,7 +110,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
         <div role="group" aria-label={t('maintenance.form.type')} className="flex flex-col gap-2">
           <span
             aria-hidden="true"
-            className="font-mono text-[0.71875rem] tracking-[0.12em] text-ink-muted uppercase"
+            className="font-mono text-caption tracking-[0.12em] text-ink-muted uppercase"
           >
             {t('maintenance.form.type')}
           </span>

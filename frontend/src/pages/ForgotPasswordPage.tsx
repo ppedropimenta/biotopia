@@ -61,7 +61,7 @@ export function ForgotPasswordPage() {
           {submitting ? t('auth.working') : t('auth.forgot.submit')}
         </Button>
       </form>
-      <p className="m-0 text-[0.9375rem]">
+      <p className="m-0 text-sm">
         <Link to="/login">{t('nav.login')}</Link>
       </p>
     </AuthScreen>

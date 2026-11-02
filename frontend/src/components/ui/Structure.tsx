@@ -20,8 +20,8 @@ export function SectionHeader({
   const Heading = level === 2 ? 'h2' : 'h3'
   return (
     <div className={cx('flex flex-wrap items-baseline justify-between gap-2.5 border-b-[1.5px] border-ink pb-2', className)}>
-      <Heading className={cx('m-0 font-normal', size === 'md' ? 'text-h2' : 'text-[1.625rem]')}>{title}</Heading>
-      {aside && <div className="font-mono text-[0.78125rem]">{aside}</div>}
+      <Heading className={cx('m-0 font-normal', size === 'md' ? 'text-h2' : 'text-h3')}>{title}</Heading>
+      {aside && <div className="font-mono text-label">{aside}</div>}
     </div>
   )
 }
@@ -53,7 +53,7 @@ export function PageHeader({
 export function Breadcrumbs({ items }: { items: ReadonlyArray<{ label: ReactNode; to?: string }> }) {
   const { t } = useTranslation()
   return (
-    <nav aria-label={t('ui.breadcrumb')} className="font-mono text-[0.78125rem] text-ink-muted">
+    <nav aria-label={t('ui.breadcrumb')} className="font-mono text-label text-ink-muted">
       <ol className="m-0 flex list-none flex-wrap gap-2 p-0">
         {items.map((item, i) => (
           <li key={i} className="flex items-center gap-2">

@@ -46,7 +46,7 @@ export function MaintenancePage() {
         <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
           <p className="m-0">{t('maintenance.list.empty')}</p>
           {!tank.readOnly && (
-            <Link to={`/tanks/${tank.id}/maintenance/new`} className="font-mono text-[0.78125rem] text-ink">
+            <Link to={`/tanks/${tank.id}/maintenance/new`} className="font-mono text-label text-ink">
               {t('maintenance.list.emptyCta')}
             </Link>
           )}

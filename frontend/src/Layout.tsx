@@ -91,9 +91,9 @@ export function Layout() {
       </main>
       <footer className="texture-river-wide text-river-text">
         <div className="mx-auto flex max-w-site flex-wrap items-center justify-between gap-x-10 gap-y-5 px-6 py-11">
-          <span className="text-[1.625rem] font-semibold text-river-bright italic">{t('ui.brand.name')}</span>
-          <span className="font-mono text-[0.78125rem] text-river-caption">{t('footer.made')}</span>
-          <Link to="/credits" className="inline-flex min-h-11 items-center font-mono text-[0.8125rem] text-river-bright">
+          <span className="text-h3 font-semibold text-river-bright italic">{t('ui.brand.name')}</span>
+          <span className="font-mono text-label text-river-caption">{t('footer.made')}</span>
+          <Link to="/credits" className="inline-flex min-h-11 items-center font-mono text-sm text-river-bright">
             {t('footer.credits')}
           </Link>
         </div>

@@ -45,7 +45,7 @@ function Hero() {
           <h1 id="hero-title" className="m-0 text-hero font-normal tracking-[-0.02em] text-balance">
             {t('home.title')} <em className="font-light text-amber">{t('home.titleEmphasis')}</em>
           </h1>
-          <p className="m-0 max-w-[34ch] text-[1.3125rem] leading-normal text-river-text">{t('home.lead')}</p>
+          <p className="m-0 max-w-[34ch] text-lead leading-normal text-river-text">{t('home.lead')}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-6 gap-y-3">
             {state.status === 'in' ? (
               <ButtonLink to="/tanks" variant="amber" size="lg" iconEnd="arrowRight">
@@ -56,13 +56,13 @@ function Hero() {
                 <ButtonLink to="/demo" variant="amber" size="lg" iconEnd="arrowRight">
                   {t('home.ctaDemo')}
                 </ButtonLink>
-                <Link to="/signup" className="inline-flex min-h-11 items-center text-[1.0625rem] text-river-bright">
+                <Link to="/signup" className="inline-flex min-h-11 items-center text-base text-river-bright">
                   {t('home.ctaSignUp')}
                 </Link>
               </>
             )}
           </div>
-          {state.status !== 'in' && <p className="m-0 font-mono text-[0.78125rem] text-river-caption">{t('home.ctaNote')}</p>}
+          {state.status !== 'in' && <p className="m-0 font-mono text-label text-river-caption">{t('home.ctaNote')}</p>}
         </div>
 
         <div className="relative h-[620px]">
@@ -75,11 +75,11 @@ function Hero() {
             <PlateCorners items={[`${t('ui.plate.plate')} I`, t('home.hero.water'), `${t('ui.plate.fig')} 1`]} />
             <Illustration slug="paracheirodon-axelrodi" decorative eager className="mt-3.5 mb-1.5" />
             <figcaption className="flex flex-col gap-0.5 border-t border-ink/40 pt-3">
-              <span className="text-[1.625rem]">
+              <span className="text-h3">
                 <Binomial>Paracheirodon axelrodi</Binomial>{' '}
-                <span className="text-[0.9375rem] text-ink-muted">(Schultz, 1956)</span>
+                <span className="text-sm text-ink-muted">(Schultz, 1956)</span>
               </span>
-              <span className="font-mono text-[0.78125rem] text-ink-muted">{t('home.hero.caption')}</span>
+              <span className="font-mono text-label text-ink-muted">{t('home.hero.caption')}</span>
             </figcaption>
           </figure>
           <figure className={cx(plateClasses('sm'), 'absolute bottom-0 left-0 m-0 w-[46%] rotate-[2.4deg] shadow-float')}>
@@ -103,7 +103,7 @@ function Demo() {
       <div className="mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(440px,100%),1fr))] items-center gap-12 px-6 py-18">
         <Illustration slug="blackwater" decorative className="rounded-paper bg-paper drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]" />
         <div className="flex flex-col gap-4.5">
-          <h2 id="demo-title" className="m-0 text-[2.75rem] leading-[1.08] font-normal">
+          <h2 id="demo-title" className="m-0 text-display leading-[1.08] font-normal">
             {t('home.demo.title')}
           </h2>
           <p className="m-0 max-w-[44ch] text-river-text">{t('home.demo.body')}</p>
@@ -142,7 +142,7 @@ function Idea() {
         </svg>
         <figcaption className="mt-1 flex flex-wrap justify-between gap-4">
           <Handwritten tone="red">{t('home.idea.chartNote')} ↑</Handwritten>
-          <span className="self-end font-mono text-[0.71875rem] text-ink-muted">{t('home.idea.chartLegend')}</span>
+          <span className="self-end font-mono text-caption text-ink-muted">{t('home.idea.chartLegend')}</span>
         </figcaption>
       </figure>
     </section>
@@ -166,7 +166,7 @@ function Features() {
   return (
     <section aria-labelledby="features-title" className="mx-auto max-w-site px-6 pt-14 pb-20">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-ink pb-3.5">
-        <h2 id="features-title" className="m-0 text-[2.5rem] font-normal">
+        <h2 id="features-title" className="m-0 text-display font-normal">
           {t('home.features.title')}
         </h2>
         <span className="label-mono text-ink-muted">{t('home.features.phase')}</span>
@@ -184,7 +184,7 @@ function Features() {
                   {sample.map(({ key, value }) => (
                     <span key={key} className="flex flex-col gap-0.5 border border-ink/60 px-2 py-1.5 font-mono">
                       <span className="text-caption text-ink-muted">{t(`home.features.measurements.sample.${key}`)}</span>
-                      <span className="text-lg text-ink">{formatNumber(value, language, { maxDecimals: 1 })}</span>
+                      <span className="text-lead text-ink">{formatNumber(value, language, { maxDecimals: 1 })}</span>
                     </span>
                   ))}
                 </div>
@@ -261,11 +261,11 @@ function Roadmap() {
               <div aria-hidden="true" className="flex h-24 items-end">
                 <Illustration slug={phase.art} decorative fit="contain" className="max-h-[92px] max-w-[86%]" />
               </div>
-              <h3 className="m-0 text-[1.375rem] leading-[1.15] font-medium">{t(`home.roadmap.phases.${phase.key}.title`)}</h3>
-              <p className="m-0 text-[0.9375rem] text-ink-soft">{t(`home.roadmap.phases.${phase.key}.body`)}</p>
+              <h3 className="m-0 text-h3 leading-[1.15] font-medium">{t(`home.roadmap.phases.${phase.key}.title`)}</h3>
+              <p className="m-0 text-sm text-ink-soft">{t(`home.roadmap.phases.${phase.key}.body`)}</p>
               <span
                 className={cx(
-                  'self-start px-2 py-1 font-mono text-[0.71875rem] tracking-[0.1em] uppercase',
+                  'self-start px-2 py-1 font-mono text-caption tracking-[0.1em] uppercase',
                   phase.building ? 'bg-cardinal text-paper-card' : 'border border-ink-muted text-ink-muted',
                 )}
               >
@@ -275,7 +275,7 @@ function Roadmap() {
           ))}
         </ol>
       </div>
-      <p className="mt-10 border-t border-dashed border-ink/50 pt-4 font-mono text-[0.8125rem] text-ink-soft">
+      <p className="mt-10 border-t border-dashed border-ink/50 pt-4 font-mono text-sm text-ink-soft">
         {t('home.roadmap.today')}
       </p>
     </section>
@@ -299,10 +299,10 @@ function Why() {
         <h2 id="why-title" className="sr-only">
           {t('home.why.title')}
         </h2>
-        <blockquote className="ruled m-0 font-hand text-[1.8125rem] leading-[34px] text-ink-blue [background-size:100%_34px]">
+        <blockquote className="ruled m-0 font-hand text-h3 sm:text-h2 leading-[34px] text-ink-blue [background-size:100%_34px]">
           {t('home.why.body')}
         </blockquote>
-        <figcaption className="mt-3.5 text-right font-hand text-[1.625rem] text-ink-blue">{t('home.why.signature')}</figcaption>
+        <figcaption className="mt-3.5 text-right font-hand text-h3 text-ink-blue">{t('home.why.signature')}</figcaption>
       </figure>
     </section>
   )

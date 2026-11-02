@@ -31,7 +31,7 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
   return (
     <nav
       aria-label={t('ui.nav.label')}
-      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-[0.84375rem] text-river-text md:gap-6.5 md:py-6.5"
+      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5"
     >
       <div className="flex items-center justify-between gap-3 pr-4.5 md:pr-0">
         <Wordmark stacked tagline className="pl-2" />
@@ -52,7 +52,7 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
           {groups.map((group, i) => (
             <div key={i} className="flex flex-col gap-0.5">
               {group.label && (
-                <p className="mt-4.5 mb-1.5 ml-3.5 text-[0.65625rem] tracking-[0.18em] break-words text-river-muted uppercase">
+                <p className="mt-4.5 mb-1.5 ml-3.5 text-caption tracking-[0.18em] break-words text-river-muted uppercase">
                   {group.label}
                 </p>
               )}

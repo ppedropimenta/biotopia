@@ -65,7 +65,7 @@ export function HistoryList({
                   <span className="font-mono text-xs tracking-[0.08em] text-ink-muted uppercase">
                     {t('timeline.history.measured')} · {formatMoment(entry.group.measuredAt, language)}
                   </span>
-                  <span className="text-[1.0625rem]">
+                  <span className="text-base">
                     {[...entry.group.items]
                       .sort((a, b) => position(a.parameter) - position(b.parameter))
                       .map((m) => {

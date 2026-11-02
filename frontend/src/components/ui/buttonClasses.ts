@@ -17,7 +17,7 @@ export function buttonClasses(variant: ButtonVariant = 'primary', size: ButtonSi
   return cx(
     'inline-flex cursor-pointer items-center justify-center gap-2 rounded-paper font-mono no-underline transition-colors',
     'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
-    size === 'md' ? 'min-h-11 px-4 text-[0.8125rem]' : 'min-h-12 px-[1.375rem] text-sm',
+    size === 'md' ? 'min-h-11 px-4 text-sm' : 'min-h-12 px-[1.375rem] text-sm',
     variant !== 'dashed' && 'tracking-[0.06em] uppercase',
     variant === 'primary' && 'bg-ink text-paper-card hover:bg-ink-soft hover:text-paper-card',
     variant === 'secondary' && 'border-[1.5px] border-ink text-ink hover:bg-paper-card hover:text-ink',

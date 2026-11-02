@@ -22,7 +22,7 @@ export function PublicHeader({
       <nav aria-label={t('ui.nav.label')} className="relative mx-auto flex max-w-site flex-wrap items-center gap-x-7 gap-y-4 px-6 py-4.5">
         <Wordmark size="lg" />
         <div className="flex-auto" />
-        <div className="flex flex-wrap items-center gap-5.5 font-mono text-[0.8125rem] tracking-[0.04em]">
+        <div className="flex flex-wrap items-center gap-5.5 font-mono text-sm tracking-[0.04em]">
           {links.map((link) => (
             <Link key={link.to} to={link.to} className="inline-flex min-h-11 items-center text-river-bright no-underline hover:text-amber">
               {link.label}

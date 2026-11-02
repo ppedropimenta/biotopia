@@ -115,7 +115,7 @@ function RecordCard({ tank }: { tank: Tank }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="m-0 text-[3.375rem] leading-none font-normal tracking-[-0.015em] [overflow-wrap:anywhere]">{tank.name}</h1>
+      <h1 className="m-0 text-h1 leading-none font-normal tracking-[-0.015em] [overflow-wrap:anywhere]">{tank.name}</h1>
       <dl className="m-0 grid grid-cols-[max-content_1fr] gap-x-4.5 gap-y-1.5 border-t border-ink/35 pt-3 text-base">
         {facts.map(([label, value]) => (
           <Fact key={label} label={label}>
@@ -131,7 +131,7 @@ function RecordCard({ tank }: { tank: Tank }) {
         )}
       </dl>
       {tank.archivedAt && (
-        <p role="status" className="m-0 border-l-[3px] border-ink pl-3 font-mono text-[0.8125rem] text-ink-soft">
+        <p role="status" className="m-0 border-l-[3px] border-ink pl-3 font-mono text-sm text-ink-soft">
           <strong className="font-medium uppercase">{t('tanks.lifecycle.archivedBadge')}</strong>{' '}
           {t('tanks.lifecycle.archivedOn', { date: formatDay(tank.archivedAt.slice(0, 10), language) })}
         </p>

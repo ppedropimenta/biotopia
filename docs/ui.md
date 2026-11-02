@@ -76,6 +76,17 @@ alone: a symbol or a word goes with it (▲ ▼ =, "Not measured").
 - Show only data that exists. A chart or value drawn for illustration says that it is an example.
 - Every picture made by someone else goes in `frontend/src/credits.ts`, which the credits page renders.
 
+## Logo
+
+- The symbol is a fallen leaf that is also a fish: the Amazon leaffish (*Monocirrhus polyacanthus*), which
+  hides in blackwater by looking like a dead leaf adrift. It was made for this project and is not credited.
+- In the app it is amber on blackwater (`BrandSymbol` in `frontend/src/components/ui/Brand.tsx`), always
+  before the name in Fraunces italic. Only the side menu adds the tagline in mono under the name; the public
+  header and the account screens show the symbol and the name alone.
+- The favicon and the app icons (`frontend/public`) are the symbol on a blackwater square. Under 24px the
+  side veins go away.
+- One colour only, from the palette. Never `cardinal`, and no shadow or outline.
+
 ## Layout
 
 - Logged in: a 248px blackwater side menu with the tanks, the current tank's overview and the main action

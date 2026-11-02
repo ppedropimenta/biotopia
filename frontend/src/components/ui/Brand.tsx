@@ -7,35 +7,56 @@ import { cx } from '../../lib/cx'
 import { findArt } from '../../lib/illustrations'
 
 /**
- * "Biotopia" in Fraunces italic and the tagline in mono ("Aquarium logbook"). Always on blackwater. The name and
- * the tagline are set only here and in the translations (ui.brand).
+ * The leaffish symbol, drawn in the current colour. This is the cut for dark backgrounds (slightly wider veins);
+ * the full logo kit, with the other cuts, lives outside the repo.
+ */
+export function BrandSymbol({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="14 72 228 116" className={cx('block h-auto shrink-0 fill-current', className)}>
+      <path
+        fillRule="evenodd"
+        d="M16.68 155.95C40.31 89.58 125.17 58.55 193.63 105.43L208.12 101.55C214.75 91.49 220.66 82.66 227.35 76.73C225.18 91.8 229.32 107.26 238.74 119.23C229.98 117.43 220.44 112.74 209.68 107.35L195.19 111.23C159.33 186.06 70.33 201.62 16.68 155.95ZM66.39 140.56 187.68 106.41 189.55 113.36 67.43 144.43ZM110.49 123.57 79.88 105.89 84.17 99.88 120.54 120.88ZM158.79 110.63 129.4 93.66 134.58 87.5 169.61 107.73ZM114.12 137.09 96.44 167.71 103.16 170.77 124.16 134.4ZM162.41 124.15 145.44 153.54 153.01 156.28 173.23 121.25ZM37.54 144.15C36.28 139.46 39.06 134.63 43.76 133.37 48.45 132.12 53.28 134.9 54.54 139.6 55.79 144.29 53.01 149.12 48.31 150.37 43.62 151.63 38.79 148.85 37.54 144.15Z"
+      />
+    </svg>
+  )
+}
+
+/**
+ * The leaffish symbol, "Biotopia" in Fraunces italic and the tagline in mono ("Aquarium logbook"). Always on
+ * blackwater. The name and the tagline are set only here and in the translations (ui.brand). The tagline shows
+ * only with `tagline` (the side menu).
  */
 export function Wordmark({
   to = '/',
   stacked = false,
   size = 'md',
+  tagline = false,
   className,
 }: {
   to?: string
   stacked?: boolean
   size?: 'md' | 'lg'
+  tagline?: boolean
   className?: string
 }) {
   const { t } = useTranslation()
   return (
     <Link
       to={to}
-      className={cx(
-        'flex min-h-11 text-river-bright no-underline hover:text-river-bright',
-        stacked ? 'flex-col justify-center gap-0.5' : 'items-baseline gap-2.5 py-2',
-        className,
-      )}
+      className={cx('flex min-h-11 items-center gap-2.5 text-river-bright no-underline hover:text-river-bright', !stacked && 'py-2', className)}
     >
-      <span className={cx('font-serif leading-none font-semibold italic', size === 'md' ? 'text-[1.75rem]' : 'text-[1.875rem]')}>
-        {t('ui.brand.name')}
+      <BrandSymbol className={cx('text-amber', size === 'md' ? 'w-11' : 'w-12')} />
+      <span className={cx('flex', stacked ? 'flex-col justify-center gap-0.5' : 'flex-wrap items-baseline gap-x-2.5')}>
+        <span className={cx('font-serif leading-none font-semibold italic', size === 'md' ? 'text-[1.75rem]' : 'text-[1.875rem]')}>
+          {t('ui.brand.name')}
+        </span>
+        {tagline && (
+          <>
+            <span className="sr-only"> · </span>
+            <span className="font-mono text-[0.65625rem] tracking-[0.16em] text-amber-soft uppercase">{t('ui.brand.tagline')}</span>
+          </>
+        )}
       </span>
-      <span className="sr-only"> · </span>
-      <span className="font-mono text-[0.65625rem] tracking-[0.16em] text-amber-soft uppercase">{t('ui.brand.tagline')}</span>
     </Link>
   )
 }

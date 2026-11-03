@@ -37,7 +37,7 @@ export const en = {
     ctaNote: 'The demo opens without signing in. Nothing to install.',
     navDemo: 'Demo tank',
     demo: {
-      title: 'Open a real tank, no account needed.',
+      title: 'Open a real tank.',
       body: 'A real tank with its measurements, water changes and photos. Browse the charts and the timeline as if it were yours.',
     },
     hero: {
@@ -45,7 +45,7 @@ export const en = {
       caption: 'cardinal tetra · blackwater streams of the Rio Negro, Brazil',
     },
     idea: {
-      title: 'Numbers, maintenance and photos on the same timeline.',
+      title: 'Everything on the same timeline.',
       body: 'Nitrate went up? Right below, you see that week’s water change never happened. Leaves turning yellow? The photo from that day sits next to the measurement. No more switching between the measurements app and your phone’s gallery.',
       chartLabel: 'Nitrate (NO₃) · ppm',
       chartNote: 'trip: two weeks without a water change',

@@ -62,9 +62,6 @@ function Hero() {
               </>
             )}
           </div>
-          {state.status !== 'in' && (
-            <p className="rise m-0 [--rise-delay:260ms] font-mono text-label text-river-caption">{t('home.ctaNote')}</p>
-          )}
         </div>
 
         <div className="relative h-[620px]">
@@ -120,6 +117,7 @@ function Demo() {
               {t('home.ctaDemo')}
             </ButtonLink>
           </div>
+          <p className="m-0 font-mono text-label text-river-caption">{t('home.ctaNote')}</p>
         </div>
       </div>
     </section>

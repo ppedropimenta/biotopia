@@ -36,7 +36,7 @@ test('the landing page offers the demo tank, an account and a log in', async ({ 
   await expect(page).toHaveURL(/\/login$/)
 
   await page.goBack()
-  await expect(main.getByRole('heading', { name: 'Open a real tank, no account needed.' })).toBeVisible()
+  await expect(main.getByRole('heading', { name: 'Open a real tank.' })).toBeVisible()
   await expect(main.getByRole('link', { name: 'Open the demo tank' })).toHaveCount(2)
   await expect(main.getByRole('heading', { name: 'Five tributaries, one river.' })).toBeVisible()
   await expect(main.getByRole('listitem').filter({ hasText: 'In progress' })).toHaveCount(1)

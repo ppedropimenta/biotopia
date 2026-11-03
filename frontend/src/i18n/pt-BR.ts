@@ -39,7 +39,7 @@ export const ptBR: Messages = {
     ctaNote: 'O demo abre sem entrar. Nada para instalar.',
     navDemo: 'Aquário demo',
     demo: {
-      title: 'Abra um aquário de verdade, sem criar conta.',
+      title: 'Abra um aquário de verdade.',
       body: 'Um aquário real com suas medições, trocas de água e fotos. Navegue pelos gráficos e pela linha do tempo como se fosse o seu.',
     },
     hero: {
@@ -47,7 +47,7 @@ export const ptBR: Messages = {
       caption: 'tetra-cardinal · igarapés do Rio Negro, AM',
     },
     idea: {
-      title: 'Números, manutenção e fotos na mesma linha do tempo.',
+      title: 'Tudo na mesma linha do tempo.',
       body: 'O nitrato subiu? Veja logo abaixo que a troca de água daquela semana não aconteceu. As folhas amarelaram? A foto do dia está do lado da medição. Nada de pular entre o app das medições e a galeria do celular.',
       chartLabel: 'Nitrato (NO₃) · ppm',
       chartNote: 'viagem: duas semanas sem TPA',

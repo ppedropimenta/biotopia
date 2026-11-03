@@ -271,10 +271,11 @@ function Roadmap() {
               <p className="m-0 text-sm text-ink-soft">{t(`home.roadmap.phases.${phase.key}.body`)}</p>
               <span
                 className={cx(
-                  'self-start px-2 py-1 font-mono text-caption tracking-[0.1em] uppercase',
-                  phase.building ? 'bg-cardinal text-paper-card' : 'border border-ink-muted text-ink-muted',
+                  'self-start py-1 font-mono text-caption tracking-[0.1em] uppercase',
+                  phase.building ? 'bg-cardinal px-2 text-paper-card' : 'inline-flex items-center gap-1.5 text-ink-muted',
                 )}
               >
+                {!phase.building && <span aria-hidden="true" className="size-2 rounded-full border border-current" />}
                 {phase.building ? t('home.roadmap.statusBuilding') : t('home.roadmap.statusPlanned')}
               </span>
             </li>

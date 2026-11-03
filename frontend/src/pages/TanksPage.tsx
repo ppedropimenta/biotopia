@@ -126,7 +126,7 @@ function TankPlate({
   return (
     <Link
       to={`/tanks/${tank.id}`}
-      className={cx(plateClasses('md'), 'flex w-full flex-col gap-3.5 no-underline hover:text-ink')}
+      className={cx(plateClasses('md'), 'flex w-full flex-col gap-3.5 no-underline transition-[translate] duration-200 ease-out hover:-translate-y-1 hover:text-ink focus-visible:-translate-y-1')}
     >
       <PlateCorners
         items={[`${t('ui.plate.plate')} ${roman(number)}`, ...(photos.count > 0 ? [t('photos.count', { count: photos.count })] : [])]}

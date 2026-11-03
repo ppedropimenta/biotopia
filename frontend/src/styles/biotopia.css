@@ -137,6 +137,52 @@
   color: var(--color-ink-muted);
 }
 
+/* ---------- Motion. Opacity and translate only; the base layer below shortens every animation for reduced motion. ---------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+}
+/* Set --rise-delay (e.g. [--rise-delay:90ms]) to stagger parts of one block. `translate` leaves a plate's `rotate` alone. */
+@utility rise {
+  animation: rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--rise-delay, 0ms) both;
+}
+/* A slow drift for something that floats. An endless animation cannot be shortened, so it only runs for people who have not asked for less motion. */
+@keyframes sway {
+  50% {
+    translate: 0.75rem 0.25rem;
+  }
+}
+@utility sway {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: sway 9s ease-in-out infinite;
+  }
+}
+/* A slow push-in on a picture that sits in a frame that clips it. */
+@keyframes drift {
+  to {
+    scale: 1.06;
+    translate: -1.5% 1%;
+  }
+}
+@utility drift {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: drift 28s ease-in-out infinite alternate;
+  }
+}
+
+/* Added by useReveal to `[data-reveal]` elements below the fold; `reveal-in` is added when they scroll into view. */
+.reveal-hidden:not(.reveal-in) {
+  opacity: 0;
+  translate: 0 1.25rem;
+}
+.reveal-hidden {
+  transition:
+    opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--rise-delay, 0ms),
+    translate 700ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--rise-delay, 0ms);
+}
+
 /* ---------- Base ---------- */
 @layer base {
   html {

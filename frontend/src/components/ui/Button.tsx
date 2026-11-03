@@ -26,7 +26,7 @@ export function Button({
     <button type={type} className={buttonClasses(variant, size, className)} {...rest}>
       {icon && <Icon name={icon} size={16} strokeWidth={2} />}
       {children}
-      {iconEnd && <Icon name={iconEnd} size={18} strokeWidth={1.8} />}
+      {iconEnd && <EndIcon name={iconEnd} />}
     </button>
   )
 }
@@ -36,8 +36,17 @@ export function ButtonLink({ variant, size, icon, iconEnd, className, children, 
     <Link className={buttonClasses(variant, size, className)} {...rest}>
       {icon && <Icon name={icon} size={16} strokeWidth={2} />}
       {children}
-      {iconEnd && <Icon name={iconEnd} size={18} strokeWidth={1.8} />}
+      {iconEnd && <EndIcon name={iconEnd} />}
     </Link>
+  )
+}
+
+/** The icon after the label; it leans forward a little when the button is hovered or focused. */
+function EndIcon({ name }: { name: IconName }) {
+  return (
+    <span className="inline-flex transition-[translate] duration-200 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1">
+      <Icon name={name} size={18} strokeWidth={1.8} />
+    </span>
   )
 }
 
@@ -54,7 +63,7 @@ export function IconButton({
       type={type}
       aria-label={label}
       className={cx(
-        'inline-flex size-11 cursor-pointer items-center justify-center rounded-paper border border-ink/50 text-ink hover:bg-paper-card',
+        'inline-flex size-11 cursor-pointer items-center justify-center rounded-paper border border-ink/50 text-ink transition-[background-color,scale] duration-150 ease-out hover:bg-paper-card active:scale-[0.95]',
         className,
       )}
       {...rest}

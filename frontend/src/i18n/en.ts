@@ -26,7 +26,7 @@ export const en = {
     login: 'Log in',
   },
   home: {
-    title: 'Your tank,',
+    title: 'Your tank',
     titleEmphasis: 'over time.',
     lead: 'Tanks, measurements, maintenance and photos in one notebook, so you can see, week by week, what changed and why.',
     signUp: 'Create an account',
@@ -38,7 +38,7 @@ export const en = {
     navDemo: 'Demo tank',
     demo: {
       title: 'Open a real tank.',
-      body: 'A real tank with its measurements, water changes and photos. Browse the charts and the timeline as if it were yours.',
+      body: 'Measurements, water changes and photos from a tank that is running right now. Browse the charts and the timeline as if it were yours.',
     },
     hero: {
       water: 'Blackwater',
@@ -46,7 +46,7 @@ export const en = {
     },
     idea: {
       title: 'Everything on the same timeline.',
-      body: 'Nitrate went up? Right below, you see that week’s water change never happened. Leaves turning yellow? The photo from that day sits next to the measurement. No more switching between the measurements app and your phone’s gallery.',
+      body: 'Nitrate went up? Right below, you see that week’s water change never happened. Plant leaves turning yellow? The photo from that day sits next to the measurement. No more jumping between a notebook, a spreadsheet and your phone’s gallery.',
       chartLabel: 'Nitrate (NO₃) · ppm',
       chartNote: 'trip: two weeks without a water change',
       chartLegend: 'example data',
@@ -54,8 +54,7 @@ export const en = {
     },
     features: {
       title: 'What goes in the notebook',
-      phase: 'Phase 1 · in progress',
-      tanks: { title: 'Tanks', body: 'Net Volume, dimensions and start date of each tank, one page each.' },
+      tanks: { title: 'Tanks', body: 'Volume, dimensions and start date of each tank.' },
       measurements: {
         title: 'Measurements',
         body: 'Temperature, pH, GH and KH, total ammonia, nitrite, nitrate and more, each with its date and an optional note.',
@@ -70,10 +69,10 @@ export const en = {
       photos: { title: 'Photos', body: 'Dated tank photos, right next to that day’s numbers.' },
     },
     roadmap: {
-      title: 'Five tributaries, one river.',
-      lead: 'The project grows in phases, and each one is usable on its own.',
+      title: 'Where the project is going',
+      lead: 'The project grows in phases, each one independent.',
       stamp: 'Work in progress',
-      statusBuilding: 'In progress',
+      statusReady: 'Ready',
       statusPlanned: 'Planned',
       phases: {
         p1: { title: 'Tank manager', body: 'Accounts, tanks, measurements, charts, maintenance log, photos and a public demo tank.' },
@@ -82,12 +81,11 @@ export const en = {
         p4: { title: 'Assistant', body: 'The rules decide, a language model explains, and every answer cites its source. With no source, it says it does not know.' },
         p5: { title: '3D planner', body: 'Lay out a tank in simple 3D, checked against the library and the rules.' },
       },
-      today: 'Today: accounts, tanks and measurements work. Charts, maintenance and photos are next. There is no public instance yet.',
     },
     why: {
       title: 'Why Biotopia exists',
-      body: 'I keep an aquarium. My records were split between a phone app and the photo gallery, and I could never see measurements, maintenance and photos together over time. This project is my attempt to fix that, and a way to build a full web app, from database to deploy.',
-      signature: '— the person behind Biotopia',
+      body: 'I keep a freshwater tank. My records were split between a notebook and the photo gallery, and I could never see measurements, maintenance and photos together over time. This project is my attempt to fix that.',
+      signature: '— Pedro',
     },
   },
   auth: {

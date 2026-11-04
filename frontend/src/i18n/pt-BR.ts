@@ -28,7 +28,7 @@ export const ptBR: Messages = {
     login: 'Entrar',
   },
   home: {
-    title: 'Seu aquário,',
+    title: 'Seu aquário',
     titleEmphasis: 'ao longo do tempo.',
     lead: 'Aquários, medições, manutenções e fotos num caderno só, para ver, semana a semana, o que mudou e por quê.',
     signUp: 'Criar uma conta',
@@ -40,7 +40,7 @@ export const ptBR: Messages = {
     navDemo: 'Aquário demo',
     demo: {
       title: 'Abra um aquário de verdade.',
-      body: 'Um aquário real com suas medições, trocas de água e fotos. Navegue pelos gráficos e pela linha do tempo como se fosse o seu.',
+      body: 'Medições, trocas de água e fotos de um aquário que está funcionando agora. Navegue pelos gráficos e pela linha do tempo como se fosse o seu.',
     },
     hero: {
       water: 'Águas pretas',
@@ -48,16 +48,15 @@ export const ptBR: Messages = {
     },
     idea: {
       title: 'Tudo na mesma linha do tempo.',
-      body: 'O nitrato subiu? Veja logo abaixo que a troca de água daquela semana não aconteceu. As folhas amarelaram? A foto do dia está do lado da medição. Nada de pular entre o app das medições e a galeria do celular.',
+      body: 'O nitrato subiu? Veja logo abaixo que a troca de água daquela semana não aconteceu. As folhas das plantas estão amarelando? A foto do dia está do lado da medição. Nada de pular entre caderno, planilha e a galeria do celular.',
       chartLabel: 'Nitrato (NO₃) · ppm',
       chartNote: 'viagem: duas semanas sem TPA',
       chartLegend: 'dados de exemplo',
       chartRange: 'ago — out',
     },
     features: {
-      title: 'O que cabe no caderno',
-      phase: 'Fase 1 · em construção',
-      tanks: { title: 'Aquários', body: 'Volume líquido, dimensões e data de montagem de cada aquário, um por página.' },
+      title: 'O que entra no caderno',
+      tanks: { title: 'Aquários', body: 'Volume líquido, dimensões e data de montagem de cada aquário.' },
       measurements: {
         title: 'Medições',
         body: 'Temperatura, pH, GH e KH, amônia total, nitrito, nitrato e mais, cada uma com a sua data e uma nota opcional.',
@@ -72,10 +71,10 @@ export const ptBR: Messages = {
       photos: { title: 'Fotos', body: 'Fotos datadas do aquário, ao lado dos números daquele mesmo dia.' },
     },
     roadmap: {
-      title: 'Cinco afluentes, um rio.',
-      lead: 'O projeto cresce em fases, e cada uma já serve sozinha.',
+      title: 'Para onde o projeto vai',
+      lead: 'O projeto cresce em fases, cada uma independente.',
       stamp: 'Em obras',
-      statusBuilding: 'Em construção',
+      statusReady: 'Pronta',
       statusPlanned: 'Planejada',
       phases: {
         p1: { title: 'Gerenciador de aquários', body: 'Contas, aquários, medições, gráficos, diário de manutenção, fotos e um aquário demo público.' },
@@ -84,12 +83,11 @@ export const ptBR: Messages = {
         p4: { title: 'Assistente', body: 'As regras decidem, um modelo de linguagem explica e toda resposta cita a fonte. Sem fonte, ele diz que não sabe.' },
         p5: { title: 'Planejador 3D', body: 'Monte o layout do aquário em 3D simples, conferido contra a biblioteca e as regras.' },
       },
-      today: 'Hoje: contas, aquários e medições funcionam. Gráficos, manutenção e fotos vêm a seguir. Ainda não há instância pública.',
     },
     why: {
       title: 'Por que o Biotopia existe',
-      body: 'Mantenho um aquário. Meus registros viviam divididos entre um app no celular e a galeria de fotos, e eu nunca conseguia ver medições, manutenção e fotos juntas ao longo do tempo. Este projeto é a minha tentativa de resolver isso, e um jeito de construir um app web inteiro, do banco de dados ao deploy.',
-      signature: '— quem faz o Biotopia',
+      body: 'Tenho um aquário de água doce. Meus registros ficavam divididos entre um caderno e a galeria de fotos, e eu nunca conseguia ver medições, manutenção e fotos juntas ao longo do tempo. Esse projeto é minha tentativa de resolver isso.',
+      signature: '— Pedro',
     },
   },
   auth: {

@@ -175,7 +175,6 @@ function Features() {
         <h2 id="features-title" className="m-0 text-display font-normal">
           {t('home.features.title')}
         </h2>
-        <span className="label-mono text-ink-muted">{t('home.features.phase')}</span>
       </div>
       <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] border-l border-ink p-0">
         {features.map((feature, i) => (
@@ -222,11 +221,11 @@ function Features() {
 }
 
 const phases = [
-  { number: 'I', key: 'p1', art: 'paracheirodon-axelrodi', building: true },
-  { number: 'II', key: 'p2', art: 'corydoras-adolfoi', building: false },
-  { number: 'III', key: 'p3', art: 'victoria-amazonica', building: false },
-  { number: 'IV', key: 'p4', art: 'apistogramma-agassizii', building: false },
-  { number: 'V', key: 'p5', art: 'echinodorus', building: false },
+  { number: 'I', key: 'p1', art: 'paracheirodon-axelrodi', ready: true },
+  { number: 'II', key: 'p2', art: 'corydoras-adolfoi', ready: false },
+  { number: 'III', key: 'p3', art: 'victoria-amazonica', ready: false },
+  { number: 'IV', key: 'p4', art: 'apistogramma-agassizii', ready: false },
+  { number: 'V', key: 'p5', art: 'echinodorus', ready: false },
 ] as const
 
 function Roadmap() {
@@ -259,7 +258,7 @@ function Roadmap() {
                 aria-hidden="true"
                 className={cx(
                   'flex size-12.5 items-center justify-center rounded-full border-2 border-ink text-2xl italic',
-                  phase.building ? 'bg-cardinal text-paper-card' : 'bg-paper-card',
+                  phase.ready ? 'bg-cardinal text-paper-card' : 'bg-paper-card',
                 )}
               >
                 {phase.number}
@@ -272,17 +271,16 @@ function Roadmap() {
               <span
                 className={cx(
                   'self-start py-1 font-mono text-caption tracking-[0.1em] uppercase',
-                  phase.building ? 'bg-cardinal px-2 text-paper-card' : 'inline-flex items-center gap-1.5 text-ink-muted',
+                  phase.ready ? 'bg-cardinal px-2 text-paper-card' : 'inline-flex items-center gap-1.5 text-ink-muted',
                 )}
               >
-                {!phase.building && <span aria-hidden="true" className="size-2 rounded-full border border-current" />}
-                {phase.building ? t('home.roadmap.statusBuilding') : t('home.roadmap.statusPlanned')}
+                {!phase.ready && <span aria-hidden="true" className="size-2 rounded-full border border-current" />}
+                {phase.ready ? t('home.roadmap.statusReady') : t('home.roadmap.statusPlanned')}
               </span>
             </li>
           ))}
         </ol>
       </div>
-      <p className="mt-10 border-t border-dashed border-ink/50 pt-4 font-mono text-sm text-ink-soft">{t('home.roadmap.today')}</p>
     </section>
   )
 }

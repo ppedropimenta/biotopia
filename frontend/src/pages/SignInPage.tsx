@@ -48,6 +48,7 @@ export function SignInPage({ mode }: { mode: Mode }) {
       title={mode === 'login' ? t('auth.login.title') : t('auth.signup.title')}
       switcher={<ModeSwitch mode={mode} />}
       note={mode === 'signup' ? t('auth.frame.privacy') : undefined}
+      languageToggle={mode === 'signup'}
     >
       {mode === 'login' ? <LogInForm /> : <SignUpForm onSignedUp={setSentTo} />}
     </AuthScreen>
@@ -210,7 +211,7 @@ function DemoLink() {
   const { t } = useTranslation()
   return (
     <Link to="/demo" className="flex items-center gap-4 border border-ink texture-card px-4 py-3.5 text-ink no-underline hover:text-ink">
-      <div className="w-32 flex-none">
+      <div className="w-24 flex-none sm:w-32">
         <Illustration slug="blackwater" decorative />
       </div>
       <span className="flex flex-col">

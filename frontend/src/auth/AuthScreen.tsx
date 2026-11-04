@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SkipLink } from '../components/layout/AppShell'
-import { Binomial, Illustration, Wordmark } from '../components/ui/Brand'
+import { Binomial, Illustration, LanguageToggle, Wordmark } from '../components/ui/Brand'
 import { PlateCorners } from '../components/ui/Plate'
 import { plateClasses } from '../components/ui/plateClasses'
 import { Handwritten } from '../components/ui/Paper'
@@ -17,6 +17,8 @@ type Props = {
   switcher?: ReactNode
   /** A short handwritten note under the content. */
   note?: string
+  /** The language switch, for the screen where the language decides the language of the first email. */
+  languageToggle?: boolean
   children?: ReactNode
 }
 
@@ -25,7 +27,7 @@ type Props = {
  * amazonica on the left, the form on paper on the right. On a phone the plate gives way to a dark strip with
  * the brand, so the form comes first.
  */
-export function AuthScreen({ title, lead, switcher, note, children }: Props) {
+export function AuthScreen({ title, lead, switcher, note, languageToggle, children }: Props) {
   const { t } = useTranslation()
   return (
     <div className="grid min-h-svh grid-rows-[auto_1fr] texture-paper font-serif text-ink lg:grid-cols-2 lg:grid-rows-1">
@@ -78,10 +80,17 @@ export function AuthScreen({ title, lead, switcher, note, children }: Props) {
           </div>
           {lead && <p className="m-0 -mt-3 text-lead text-ink-soft">{lead}</p>}
           {children}
-          {note && (
-            <Handwritten as="p" className="m-0">
-              {note}
-            </Handwritten>
+          {(note || languageToggle) && (
+            <div className="flex items-center justify-between gap-4">
+              {note ? (
+                <Handwritten as="p" className="m-0">
+                  {note}
+                </Handwritten>
+              ) : (
+                <span />
+              )}
+              {languageToggle && <LanguageToggle tone="light" className="flex-none" />}
+            </div>
           )}
         </div>
       </main>

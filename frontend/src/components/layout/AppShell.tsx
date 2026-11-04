@@ -34,7 +34,7 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
       className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5"
     >
       <div className="flex items-center justify-between gap-3 pr-4.5 md:pr-0">
-        <Wordmark stacked tagline className="pl-2" />
+        <Wordmark stacked className="pl-2" />
         <button
           type="button"
           aria-expanded={open}

@@ -22,7 +22,7 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await loggedInKeeper(page)
 
   // A new account has no tanks, and the empty list invites the first one.
-  await expect(page.getByText('No tanks yet. Start with a name and a volume.')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Start a new plate' })).toBeVisible()
   await page.getByRole('link', { name: 'Start a new plate' }).click()
 
   // A name and a start date are needed before anything is sent.

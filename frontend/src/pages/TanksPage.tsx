@@ -2,21 +2,21 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { api } from '../auth/api'
 import { Illustration } from '../components/ui/Brand'
-import { ButtonLink } from '../components/ui/Button'
-import { Handwritten } from '../components/ui/Paper'
+import { Icon } from '../components/ui/Icon'
 import { PlateCorners } from '../components/ui/Plate'
 import { plateClasses } from '../components/ui/plateClasses'
 import { Sparkline } from '../components/ui/Measures'
 import { PageHeader, SectionHeader } from '../components/ui/Structure'
 import { cx } from '../lib/cx'
 import { roman } from '../lib/roman'
+import { useGridColumns } from '../lib/useGridColumns'
 import { daysAgo, formatDay } from '../tanks/dates'
 import type { Maintenance } from '../tanks/maintenance'
 import { valueDecimals, type Measurement, type Parameter } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import type { PhotoSummary } from '../tanks/photos'
 import { TankCover } from '../tanks/TankCover'
-import { plateValues } from '../tanks/plates'
+import { hasRoomInLastRow, plateValues } from '../tanks/plates'
 import { recentSeries } from '../tanks/series'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
@@ -46,17 +46,15 @@ async function loadTanks(): Promise<Loaded> {
 export function TanksPage() {
   const { t } = useTranslation()
   const loaded = useLoad(loadTanks, 'tanks')
+  const running = loaded.status === 'ready' ? loaded.data.tanks.filter((tank) => !tank.archivedAt).length : 0
+  // The blank plate takes the free place beside the last plate, however many columns this screen has; with no room
+  // there, it is a bar under the grid.
+  const [columns, gridRef] = useGridColumns()
+  const roomForPlate = hasRoomInLastRow(running, columns)
 
   return (
     <>
-      <PageHeader
-        title={t('tanks.title')}
-        actions={
-          <ButtonLink to="/tanks/new" variant="secondary" icon="plus">
-            {t('tanks.new')}
-          </ButtonLink>
-        }
-      />
+      <PageHeader title={t('tanks.title')} />
 
       {loaded.status === 'error' && (
         <p role="alert" className="m-0 text-lead text-cardinal">
@@ -65,9 +63,9 @@ export function TanksPage() {
       )}
       {loaded.status === 'ready' && (
         <>
-          {loaded.data.tanks.length === 0 && <NewPlate first />}
-          {loaded.data.tanks.some((tank) => !tank.archivedAt) && (
-            <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7 p-0">
+          {running === 0 && <NewPlate number={loaded.data.tanks.length + 1} layout="bar" />}
+          {running > 0 && (
+            <ul ref={gridRef} className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(340px,100%),1fr))] gap-7 p-0">
               {loaded.data.tanks.map((tank, i) => tank.archivedAt ? null : (
                 <li key={tank.id} className="flex">
                   <TankPlate number={i + 1} tank={tank} parameters={loaded.data.parameters} latest={loaded.data.latest[i]}
@@ -78,9 +76,14 @@ export function TanksPage() {
                   />
                 </li>
               ))}
+              {roomForPlate && (
+                <li className="flex">
+                  <NewPlate number={loaded.data.tanks.length + 1} layout="plate" />
+                </li>
+              )}
             </ul>
           )}
-          {loaded.data.tanks.length > 0 && <NewPlate />}
+          {running > 0 && !roomForPlate && <NewPlate number={loaded.data.tanks.length + 1} layout="bar" />}
           <ArchivedTanks tanks={loaded.data.tanks} />
         </>
       )}
@@ -88,7 +91,7 @@ export function TanksPage() {
   )
 }
 
-/** One tank as a numbered plate: the drawing, its name and size, and the latest pH, temperature and total ammonia. */
+/** One tank as a numbered plate: the drawing, its name and size, and the latest values of three Parameters (see plateValues). */
 function TankPlate({
   number,
   tank,
@@ -131,7 +134,7 @@ function TankPlate({
       <PlateCorners
         items={[`${t('ui.plate.plate')} ${roman(number)}`, ...(photos.count > 0 ? [t('photos.count', { count: photos.count })] : [])]}
       />
-      <TankCover tank={tank} latestPhotoId={photos.latestId} />
+      <TankCover tank={tank} number={number} latestPhotoId={photos.latestId} />
       <div className="flex flex-col gap-0.5">
         <h2 className="m-0 text-h3 leading-[1.1] font-medium [overflow-wrap:anywhere]">{tank.name}</h2>
         <span className="font-mono text-label text-ink-muted">{facts.join(' · ')}</span>
@@ -151,7 +154,7 @@ function TankPlate({
             className={cx('flex min-w-0 flex-col py-2.5', i === 0 ? 'pr-2' : 'border-l border-dashed border-ink/35 px-2')}
           >
             <dt className={cx('font-mono text-caption text-ink-muted', parameter !== 'ph' && 'uppercase')}>
-              {t(`parameters.${parameter}`)} {parameters.find((p) => p.code === parameter)?.unit}
+              {t(`tanks.plate.short.${parameter}`)}
             </dt>
             <dd className="m-0 mt-auto text-2xl leading-[1.1]">
               {value === null ? (
@@ -160,7 +163,10 @@ function TankPlate({
                   <span className="sr-only">{t('tanks.plate.notMeasured')}</span>
                 </>
               ) : (
-                formatNumber(value, language, { maxDecimals: valueDecimals })
+                <>
+                  {formatNumber(value, language, { maxDecimals: valueDecimals })}
+                  <Unit>{parameters.find((p) => p.code === parameter)?.unit}</Unit>
+                </>
               )}
               <Sparkline values={recentSeries(history, parameter, sparklineValues)} className="mt-1" />
             </dd>
@@ -171,21 +177,50 @@ function TankPlate({
   )
 }
 
-/** "Start a new plate": a dashed card, below the plates or, with no tanks, first and with a handwritten note. */
-function NewPlate({ first = false }: { first?: boolean }) {
+/** A Parameter's unit, small and after its value; a Parameter with no unit (pH) shows nothing. */
+function Unit({ children }: { children: string | undefined }) {
+  if (!children) return null
+  return <span className="ml-1 font-mono text-caption text-ink-muted">{children}</span>
+}
+
+/**
+ * "Start a new plate": a blank plate waiting for its tank. Among one or two plates it is one more plate in the grid
+ * (`plate`), with the same corners, picture slot and name as the others; with three or more, or none, it is a bar
+ * under them (`bar`), without the button: the whole bar is the link.
+ */
+function NewPlate({ number, layout }: { number: number; layout: 'plate' | 'bar' }) {
   const { t } = useTranslation()
+  const corners = [`${t('ui.plate.plate')} ${roman(number)}`, t('tanks.blank')]
+  const action = (
+    <span className="inline-flex min-h-11 items-center gap-2 self-start border-[1.5px] border-ink px-4 font-mono text-button tracking-[0.06em] text-ink uppercase transition-colors group-hover:bg-paper-card">
+      <Icon name="plus" size={16} strokeWidth={2} />
+      {t('tanks.new')}
+    </span>
+  )
+  const frame =
+    'group border-[1.5px] border-dashed border-ink/55 text-ink no-underline transition-[translate] duration-200 ease-out hover:-translate-y-1 hover:text-ink focus-visible:-translate-y-1'
+
+  if (layout === 'plate') {
+    return (
+      <Link to="/tanks/new" className={cx(frame, 'flex w-full flex-col gap-3.5 px-5 pt-4 pb-5')}>
+        <PlateCorners items={corners} />
+        <div className="flex aspect-[3/2] items-center justify-center border border-dashed border-ink/35">
+          <Illustration slug="folhas-secas" decorative fit="contain" className="h-24 w-auto -rotate-6" />
+        </div>
+        <h2 className="m-0 text-h3 leading-[1.1] font-medium">{t('tanks.newPlate')}</h2>
+        <div className="mt-auto pt-1">{action}</div>
+      </Link>
+    )
+  }
   return (
-    <Link
-      to="/tanks/new"
-      className="flex min-h-22 flex-wrap items-center gap-x-6 gap-y-3 border-[1.5px] border-dashed border-ink/55 px-6 py-3.5 text-ink-soft no-underline hover:text-ink"
-    >
-      <Illustration slug="folhas-secas" decorative fit="contain" className="h-16 w-auto" />
-      <span className="text-h3">{t('tanks.newPlate')}</span>
-      {first ? (
-        <Handwritten>{t('tanks.empty')}</Handwritten>
-      ) : (
-        <span className="font-mono text-label text-ink-muted">{t('tanks.enough')}</span>
-      )}
+    <Link to="/tanks/new" className={cx(frame, 'flex flex-wrap items-center gap-x-6 gap-y-3 px-6 py-4')}>
+      <Illustration slug="folhas-secas" decorative fit="contain" className="h-16 w-auto -rotate-6" />
+      <div className="flex min-w-0 flex-[1_1_240px] flex-col gap-0.5">
+        <span aria-hidden="true" className="plate-corner">
+          {corners.join(' · ')}
+        </span>
+        <h2 className="m-0 text-h3 leading-[1.1] font-medium">{t('tanks.newPlate')}</h2>
+      </div>
     </Link>
   )
 }

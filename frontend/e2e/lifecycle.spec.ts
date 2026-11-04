@@ -32,7 +32,8 @@ test('a keeper archives a tank, finds it apart from the running ones, restores i
   await expect(page.getByText(/Every measurement, maintenance entry and photo/)).toBeVisible()
   await page.getByRole('button', { name: 'Yes, delete it' }).click()
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
-  await expect(page.getByText('No tanks yet. Start with a name and a volume.')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Start a new plate' })).toBeVisible()
+  await expect(page.getByText('Old tank')).toHaveCount(0)
 })
 
 test('a keeper deletes the account with the password and is sent to the log in screen', async ({ page }) => {

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Illustration } from '../components/ui/Brand'
+import { tankDrawing } from '../lib/illustrations'
 import { photoUrl } from './photos'
 import type { Tank } from './types'
 
@@ -7,9 +8,18 @@ import type { Tank } from './types'
  * What stands for a tank on its plate: its latest Tank Photo, and the drawing only while it has none. The tanks
  * list and the tank page both use it, so they always show the same one.
  */
-export function TankCover({ tank, latestPhotoId }: { tank: Tank; latestPhotoId: string | null }) {
+export function TankCover({
+  tank,
+  number,
+  latestPhotoId,
+}: {
+  tank: Tank
+  /** The tank's plate number, which picks its drawing; null when it has none. */
+  number: number | null
+  latestPhotoId: string | null
+}) {
   const { t } = useTranslation()
-  if (latestPhotoId === null) return <Illustration slug="blackwater" decorative />
+  if (latestPhotoId === null) return <Illustration slug={tankDrawing(number)} decorative />
   return (
     <img
       src={photoUrl(tank.id, latestPhotoId)}

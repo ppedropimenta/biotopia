@@ -98,11 +98,15 @@ test('a keeper records several measurements at once, sees the latest values, edi
   await expect(figure(latestValues(page), '20')).toBeVisible()
   await expect(latestValues(page)).not.toContainText('from the previous measurement')
 
-  // The tank list shows the latest pH on the tank's plate; temperature and total ammonia were never measured.
+  // The tank list shows the latest pH on the tank's plate. Temperature and total ammonia were never measured, so the
+  // plate shows the nitrite and nitrate that were, not a dash.
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'My tanks' }).click()
   const plate = page.getByRole('link', { name: /Water tests/ })
   await expect(plate).toContainText('7.1')
-  await expect(plate.getByText('not measured yet')).toHaveCount(2)
+  await expect(plate).toContainText('NO₂')
+  await expect(plate).toContainText('NO₃')
+  await expect(plate).not.toContainText('Temperature')
+  await expect(plate.getByText('not measured yet')).toHaveCount(0)
 })
 
 test('in Brazilian Portuguese the decimal comma is typed and shown, and the point is refused', async ({ page }) => {
@@ -137,6 +141,8 @@ function daysAgo(days: number): string {
 
 async function record(page: Page, daysBack: number, values: Record<string, string>) {
   await page.getByRole('link', { name: 'Add measurement' }).click()
+  // Wait for the form: until it replaces the tank page, a label such as Nitrate also matches that page's gauges.
+  await expect(page.getByRole('heading', { name: 'Log measurement', level: 1 })).toBeVisible()
   for (const [label, value] of Object.entries(values)) await page.getByLabel(label === 'pH' ? 'pH' : new RegExp('^' + label), { exact: label === 'pH' }).fill(value)
   await page.getByLabel('When').fill(daysAgo(daysBack))
   await page.getByRole('button', { name: 'Save measurements' }).click()

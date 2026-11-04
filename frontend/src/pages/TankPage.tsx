@@ -89,7 +89,7 @@ function TankPlate({
     <figure className={`${plateClasses('md')} m-0`}>
       <PlateCorners items={corners} />
       <div className="mt-1.5">
-        <TankCover tank={tank} latestPhotoId={latestPhotoId} />
+        <TankCover tank={tank} number={number} latestPhotoId={latestPhotoId} />
       </div>
     </figure>
   )

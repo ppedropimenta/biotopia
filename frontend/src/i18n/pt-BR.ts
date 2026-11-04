@@ -160,16 +160,30 @@ export const ptBR: Messages = {
   tanks: {
     title: 'Seus aquários',
     new: 'Novo aquário',
+    blank: 'em branco',
     netVolume: 'Volume líquido',
     loadFailed: 'Não foi possível carregar os aquários. Tente de novo em instantes.',
     enough: 'Nome, volume e data de início bastam; o resto vem com o tempo.',
     newPlate: 'Começar uma nova prancha',
-    empty: 'Nenhum aquário ainda. Comece pelo nome e pelo volume.',
     plate: {
       volume: '{{value}} L',
       size: '{{length}}×{{width}}×{{height}} cm',
       since: 'desde {{date}}',
       notMeasured: 'ainda não medido',
+      // O nome de um parâmetro em uma linha curta, para as células estreitas de uma prancha.
+      short: {
+        temperature: 'Temperatura',
+        ph: 'pH',
+        gh: 'GH',
+        kh: 'KH',
+        total_ammonia: 'Amônia total',
+        nitrite: 'NO₂',
+        nitrate: 'NO₃',
+        phosphate: 'PO₄',
+        conductivity: 'Condutividade',
+        iron: 'Fe',
+        potassium: 'K',
+      },
     },
     page: {
       addMeasurement: 'Adicionar medição',

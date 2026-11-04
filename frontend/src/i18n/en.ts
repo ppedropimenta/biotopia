@@ -158,16 +158,30 @@ export const en = {
   tanks: {
     title: 'Your tanks',
     new: 'New tank',
+    blank: 'blank',
     netVolume: 'Net volume',
     loadFailed: 'The tanks could not be loaded. Try again in a moment.',
     enough: 'Name, volume and start date are enough; the rest comes with time.',
     newPlate: 'Start a new plate',
-    empty: 'No tanks yet. Start with a name and a volume.',
     plate: {
       volume: '{{value}} L',
       size: '{{length}}×{{width}}×{{height}} cm',
       since: 'since {{date}}',
       notMeasured: 'not measured yet',
+      // A Parameter's name as one short line, for the narrow cells of a plate.
+      short: {
+        temperature: 'Temperature',
+        ph: 'pH',
+        gh: 'GH',
+        kh: 'KH',
+        total_ammonia: 'Total ammonia',
+        nitrite: 'NO₂',
+        nitrate: 'NO₃',
+        phosphate: 'PO₄',
+        conductivity: 'Conductivity',
+        iron: 'Fe',
+        potassium: 'K',
+      },
     },
     page: {
       addMeasurement: 'Add measurement',

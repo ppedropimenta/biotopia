@@ -6,6 +6,8 @@
  * more (other fish, plants, a basin map); copy them when a screen needs them.
  */
 import tankBlackwater from '../assets/illustrations/tanks/blackwater.svg'
+import tankPlanted from '../assets/illustrations/tanks/planted.svg'
+import tankPlantedDiscus from '../assets/illustrations/tanks/planted-discus.svg'
 import apistogramma from '../assets/illustrations/fish/apistogramma-agassizii.svg'
 import cardinal from '../assets/illustrations/fish/cardinal.svg'
 import corydoras from '../assets/illustrations/fish/corydoras-adolfoi.svg'
@@ -44,7 +46,20 @@ export const decorationArt = {
 /** Tank drawings, used until a tank has photos. */
 export const tankArt = {
   blackwater: art(tankBlackwater, 540, 360),
+  planted: art(tankPlanted, 540, 360),
+  'planted-discus': art(tankPlantedDiscus, 540, 360),
 } as const
+
+const tankDrawings = Object.keys(tankArt) as Array<keyof typeof tankArt>
+
+/**
+ * The drawing for a tank: the drawings take turns by plate number, so neighbouring plates never look alike. A tank
+ * with no plate number (the Demo Tank, which is not in the visitor's list) gets the first one.
+ */
+export function tankDrawing(plateNumber: number | null): keyof typeof tankArt {
+  if (plateNumber === null) return tankDrawings[0]
+  return tankDrawings[(plateNumber - 1) % tankDrawings.length]
+}
 
 /** Looks a slug up in every group; undefined when there is no drawing (show the FishPlaceholder). */
 export function findArt(slug: string): Art | undefined {

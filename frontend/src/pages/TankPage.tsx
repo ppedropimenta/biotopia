@@ -59,10 +59,13 @@ export function TankPage() {
           <RecordCard tank={tank} />
         </div>
       </header>
-      <MeasurementSections tankId={tank.id} readOnly={tank.readOnly}>
+      <MeasurementSections
+        tankId={tank.id}
+        readOnly={tank.readOnly}
+        footer={!tank.readOnly && <TankLifecycle tank={tank} onChanged={() => setVersion((v) => v + 1)} />}
+      >
         <PhotoStrip tank={tank} />
         <MaintenanceDiary tank={tank} />
-        {!tank.readOnly && <TankLifecycle tank={tank} onChanged={() => setVersion((v) => v + 1)} />}
       </MeasurementSections>
     </>
   )

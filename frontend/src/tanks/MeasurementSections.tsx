@@ -28,16 +28,19 @@ const dashedCard =
 
 /**
  * The tank page's water: the latest value of each Parameter with how it changed, a small chart, whatever the page
- * puts in between (`children`) and then the Measurements in a table, each with a way to edit it.
+ * puts in between (`children`), the Measurements in a table, each with a way to edit it, and last whatever closes
+ * the page (`footer`).
  */
 export function MeasurementSections({
   tankId,
   readOnly = false,
   children,
+  footer,
 }: {
   tankId: string
   readOnly?: boolean
   children?: ReactNode
+  footer?: ReactNode
 }) {
   const { t } = useTranslation()
   const loaded = useLoad(async () => {
@@ -71,6 +74,7 @@ export function MeasurementSections({
         parameters={parameters}
         measurements={history.slice(0, tableCount)}
       />
+      {footer}
     </>
   )
 }

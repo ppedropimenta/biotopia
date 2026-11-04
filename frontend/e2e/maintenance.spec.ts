@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { loggedInKeeper } from './keeper.ts'
+import { fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -72,7 +72,7 @@ test('a keeper records a water change and other care, edits one, deletes one and
   // A measurement and the maintenance share the history, and the maintenance marks the chart.
   await page.getByRole('link', { name: /Care log/ }).click()
   await page.getByRole('link', { name: 'Log measurement' }).first().click()
-  await page.getByLabel(/^Nitrate/).fill('20')
+  await fillValue(page, 'Nitrate', '20')
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Timeline' }).click()
   await expect(page.getByText(/^Water change, /)).toBeAttached()

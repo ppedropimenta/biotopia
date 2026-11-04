@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { loggedInKeeper } from './keeper.ts'
+import { fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -30,14 +30,14 @@ test('a keeper records several measurements at once, sees the latest values, edi
   await expect(page.getByText('Fill in at least one value.')).toBeVisible()
 
   // An impossible value is refused where it was typed, with the limits.
-  await page.getByLabel('pH', { exact: true }).fill('72')
+  await fillValue(page, 'pH', '72')
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await expect(page.getByText('Enter a value from 0 to 14.')).toBeVisible()
 
   // Only the Parameters that were measured are filled; a 0 is a value. The moment is in the past.
-  await page.getByLabel('pH', { exact: true }).fill('6.8')
-  await page.getByLabel(/^Nitrate/).fill('20')
-  await page.getByLabel(/^Nitrite/).fill('0')
+  await fillValue(page, 'pH', '6.8')
+  await fillValue(page, 'Nitrate', '20')
+  await fillValue(page, 'Nitrite', '0')
   await page.getByLabel('When').fill('2026-01-10T08:30')
   await page.getByLabel('Note').fill('API kit')
   await page.getByRole('button', { name: 'Save measurements' }).click()
@@ -54,21 +54,29 @@ test('a keeper records several measurements at once, sees the latest values, edi
   await page.getByRole('link', { name: 'Add measurement' }).click()
   await expect(page.getByRole('heading', { name: 'Log measurement', level: 1 })).toBeVisible()
 
-  // The form shows the last value beside each Parameter that has one, and nothing for the others.
+  // Each tile shows the last value of its Parameter, dimmed; a Parameter never measured shows a dash.
+  await expect(page.getByRole('button', { name: /^Nitrate/ })).toContainText('20')
+  await expect(page.getByRole('button', { name: /^pH/ })).toContainText('6.8')
+  await expect(page.getByRole('button', { name: /^Temperature/ })).toContainText('never measured')
+  await expect(page.getByRole('button', { name: /^Total ammonia/ })).toContainText('never measured')
+
+  // Touching a tile opens it with its last value and − and + buttons, which step by the Parameter's own step.
+  await page.getByRole('button', { name: /^Nitrate/ }).click()
   await expect(page.getByText('last: 20 mg/L')).toBeVisible()
-  await expect(page.getByText('last: 6.8')).toBeVisible()
-  await expect(page.getByText(/^last:/)).toHaveCount(3)
-
-  // Temperature, GH and KH have − and + buttons; the others do not.
+  await expect(page.getByRole('button', { name: /^(Increase|Decrease)/ })).toHaveCount(2)
+  await page.getByRole('button', { name: 'Increase Nitrate (NO₃)' }).click()
+  await expect(page.getByRole('textbox', { name: /^Nitrate/ })).toHaveValue('25')
+  await page.getByRole('textbox', { name: /^Nitrate/ }).fill('')
+  await fillValue(page, 'Temperature', '')
   await page.getByRole('button', { name: 'Increase Temperature' }).click()
-  await expect(page.getByLabel('Temperature', { exact: true })).toHaveValue('25.5')
+  await expect(page.getByRole('textbox', { name: 'Temperature', exact: true })).toHaveValue('25.5')
   await page.getByRole('button', { name: 'Decrease Temperature' }).click()
   await page.getByRole('button', { name: 'Decrease Temperature' }).click()
-  await expect(page.getByLabel('Temperature', { exact: true })).toHaveValue('24.5')
-  await expect(page.getByRole('button', { name: /^(Increase|Decrease)/ })).toHaveCount(6)
-  await page.getByLabel('Temperature', { exact: true }).fill('')
+  await expect(page.getByRole('textbox', { name: 'Temperature', exact: true })).toHaveValue('24.5')
+  await page.getByRole('textbox', { name: 'Temperature', exact: true }).fill('')
 
-  await page.getByLabel(/^Nitrate/).fill('35')
+  await fillValue(page, 'Nitrate', '35')
+  await expect(page.getByText('1 measurement to save')).toBeVisible()
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await expect(figure(latestValues(page), '35')).toBeVisible()
   await expect(figure(latestValues(page), '6.8')).toBeVisible()
@@ -114,15 +122,15 @@ test('in Brazilian Portuguese the decimal comma is typed and shown, and the poin
   await page.getByRole('button', { name: 'PT', exact: true }).click()
   await page.getByRole('link', { name: 'Registrar a primeira medição' }).click()
 
-  await page.getByLabel('pH', { exact: true }).fill('6.8')
+  await fillValue(page, 'pH', '6.8')
   await page.getByRole('button', { name: 'Salvar medições' }).click()
   await expect(page.getByText('Digite um número com no máximo 4 casas decimais, como 6,8.')).toBeVisible()
 
-  await page.getByLabel('pH', { exact: true }).fill('6,8')
-  await page.getByLabel(/^Temperatura/).fill('25,5')
+  await fillValue(page, 'pH', '6,8')
+  await fillValue(page, 'Temperatura', '25,5')
   await page.getByRole('button', { name: 'Aumentar Temperatura' }).click()
-  await expect(page.getByLabel(/^Temperatura/)).toHaveValue('26')
-  await page.getByLabel(/^Temperatura/).fill('25,5')
+  await expect(page.getByRole('textbox', { name: /^Temperatura/ })).toHaveValue('26')
+  await page.getByRole('textbox', { name: /^Temperatura/ }).fill('25,5')
   await page.getByRole('button', { name: 'Salvar medições' }).click()
 
   const latest = page.locator('section', { has: page.getByRole('heading', { name: 'Última medição' }) })
@@ -143,7 +151,7 @@ async function record(page: Page, daysBack: number, values: Record<string, strin
   await page.getByRole('link', { name: 'Add measurement' }).click()
   // Wait for the form: until it replaces the tank page, a label such as Nitrate also matches that page's gauges.
   await expect(page.getByRole('heading', { name: 'Log measurement', level: 1 })).toBeVisible()
-  for (const [label, value] of Object.entries(values)) await page.getByLabel(label === 'pH' ? 'pH' : new RegExp('^' + label), { exact: label === 'pH' }).fill(value)
+  for (const [label, value] of Object.entries(values)) await fillValue(page, label, value)
   await page.getByLabel('When').fill(daysAgo(daysBack))
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await expect(page.getByRole('heading', { name: 'Water tests', level: 1 })).toBeVisible()
@@ -158,7 +166,7 @@ test('a keeper reads the water over time: a chart for each parameter, a period t
   await expect(page.getByText('Nothing measured yet.')).toBeVisible()
 
   await page.getByRole('link', { name: 'Log the first measurement' }).click()
-  await page.getByLabel(/^Nitrate/).fill('5')
+  await fillValue(page, 'Nitrate', '5')
   await page.getByLabel('When').fill(daysAgo(200))
   await page.getByRole('button', { name: 'Save measurements' }).click()
   await record(page, 20, { Nitrate: '20', pH: '6.8' })

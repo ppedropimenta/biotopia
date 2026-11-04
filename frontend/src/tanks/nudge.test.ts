@@ -22,6 +22,14 @@ describe('nudge', () => {
     expect(nudge('', 1, gh, null, 'en')).toBe('1')
   })
 
+  it('has a step of its own for every Parameter', () => {
+    const ph: Parameter = { code: 'ph', unit: '', min: 0, max: 14 }
+    const nitrate: Parameter = { code: 'nitrate', unit: 'mg/L', min: 0, max: 1000 }
+    expect(nudge('', 1, ph, null, 'en')).toBe('7.1')
+    expect(nudge('6,3', -1, ph, null, 'pt-BR')).toBe('6,2')
+    expect(nudge('30', 1, nitrate, null, 'en')).toBe('35')
+  })
+
   it('treats a value that is not a number as empty', () => {
     expect(nudge('abc', 1, gh, 4, 'en')).toBe('5')
     expect(nudge('1.5', 1, gh, 4, 'pt-BR')).toBe('5')

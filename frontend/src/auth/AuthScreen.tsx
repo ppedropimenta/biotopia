@@ -39,7 +39,7 @@ export function AuthScreen({ title, lead, switcher, note, children }: Props) {
         <figure
           className={cx(
             plateClasses('md'),
-            'mx-auto my-0 w-full max-w-[520px] -rotate-[1.2deg] shadow-[inset_0_0_0_5px_var(--color-paper-card),inset_0_0_0_6px_rgb(36_26_17/0.5),var(--shadow-float)]',
+            'mx-auto my-0 w-full max-w-[clamp(400px,40vw,640px)] -rotate-[1.2deg] shadow-[inset_0_0_0_5px_var(--color-paper-card),inset_0_0_0_6px_rgb(36_26_17/0.5),var(--shadow-float)]',
           )}
         >
           <PlateCorners items={[`${t('ui.plate.plate')} IV`, t('auth.frame.habitat'), `${t('ui.plate.fig')} 7`]} />

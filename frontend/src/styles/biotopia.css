@@ -55,6 +55,8 @@
   --text-label--line-height: 1.45;
   --text-lead: 1.25rem; /* 20px: subtitles */
   --text-lead--line-height: 1.5;
+  --text-button: 0.8125rem; /* 13px: the text of a regular button; the large (call to action) one uses 14px */
+  --text-button--line-height: 1.4;
   --text-hand: 1.5rem; /* 24px: handwritten notes */
   --text-hand--line-height: 1.2;
   --text-h3: 1.5rem; /* 24px */

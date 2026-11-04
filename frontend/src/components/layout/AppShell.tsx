@@ -40,7 +40,7 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
           aria-expanded={open}
           aria-controls={listId}
           onClick={() => setOpen((v) => !v)}
-          className="flex min-h-11 cursor-pointer items-center gap-2 border border-river-muted/60 px-3 text-river-text md:hidden"
+          className="flex min-h-11 cursor-pointer items-center gap-2 border border-river-muted/60 px-3 text-button text-river-text md:hidden"
         >
           <Icon name={open ? 'close' : 'menu'} size={18} strokeWidth={1.8} />
           {t('ui.nav.menu')}

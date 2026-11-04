@@ -5,7 +5,7 @@ import { AppShell, LogMeasurementCta, SideNav, SkipLink } from './components/lay
 import { DemoBanner } from './components/layout/DemoBanner'
 import { demoNavGroups, navGroups } from './components/layout/navGroups'
 import { PublicHeader } from './components/layout/PublicHeader'
-import { Button, ButtonLink } from './components/ui/Button'
+import { ButtonLink } from './components/ui/Button'
 import { useCurrentTank } from './tanks/useCurrentTank'
 
 /**
@@ -37,9 +37,13 @@ export function Layout() {
                 <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
                   {t('ui.nav.credits')}
                 </Link>
-                <Button variant="onDark" onClick={logOut} className="self-start">
+                <button
+                  type="button"
+                  onClick={logOut}
+                  className="inline-flex min-h-11 cursor-pointer items-center self-start bg-transparent p-0 font-mono text-sm text-river-text hover:text-river-bright"
+                >
                   {t('ui.nav.logOut')}
-                </Button>
+                </button>
               </>
             }
           />

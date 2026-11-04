@@ -86,7 +86,7 @@ export const ptBR: Messages = {
     },
     why: {
       title: 'Por que o Biotopia existe',
-      body: 'Tenho um aquário de água doce. Meus registros ficavam divididos entre um caderno e a galeria de fotos, e eu nunca conseguia ver medições, manutenção e fotos juntas ao longo do tempo. Esse projeto é minha tentativa de resolver isso.',
+      body: 'Tenho um aquário de água doce. Meus registros ficavam divididos entre um caderno e a galeria do celular, e eu nunca conseguia ver medições, manutenção e fotos juntas ao longo do tempo. Esse projeto é minha tentativa de resolver isso.',
       signature: '— Pedro',
     },
   },

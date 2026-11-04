@@ -84,7 +84,7 @@ export const en = {
     },
     why: {
       title: 'Why Biotopia exists',
-      body: 'I keep a freshwater tank. My records were split between a notebook and the photo gallery, and I could never see measurements, maintenance and photos together over time. This project is my attempt to fix that.',
+      body: 'I keep a freshwater tank. My records were split between a notebook and my phone’s gallery, and I could never see measurements, maintenance and photos together over time. This project is my attempt to fix that.',
       signature: '— Pedro',
     },
   },

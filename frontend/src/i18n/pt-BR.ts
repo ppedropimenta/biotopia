@@ -98,9 +98,9 @@ export const ptBR: Messages = {
     demoHint: 'Somente leitura · sem conta',
     tabs: { label: 'Entrar ou criar uma conta', login: 'Entrar', signup: 'Criar conta' },
     frame: {
-      tagline: 'Cada medição, cada aquário —',
-      taglineEmphasis: 'no mesmo caderno.',
+      tagline: 'Cada medição, cada troca, no mesmo aquário.',
       habitat: 'várzea',
+      plateCaption: 'vitória-régia · lagos de várzea do Amazonas',
       privacy: 'Seus registros são só seus.',
     },
     signup: {

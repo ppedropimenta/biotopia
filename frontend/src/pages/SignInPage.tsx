@@ -47,7 +47,7 @@ export function SignInPage({ mode }: { mode: Mode }) {
     <AuthScreen
       title={mode === 'login' ? t('auth.login.title') : t('auth.signup.title')}
       switcher={<ModeSwitch mode={mode} />}
-      note={t('auth.frame.privacy')}
+      note={mode === 'signup' ? t('auth.frame.privacy') : undefined}
     >
       {mode === 'login' ? <LogInForm /> : <SignUpForm onSignedUp={setSentTo} />}
     </AuthScreen>
@@ -113,8 +113,9 @@ function LogInForm() {
           onChange={(event) => setEmail(event.target.value)}
           error={errors.email && t(errors.email)}
         />
-        <div className="relative">
+        <div className="flex flex-col items-end gap-2">
           <TextField
+            className="w-full"
             label={t('auth.password')}
             name="password"
             type="password"
@@ -123,7 +124,7 @@ function LogInForm() {
             onChange={(event) => setPassword(event.target.value)}
             error={errors.password && t(errors.password)}
           />
-          <Link to="/forgot-password" className="absolute top-0 right-0 text-sm">
+          <Link to="/forgot-password" className="text-sm text-ink-muted underline hover:text-ink">
             {t('auth.login.forgot')}
           </Link>
         </div>
@@ -209,12 +210,12 @@ function DemoLink() {
   const { t } = useTranslation()
   return (
     <Link to="/demo" className="flex items-center gap-4 border border-ink texture-card px-4 py-3.5 text-ink no-underline hover:text-ink">
-      <div className="w-28 flex-none">
+      <div className="w-32 flex-none">
         <Illustration slug="blackwater" decorative />
       </div>
       <span className="flex flex-col">
         <span className="text-lead">{t('auth.demoTitle')}</span>
-        <span className="font-mono text-xs text-ink-muted">{t('auth.demoHint')}</span>
+        <span className="text-sm text-ink-muted">{t('auth.demoHint')}</span>
       </span>
       <Icon name="arrowRight" className="ml-auto flex-none" />
     </Link>

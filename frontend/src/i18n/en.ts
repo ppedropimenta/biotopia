@@ -96,9 +96,9 @@ export const en = {
     demoHint: 'Read-only · no account',
     tabs: { label: 'Log in or create an account', login: 'Log in', signup: 'Create account' },
     frame: {
-      tagline: 'Every measurement, every tank —',
-      taglineEmphasis: 'in the same notebook.',
+      tagline: 'Every measurement, every water change, in the same tank.',
       habitat: 'floodplain',
+      plateCaption: 'giant water lily · floodplain lakes of the Amazon',
       privacy: 'Your records are yours alone.',
     },
     signup: {

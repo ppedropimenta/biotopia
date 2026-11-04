@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import type { Measurement, Parameter, ParameterCode } from './measurements'
-import { buildPanels, busiestPanel, momentsOf, niceScale, periodStart, recentSeries, timeRange, timeTicks } from './series'
+import {
+  buildPanels,
+  busiestPanel,
+  busiestPanels,
+  momentsOf,
+  niceScale,
+  periodStart,
+  recentSeries,
+  timeRange,
+  timeTicks,
+} from './series'
 
 const parameters: Parameter[] = [
   { code: 'temperature', unit: '°C', min: 0, max: 45 },
@@ -163,5 +173,22 @@ describe('busiestPanel', () => {
     expect(busiestPanel(buildPanels(history, parameters, null))?.parameter).toBe('ph')
     expect(busiestPanel(buildPanels(history.slice(0, 3), parameters, null))?.parameter).toBe('nitrate')
     expect(busiestPanel([])).toBeUndefined()
+  })
+})
+
+describe('busiestPanels', () => {
+  it('keeps the busiest Parameters in their own order, the earlier one on a tie', () => {
+    const history = [
+      measurement('ph', 7, '2026-02-20T10:00:00Z'),
+      measurement('ph', 7.1, '2026-02-10T10:00:00Z'),
+      measurement('nitrate', 4, '2026-02-20T10:00:00Z'),
+      measurement('nitrate', 5, '2026-02-10T10:00:00Z'),
+      measurement('nitrate', 6, '2026-02-05T10:00:00Z'),
+      measurement('kh', 3, '2026-02-20T10:00:00Z'),
+    ]
+    const panels = buildPanels(history, parameters, null)
+    expect(busiestPanels(panels, 2).map((p) => p.parameter)).toEqual(['ph', 'nitrate'])
+    expect(busiestPanels(panels, 1).map((p) => p.parameter)).toEqual(['nitrate'])
+    expect(busiestPanels([], 2)).toEqual([])
   })
 })

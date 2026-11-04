@@ -31,7 +31,7 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
   return (
     <nav
       aria-label={t('ui.nav.label')}
-      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5"
+      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5 min-[808px]:sticky min-[808px]:top-0 min-[808px]:h-svh min-[808px]:self-start min-[808px]:overflow-y-auto"
     >
       <div className="flex items-center justify-between gap-3 pr-4.5 md:pr-0">
         <Wordmark stacked className="pl-2" />

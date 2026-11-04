@@ -149,14 +149,24 @@ export function ParamTile({
         <span className="text-h2 leading-[1.05]">{value}</span>
         {unit && <span className="font-mono text-sm">{unit}</span>}
       </div>
-      <RangeRuler scale={scale} value={rulerValue} ariaLabel={rulerLabel} />
-      {note && <span className="font-mono text-caption text-ink-muted">{note}</span>}
+      <div className="mt-auto flex flex-col gap-1">
+        <RangeRuler scale={scale} value={rulerValue} ariaLabel={rulerLabel} />
+        {note && <span className="font-mono text-caption text-ink-muted">{note}</span>}
+      </div>
     </div>
   )
 }
 
 /** A bare line with no axis, for cards. Decorative: the numbers sit beside it. */
-export function Sparkline({ values, tone = 'ink', className }: { values: readonly number[]; tone?: 'ink' | 'cardinal'; className?: string }) {
+export function Sparkline({
+  values,
+  tone = 'ink',
+  className,
+}: {
+  values: readonly number[]
+  tone?: 'ink' | 'cardinal'
+  className?: string
+}) {
   if (values.length < 2) return null
   const min = Math.min(...values)
   const max = Math.max(...values)

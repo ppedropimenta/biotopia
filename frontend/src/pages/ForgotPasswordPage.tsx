@@ -62,7 +62,9 @@ export function ForgotPasswordPage() {
         </Button>
       </form>
       <p className="m-0 text-sm">
-        <Link to="/login">{t('nav.login')}</Link>
+        <Link to="/login" className="text-ink-muted underline hover:text-ink">
+          {t('nav.login')}
+        </Link>
       </p>
     </AuthScreen>
   )

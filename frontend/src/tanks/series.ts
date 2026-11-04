@@ -54,10 +54,7 @@ export function niceScale(values: readonly number[]): { domain: [number, number]
     max += room
   }
   const step = niceStep(max - min)
-  const domain: [number, number] = [
-    Math.max(0, clean(Math.floor(min / step) * step)),
-    clean(Math.ceil(max / step) * step),
-  ]
+  const domain: [number, number] = [Math.max(0, clean(Math.floor(min / step) * step)), clean(Math.ceil(max / step) * step)]
   const ticks: number[] = []
   for (let tick = domain[0]; tick <= domain[1] + step / 1e6; tick = clean(tick + step)) ticks.push(tick)
   return { domain, ticks }
@@ -67,11 +64,7 @@ export function niceScale(values: readonly number[]): { domain: [number, number]
  * The panels for a chart: one per Parameter that has Measurements from `from` on, in the order of the Parameter
  * list. `from` null keeps everything. The API gives the Measurements newest first; the points go oldest first.
  */
-export function buildPanels(
-  measurements: readonly Measurement[],
-  parameters: readonly Parameter[],
-  from: Date | null,
-): Panel[] {
+export function buildPanels(measurements: readonly Measurement[], parameters: readonly Parameter[], from: Date | null): Panel[] {
   const start = from?.getTime() ?? -Infinity
   return parameters.flatMap((parameter) => {
     const points = measurements
@@ -118,4 +111,10 @@ export function momentsOf(panels: readonly Panel[]): number[] {
 /** The panel with the most points, the first of them on a tie: the one Parameter a small chart can show. */
 export function busiestPanel(panels: readonly Panel[]): Panel | undefined {
   return panels.reduce<Panel | undefined>((best, p) => (!best || p.points.length > best.points.length ? p : best), undefined)
+}
+
+/** The `count` panels with the most points, in the order they came in (a tie keeps the earlier one). */
+export function busiestPanels(panels: readonly Panel[], count: number): Panel[] {
+  const busiest = new Set([...panels].sort((a, b) => b.points.length - a.points.length).slice(0, count))
+  return panels.filter((panel) => busiest.has(panel))
 }

@@ -13,7 +13,7 @@ import type { Maintenance } from './maintenance'
 import { latestValues, type Change, type LatestValue } from './latest'
 import { formatMoment, groupByMoment, valueDecimals, type Measurement, type Parameter } from './measurements'
 import { formatNumber } from './numbers'
-import { buildPanels, busiestPanel, periodStart, timeRange } from './series'
+import { buildPanels, busiestPanels, periodStart, timeRange } from './series'
 import { useLanguage } from './useLanguage'
 import { useLoad } from './useLoad'
 
@@ -40,19 +40,16 @@ export function MeasurementSections({
   children?: ReactNode
 }) {
   const { t } = useTranslation()
-  const loaded = useLoad(
-    async () => {
-      const [parameters, latest, history, maintenance] = await Promise.all([
-        api.parameters(),
-        api.latestMeasurements(tankId),
-        api.measurements(tankId, historyCount),
-        // The chart is fine without its markers, so a failure here is not the page's failure.
-        api.maintenance(tankId, { limit: historyCount }).catch((): Maintenance[] => []),
-      ])
-      return { parameters, latest, history, maintenance, now: new Date() }
-    },
-    `water-${tankId}`,
-  )
+  const loaded = useLoad(async () => {
+    const [parameters, latest, history, maintenance] = await Promise.all([
+      api.parameters(),
+      api.latestMeasurements(tankId),
+      api.measurements(tankId, historyCount),
+      // The chart is fine without its markers, so a failure here is not the page's failure.
+      api.maintenance(tankId, { limit: historyCount }).catch((): Maintenance[] => []),
+    ])
+    return { parameters, latest, history, maintenance, now: new Date() }
+  }, `water-${tankId}`)
 
   if (loaded.status === 'loading') return null
   if (loaded.status === 'error') {
@@ -93,6 +90,9 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
   const { t } = useTranslation()
   const language = useLanguage()
   const measure = `/tanks/${tankId}/measure`
+  // Values recorded together share one moment: say it once, and only put it on a card when the moments differ.
+  const sameMoment =
+    values.length > 0 && values.every((value) => value.measurement.measuredAt === values[0].measurement.measuredAt)
 
   return (
     <section className="flex flex-col gap-3.5">
@@ -111,47 +111,58 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
           <span className="font-mono text-label text-ink">{t('measurements.latest.emptyCta')}</span>
         </Link>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(176px,100%),1fr))] gap-3">
-          {values.map(({ measurement, parameter, change }) => {
-            const name = t(`parameters.${measurement.parameter}`)
-            const value = shown(measurement.value, language)
-            return (
-              <ParamTile
-                key={measurement.id}
-                name={name}
-                value={value}
-                unit={parameter.unit}
-                change={change ? describeChange(change, language, t) : undefined}
-                scale={[parameter.min, parameter.max]}
-                rulerValue={measurement.value}
-                rulerLabel={t('measurements.latest.rulerLabel', {
-                  parameter: name,
-                  value: `${value} ${parameter.unit}`.trim(),
-                  min: shown(parameter.min, language),
-                  max: shown(parameter.max, language),
-                })}
-                note={t('measurements.latest.measured', { moment: formatMoment(measurement.measuredAt, language) })}
-              />
-            )
-          })}
-          {!readOnly && (
-            <Link to={measure} className={dashedCard}>
-              <span aria-hidden="true" className="text-2xl leading-none">
-                +
-              </span>
-              <span className="text-base">{t('measurements.latest.another')}</span>
-            </Link>
+        <>
+          {sameMoment && (
+            <p className="m-0 -mt-1 font-mono text-caption text-ink-muted">
+              {t('measurements.latest.measured', { moment: formatMoment(values[0].measurement.measuredAt, language) })}
+            </p>
           )}
-        </div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(176px,100%),1fr))] gap-3">
+            {values.map(({ measurement, parameter, change }) => {
+              const name = t(`parameters.${measurement.parameter}`)
+              const value = shown(measurement.value, language)
+              return (
+                <ParamTile
+                  key={measurement.id}
+                  name={name}
+                  value={value}
+                  unit={parameter.unit}
+                  change={change ? describeChange(change, language, t) : undefined}
+                  scale={[parameter.min, parameter.max]}
+                  rulerValue={measurement.value}
+                  rulerLabel={t('measurements.latest.rulerLabel', {
+                    parameter: name,
+                    value: `${value} ${parameter.unit}`.trim(),
+                    min: shown(parameter.min, language),
+                    max: shown(parameter.max, language),
+                  })}
+                  note={
+                    sameMoment
+                      ? undefined
+                      : t('measurements.latest.measured', { moment: formatMoment(measurement.measuredAt, language) })
+                  }
+                />
+              )
+            })}
+            {!readOnly && (
+              <Link to={measure} className={dashedCard}>
+                <span aria-hidden="true" className="text-2xl leading-none">
+                  +
+                </span>
+                <span className="text-base">{t('measurements.latest.another')}</span>
+              </Link>
+            )}
+          </div>
+        </>
       )}
     </section>
   )
 }
 
 /**
- * The last 4 weeks of one Parameter, the one measured most often in that time, with a link to the charts of all
- * of them. A small chart has room for one Parameter only: Parameters do not share a value axis. Left out when
- * nothing was measured in the 4 weeks.
+ * The last 4 weeks of the two Parameters measured most often in that time, side by side, with a link to the charts
+ * of all of them. A small chart has room for one Parameter only: Parameters do not share a value axis. Left out
+ * when nothing was measured in the 4 weeks.
  */
 function RecentChart({
   tankId,
@@ -168,25 +179,31 @@ function RecentChart({
 }) {
   const { t } = useTranslation()
   const from = periodStart('w4', now)
-  const panel = busiestPanel(buildPanels(history, parameters, from))
-  if (!panel) return null
-  const [start, end] = timeRange([panel], now)
-  const name = t(`parameters.${panel.parameter}`)
+  const panels = busiestPanels(buildPanels(history, parameters, from), 2)
+  if (panels.length === 0) return null
+  const [start, end] = timeRange(panels, now)
   return (
     <section className="flex flex-col gap-3.5">
       <SectionHeader
         title={t('timeline.recent.title')}
         aside={<Link to={`/tanks/${tankId}/timeline`}>{t('timeline.recent.seeAll')}</Link>}
       />
-      <div className="max-w-[640px] border border-ink texture-card p-3">
-        <ParameterChart
-          panels={[panel]}
-          from={start}
-          to={end}
-          markers={markersIn(maintenance, start, end)}
-          size="compact"
-          description={t('timeline.description', { parameters: name, count: panel.points.length })}
-        />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-3">
+        {panels.map((panel) => (
+          <div key={panel.parameter} className="border border-ink texture-card p-3">
+            <ParameterChart
+              panels={[panel]}
+              from={start}
+              to={end}
+              markers={markersIn(maintenance, start, end)}
+              size="compact"
+              description={t('timeline.description', {
+                parameters: t(`parameters.${panel.parameter}`),
+                count: panel.points.length,
+              })}
+            />
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -250,7 +267,11 @@ function MeasurementsTable({
                     return (
                       <tr key={measurement.id} className="align-top">
                         {i === 0 && (
-                          <th scope="rowgroup" rowSpan={group.items.length} className="px-4.5 py-3 text-left align-top font-normal">
+                          <th
+                            scope="rowgroup"
+                            rowSpan={group.items.length}
+                            className="px-4.5 py-3 text-left align-top font-normal"
+                          >
                             <span className="font-mono text-sm">{moment}</span>
                             {group.note && (
                               <Handwritten as="p" size="sm" className="m-0 mt-1 whitespace-pre-line [overflow-wrap:anywhere]">

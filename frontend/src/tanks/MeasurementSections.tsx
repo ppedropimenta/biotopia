@@ -190,7 +190,7 @@ function RecentChart({
     <section className="flex flex-col gap-3.5">
       <SectionHeader
         title={t('timeline.recent.title')}
-        aside={<Link to={`/tanks/${tankId}/timeline`}>{t('timeline.recent.seeAll')}</Link>}
+        aside={<Link to={`/tanks/${tankId}/timeline?view=chart`}>{t('timeline.recent.seeAll')}</Link>}
       />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] gap-3">
         {panels.map((panel) => (

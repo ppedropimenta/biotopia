@@ -58,12 +58,17 @@ test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and 
   await expect(page.getByRole('img', { name: 'Latest photo of Photo tank' })).toBeVisible()
   await expect(page.getByText('1 photo', { exact: true })).toBeVisible()
 
-  // The history on the timeline lists it.
+  // The journal on the timeline lists it.
   await page.getByRole('link', { name: /Photo tank/ }).click()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Timeline' }).click()
   await page.getByRole('button', { name: 'All', exact: true }).click()
-  await page.getByRole('button', { name: 'History' }).click()
-  await expect(page.getByText(/^Photo · Jan 10, 2026/)).toBeVisible()
+  await page.getByRole('button', { name: /^Enlarge the photo from Jan 10, 2026/ }).click()
+  // It opens larger, with a way to edit it; closing it leaves the timeline where it was.
+  await expect(page.getByRole('dialog').getByRole('img', { name: /^Photo of Photo tank from Jan 10, 2026/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Edit this photo' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Timeline', level: 1 })).toBeVisible()
 
   // Editing fixes the note and the date; a date in the future is refused.
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Photos' }).click()

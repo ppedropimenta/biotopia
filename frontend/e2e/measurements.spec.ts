@@ -157,7 +157,7 @@ async function record(page: Page, daysBack: number, values: Record<string, strin
   await expect(page.getByRole('heading', { name: 'Water tests', level: 1 })).toBeVisible()
 }
 
-test('a keeper reads the water over time: a chart for each parameter, a period to pick and a table', async ({ page }) => {
+test('a keeper reads the water over time: a chart for one parameter at a time, a period to pick and a table', async ({ page }) => {
   await keeperWithATank(page)
 
   // No measurements: no chart to draw, and an invitation instead.
@@ -176,20 +176,26 @@ test('a keeper reads the water over time: a chart for each parameter, a period t
   await expect(page.getByRole('heading', { name: 'Last 4 weeks' })).toBeVisible()
   await page.getByRole('link', { name: 'All charts' }).click()
 
-  // 12 weeks is the default period: the measurement from 200 days ago is not in it. One chart for each parameter.
-  await expect(page.getByRole('button', { name: '12 weeks' })).toHaveAttribute('aria-pressed', 'true')
-  const chart = page.getByRole('group', { name: /pH, Nitrate \(NO₃\), over time, from 2 measurement dates/ })
+  // 12 weeks is the default period: the measurement from 200 days ago is not in it. The chart shows one parameter
+  // at a time, the first tile (pH) to begin with, and another tile swaps it.
+  await expect(page.getByRole('button', { name: '12 wk' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('group', { name: /pH, over time, from 1 measurement date/ })).toBeVisible()
+  await page.getByRole('button', { name: /^Nitrate/ }).click()
+  const chart = page.getByRole('group', { name: /Nitrate \(NO₃\), over time, from 2 measurement dates/ })
   await expect(chart).toBeVisible()
-  await expect(chart.locator('svg text', { hasText: 'pH' }).first()).toBeAttached()
+  await expect(chart.locator('svg text', { hasText: '35' }).first()).toBeAttached()
 
-  // The arrow keys walk the measurement dates and the values are read out.
+  // The latest date is read out to begin with; the arrow keys walk back through the dates and Escape comes back.
+  const readout = page.locator('[aria-live="polite"]')
+  await expect(readout).toContainText('Latest measurement')
+  await expect(readout).toContainText('Nitrate (NO₃) 35 mg/L')
   await chart.focus()
-  await chart.press('ArrowRight')
-  await expect(page.getByText(/pH 6\.8 · Nitrate \(NO₃\) 20 mg\/L/)).toBeVisible()
-  await chart.press('ArrowRight')
-  await expect(page.getByText(/Nitrate \(NO₃\) 35 mg\/L/)).toBeVisible()
+  await chart.press('ArrowLeft')
+  await expect(readout).toContainText('Selected measurement')
+  await expect(readout).toContainText('pH 6.8')
+  await expect(readout).toContainText('Nitrate (NO₃) 20 mg/L')
   await chart.press('Escape')
-  await expect(page.getByText(/Nitrate \(NO₃\) 35 mg\/L/)).toHaveCount(0)
+  await expect(readout).toContainText('Latest measurement')
 
   // The same numbers as a table; the whole history brings the oldest value in.
   await page.getByRole('button', { name: 'Table' }).click()
@@ -204,5 +210,5 @@ test('a keeper reads the water over time: a chart for each parameter, a period t
   await page.getByRole('button', { name: 'PT', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Linha do tempo', level: 1 })).toBeVisible()
   await page.getByRole('button', { name: 'Gráfico' }).click()
-  await expect(page.getByRole('group', { name: /pH, Nitrato \(NO₃\), ao longo do tempo, a partir de 3 datas de medição/ })).toBeVisible()
+  await expect(page.getByRole('group', { name: /pH, ao longo do tempo, a partir de 1 data de medição/ })).toBeVisible()
 })

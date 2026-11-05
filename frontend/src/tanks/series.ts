@@ -1,7 +1,9 @@
 import type { Measurement, Parameter, ParameterCode } from './measurements'
 
-export type Period = 'w4' | 'w12' | 'm6' | 'all'
-export const periods: readonly Period[] = ['w4', 'w12', 'm6', 'all']
+/** The periods the timeline offers. The tank page's four weeks is not one of them: the shortest here is a month. */
+export const periods = ['m1', 'w12', 'm6', 'all'] as const
+export type TimelinePeriod = (typeof periods)[number]
+export type Period = TimelinePeriod | 'w4'
 
 const msPerDay = 24 * 60 * 60 * 1000
 
@@ -10,6 +12,11 @@ export function periodStart(period: Period, now: Date): Date | null {
   switch (period) {
     case 'w4':
       return new Date(now.getTime() - 28 * msPerDay)
+    case 'm1': {
+      const start = new Date(now)
+      start.setUTCMonth(start.getUTCMonth() - 1)
+      return start
+    }
     case 'w12':
       return new Date(now.getTime() - 84 * msPerDay)
     case 'm6': {

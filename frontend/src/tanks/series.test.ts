@@ -32,6 +32,7 @@ const now = new Date('2026-03-01T12:00:00Z')
 describe('periodStart', () => {
   it('counts back from now, and has no start for the whole history', () => {
     expect(periodStart('w4', now)).toEqual(new Date('2026-02-01T12:00:00Z'))
+    expect(periodStart('m1', now)).toEqual(new Date('2026-02-01T12:00:00Z'))
     expect(periodStart('w12', now)).toEqual(new Date('2025-12-07T12:00:00Z'))
     expect(periodStart('m6', now)).toEqual(new Date('2025-09-01T12:00:00Z'))
     expect(periodStart('all', now)).toBeNull()

@@ -1,38 +1,37 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { api } from '../auth/api'
-import { ParameterChart } from '../components/charts/ParameterChart'
-import { ChipGroup, Segmented, ToggleChip } from '../components/ui/Chip'
-import { PlateCorners } from '../components/ui/Plate'
-import { plateClasses } from '../components/ui/plateClasses'
+import { Segmented } from '../components/ui/Chip'
 import { PageHeader } from '../components/ui/Structure'
-import { buildHistory, markersIn } from '../tanks/history'
-import { HistoryList } from '../tanks/HistoryList'
 import { LoadError } from '../tanks/LoadError'
-import type { Maintenance } from '../tanks/maintenance'
-import type { Photo } from '../tanks/photos'
-import type { Tank } from '../tanks/types'
-import { formatMoment, valueDecimals, type Measurement, type Parameter, type ParameterCode } from '../tanks/measurements'
+import { formatMoment, valueDecimals } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
-import { buildPanels, momentsOf, periods, periodStart, timeRange, type Panel, type Period } from '../tanks/series'
+import { buildPanels, momentsOf, periods, periodStart, type Panel, type TimelinePeriod } from '../tanks/series'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
+import { PeriodSwitch } from './timeline/Controls'
+import { Journal } from './timeline/Journal'
+import { ParameterBoard } from './timeline/ParameterBoard'
 
 /** The most the API lists. A tank with more than this shows its newest ones. */
 const historyCount = 1000
 
-const defaultPeriod: Period = 'w12'
+const defaultPeriod: TimelinePeriod = 'w12'
 
-const isPeriod = (value: string | null): value is Period => periods.includes(value as Period)
+const isPeriod = (value: string | null): value is TimelinePeriod => periods.includes(value as TimelinePeriod)
 
-/** A tank's Parameters over time: a chart per Parameter, a time range to pick and a table with the same numbers. */
+const views = ['diary', 'chart', 'table'] as const
+type View = (typeof views)[number]
+const isView = (value: string | null): value is View => views.includes(value as View)
+
+/**
+ * A tank over time, in three views of the same period: the journal (a calendar and every day), the chart of one
+ * Parameter with the care around it, and a table with the same numbers. The period and the view are in the address.
+ */
 export function TimelinePage() {
   const { t } = useTranslation()
   const { id = '' } = useParams()
   const [search, setSearch] = useSearchParams()
-  const [view, setView] = useState<'chart' | 'table' | 'history'>('chart')
-  const [hidden, setHidden] = useState<ReadonlySet<ParameterCode>>(new Set())
   const loaded = useLoad(async () => {
     const [tank, parameters, measurements, maintenance, photos] = await Promise.all([
       api.tank(id),
@@ -56,20 +55,19 @@ export function TimelinePage() {
   }
 
   const { tank, parameters, measurements, maintenance, photos, now } = loaded.data
-  const requested = search.get('period')
-  const period = isPeriod(requested) ? requested : defaultPeriod
+  const requestedPeriod = search.get('period')
+  const period = isPeriod(requestedPeriod) ? requestedPeriod : defaultPeriod
+  const requestedView = search.get('view')
+  const view: View = isView(requestedView) ? requestedView : 'diary'
+  // The default period and view stay out of the address, so the plain link is the usual one.
+  const change = (name: 'period' | 'view', value: string, usual: string) => {
+    const params = new URLSearchParams(search)
+    if (value === usual) params.delete(name)
+    else params.set(name, value)
+    setSearch(params, { replace: true })
+  }
   const from = periodStart(period, now)
-  const inPeriod = buildPanels(measurements, parameters, from)
-  // Hidden Parameters stay hidden across periods, unless that would leave nothing to draw.
-  const unhidden = inPeriod.filter((p) => !hidden.has(p.parameter))
-  const panels = unhidden.length > 0 ? unhidden : inPeriod
-  const toggle = (parameter: ParameterCode) =>
-    setHidden((prev) => {
-      const next = new Set(prev)
-      if (next.has(parameter)) next.delete(parameter)
-      else if (panels.length > 1) next.add(parameter)
-      return next
-    })
+  const panels = buildPanels(measurements, parameters, from)
 
   return (
     <>
@@ -78,57 +76,40 @@ export function TimelinePage() {
         title={t('timeline.title')}
         subtitle={t('timeline.subtitle', { name: tank.name })}
         actions={
-          (inPeriod.length > 0 || maintenance.length > 0 || photos.length > 0) && (
+          (panels.length > 0 || maintenance.length > 0 || photos.length > 0) && (
             <Segmented
               label={t('timeline.view')}
               value={view}
-              onChange={setView}
+              onChange={(next) => change('view', next, 'diary')}
               options={[
+                { value: 'diary', label: t('timeline.diaryView') },
                 { value: 'chart', label: t('timeline.chartView') },
                 { value: 'table', label: t('timeline.tableView') },
-                { value: 'history', label: t('timeline.historyView') },
               ]}
             />
           )
         }
       />
 
-      <div className="flex flex-wrap items-center gap-x-6.5 gap-y-3">
-        <ChipGroup label={t('timeline.period')}>
-          {periods.map((p) => (
-            <ToggleChip
-              key={p}
-              pressed={period === p}
-              onClick={() => setSearch(p === defaultPeriod ? {} : { period: p }, { replace: true })}
-            >
-              {t(`timeline.periods.${p}`)}
-            </ToggleChip>
-          ))}
-        </ChipGroup>
-        {inPeriod.length > 1 && (
-          <ChipGroup label={t('timeline.parameters')}>
-            {inPeriod.map((p) => (
-              <ToggleChip key={p.parameter} variant="check" pressed={panels.includes(p)} onClick={() => toggle(p.parameter)}>
-                {t(`parameters.${p.parameter}`)}
-              </ToggleChip>
-            ))}
-          </ChipGroup>
-        )}
-      </div>
+      <PeriodSwitch period={period} onChange={(next) => change('period', next, defaultPeriod)} />
 
-      {view === 'history' ? (
-        <History
+      {measurements.length === 0 && maintenance.length === 0 && photos.length === 0 ? (
+        <Empty tankId={tank.id} anyMeasurements={false} readOnly={tank.readOnly} />
+      ) : view === 'diary' ? (
+        <Journal
+          period={period}
           measurements={measurements}
           maintenance={maintenance}
           photos={photos}
           parameters={parameters}
-          from={from}
           tank={tank}
+          from={from}
+          now={now}
         />
       ) : panels.length === 0 ? (
         <Empty tankId={tank.id} anyMeasurements={measurements.length > 0} readOnly={tank.readOnly} />
       ) : view === 'chart' ? (
-        <ChartPlate panels={panels} maintenance={maintenance} now={now} />
+        <ParameterBoard panels={panels} measurements={measurements} maintenance={maintenance} photos={photos} tank={tank} now={now} />
       ) : (
         <ValuesTable panels={panels} />
       )}
@@ -150,52 +131,6 @@ function Empty({ tankId, anyMeasurements, readOnly }: { tankId: string; anyMeasu
         </Link>
       )}
     </div>
-  )
-}
-
-/** Everything that happened in the period, measured or done, day by day. */
-function History({
-  measurements,
-  maintenance,
-  photos,
-  parameters,
-  from,
-  tank,
-}: {
-  measurements: Measurement[]
-  maintenance: Maintenance[]
-  photos: Photo[]
-  parameters: Parameter[]
-  from: Date | null
-  tank: Tank
-}) {
-  const { t } = useTranslation()
-  const start = from?.getTime() ?? -Infinity
-  const days = buildHistory(
-    measurements.filter((m) => Date.parse(m.measuredAt) >= start),
-    maintenance.filter((m) => Date.parse(m.performedAt) >= start),
-    photos.filter((p) => Date.parse(p.takenAt) >= start),
-  )
-  if (days.length === 0) return <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('timeline.history.empty')}</p>
-  return <HistoryList days={days} parameters={parameters} tank={tank} />
-}
-
-function ChartPlate({ panels, maintenance, now }: { panels: Panel[]; maintenance: Maintenance[]; now: Date }) {
-  const { t } = useTranslation()
-  const [start, end] = timeRange(panels, now)
-  const names = panels.map((p) => t(`parameters.${p.parameter}`)).join(', ')
-  return (
-    <figure className={`${plateClasses('md')} m-0 pb-2.5`}>
-      <PlateCorners items={[t('timeline.plate', { count: momentsOf(panels).length })]} />
-      <ParameterChart
-        className="mt-1.5"
-        panels={panels}
-        from={start}
-        to={end}
-        markers={markersIn(maintenance, start, end)}
-        description={t('timeline.description', { parameters: names, count: momentsOf(panels).length })}
-      />
-    </figure>
   )
 }
 

@@ -7,7 +7,7 @@ const plateSlots = 3
  * The order a plate prefers its Parameters in: the three main ones, then the rest by how often a keeper reads them
  * (the nitrogen cycle first).
  */
-const plateOrder = [
+export const plateOrder = [
   'ph',
   'temperature',
   'total_ammonia',

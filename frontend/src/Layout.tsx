@@ -6,7 +6,11 @@ import { DemoBanner } from './components/layout/DemoBanner'
 import { demoNavGroups, navGroups } from './components/layout/navGroups'
 import { PublicHeader } from './components/layout/PublicHeader'
 import { ButtonLink } from './components/ui/Button'
+import { cx } from './lib/cx'
 import { useCurrentTank } from './tanks/useCurrentTank'
+
+/** The links under the side menu. */
+const footerLink = 'inline-flex min-h-11 items-center text-river-text hover:text-river-bright'
 
 /**
  * The frame of every page: the app shell for a keeper who is logged in, the public header for anyone else. The
@@ -31,16 +35,16 @@ export function Layout() {
             cta={<LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />}
             footer={
               <>
-                <Link to="/account" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                <Link to="/account" className={footerLink}>
                   {t('ui.nav.account')}
                 </Link>
-                <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                <Link to="/credits" className={footerLink}>
                   {t('ui.nav.credits')}
                 </Link>
                 <button
                   type="button"
                   onClick={logOut}
-                  className="inline-flex min-h-11 cursor-pointer items-center self-start bg-transparent p-0 font-mono text-sm text-river-text hover:text-river-bright"
+                  className={cx(footerLink, 'cursor-pointer self-start bg-transparent p-0 font-mono text-sm')}
                 >
                   {t('ui.nav.logOut')}
                 </button>
@@ -69,10 +73,10 @@ export function Layout() {
             }
             footer={
               <>
-                <Link to="/login" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                <Link to="/login" className={footerLink}>
                   {t('ui.nav.logIn')}
                 </Link>
-                <Link to="/credits" className="inline-flex min-h-11 items-center text-river-text hover:text-river-bright">
+                <Link to="/credits" className={footerLink}>
                   {t('ui.nav.credits')}
                 </Link>
               </>

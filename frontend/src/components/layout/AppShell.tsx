@@ -2,7 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router'
 import { cx } from '../../lib/cx'
-import { LanguageToggle, Wordmark } from '../ui/Brand'
+import { Wordmark } from '../ui/Brand'
 import { ButtonLink } from '../ui/Button'
 import { Icon, type IconName } from '../ui/Icon'
 
@@ -80,7 +80,6 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
         </div>
         <div className="mt-auto flex flex-col gap-3 pr-4.5">
           {footer}
-          <LanguageToggle tone="dark" className="self-start" />
         </div>
       </div>
     </nav>

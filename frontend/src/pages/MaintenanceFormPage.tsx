@@ -4,11 +4,11 @@ import { useNavigate, useParams } from 'react-router'
 import { api } from '../auth/api'
 import { FormError } from '../auth/FormError'
 import { Button, ButtonLink } from '../components/ui/Button'
-import { ToggleChip } from '../components/ui/Chip'
 import { NoteField, TextField } from '../components/ui/Field'
 import { LoadError } from '../tanks/LoadError'
 import {
   describeMaintenanceError,
+  litersOfText,
   maintenanceTypes,
   toDetails,
   type ErrorKey,
@@ -17,6 +17,7 @@ import {
   type MaintenanceForm,
   type MaintenanceType,
 } from '../tanks/maintenance'
+import { MaintenanceTypeTile } from '../tanks/MaintenanceTypeTile'
 import { MeasurementHeader } from '../tanks/MeasurementHeader'
 import { toLocalInput } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
@@ -54,6 +55,8 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const [errors, setErrors] = useState<FormErrors>({})
   const [busy, setBusy] = useState(false)
   const [confirming, setConfirming] = useState(false)
+
+  const liters = litersOfText(form.percent, language, tank.netVolumeLiters)
 
   const message = (key: ErrorKey | undefined) =>
     key && t(key, { example: formatNumber(12.5, language) })
@@ -105,8 +108,6 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
         back={{ to: list, label: t('maintenance.form.back') }}
       />
       <form onSubmit={submit} noValidate aria-busy={busy} className="flex flex-col gap-5 pt-5">
-        <p className="m-0 text-ink-soft">{t('maintenance.form.lead')}</p>
-
         <div role="group" aria-label={t('maintenance.form.type')} className="flex flex-col gap-2">
           <span
             aria-hidden="true"
@@ -114,16 +115,9 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
           >
             {t('maintenance.form.type')}
           </span>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {maintenanceTypes.map((type) => (
-              <ToggleChip
-                key={type}
-                variant="accent"
-                pressed={form.types.includes(type)}
-                onClick={() => pick(type)}
-              >
-                {t(`maintenance.types.${type}`)}
-              </ToggleChip>
+              <MaintenanceTypeTile key={type} type={type} pressed={form.types.includes(type)} onClick={() => pick(type)} />
             ))}
           </div>
           {errors.type ? (
@@ -140,7 +134,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
             autoComplete="off"
             label={t('maintenance.form.percent')}
             unit="%"
-            hint={t('maintenance.form.percentHint')}
+            hint={liters !== null && t('maintenance.form.litersHint', { liters: formatNumber(liters, language), total: formatNumber(tank.netVolumeLiters!, language) })}
             error={message(errors.percent)}
             value={form.percent}
             onChange={(event) => setForm({ ...form, percent: event.target.value })}
@@ -165,11 +159,11 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
         />
 
         {errors.general && <FormError>{message(errors.general)}</FormError>}
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" size="lg" icon="check" disabled={busy} className="flex-1">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button type="submit" size="lg" icon="check" disabled={busy} className="w-full sm:flex-1">
             {busy ? t('maintenance.form.saving') : t(entry ? 'maintenance.edit.save' : 'maintenance.form.save')}
           </Button>
-          <ButtonLink to={list} variant="secondary" size="lg">
+          <ButtonLink to={list} variant="secondary" size="lg" className="w-full justify-center sm:w-auto">
             {t('maintenance.form.cancel')}
           </ButtonLink>
         </div>

@@ -76,6 +76,13 @@ export type FormErrors = Partial<Record<'type' | 'percent' | 'moment' | 'note' |
 /** The decimals the API keeps for a percentage. */
 const percentDecimals = 2
 
+/** The liters a typed percentage comes to, while it is a valid percentage and the tank's volume is known. */
+export function litersOfText(text: string, language: Language, netVolumeLiters: number | null): number | null {
+  if (netVolumeLiters === null) return null
+  const percent = readPercent(text, language)
+  return typeof percent === 'number' ? litersOf(percent, netVolumeLiters) : null
+}
+
 function readPercent(text: string, language: Language): number | ErrorKey {
   const value = parseNumber(text, language)
   if (value === null) return 'maintenance.errors.percent_required'

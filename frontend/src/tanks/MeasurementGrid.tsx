@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '../components/ui/Icon'
@@ -234,7 +235,7 @@ function change(
   value: number,
   last: number | null,
   show: (n: number) => string,
-  t: (key: string, options?: Record<string, string>) => string,
+  t: TFunction,
 ) {
   if (last === null) return t('measurements.form.firstTime')
   const amount = Math.round(Math.abs(value - last) * 10 ** valueDecimals) / 10 ** valueDecimals

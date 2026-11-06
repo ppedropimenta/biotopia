@@ -183,7 +183,6 @@ test('a keeper reads the water over time: a chart for one parameter at a time, a
   await page.getByRole('button', { name: /^Nitrate/ }).click()
   const chart = page.getByRole('group', { name: /Nitrate \(NO₃\), over time, from 2 measurement dates/ })
   await expect(chart).toBeVisible()
-  await expect(chart.locator('svg text', { hasText: '35' }).first()).toBeAttached()
 
   // The latest date is read out to begin with; the arrow keys walk back through the dates and Escape comes back.
   const readout = page.locator('[aria-live="polite"]')

@@ -27,8 +27,14 @@ _Avoid_: Image, gallery, cover
 
 **Net Volume**:
 The amount of water a tank actually holds, as stated by its owner, after substrate and decoration. It is
-never estimated from the tank's dimensions.
-_Avoid_: Volume, liters, gross volume
+optional, and it is never estimated from the tank's dimensions.
+_Avoid_: Volume, liters
+
+**Gross Volume**:
+The volume of a tank worked out from its dimensions (length × width × height). It is calculated by the app,
+never typed, and it stands in for the Net Volume in the calculations (a water change in liters, for one) for as
+long as the owner has not stated one.
+_Avoid_: Capacity, glass volume
 
 ### Water
 

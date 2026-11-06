@@ -32,11 +32,14 @@ export function Layout() {
         nav={
           <SideNav
             groups={navGroups(t, tank)}
+            // Recording needs a tank to record into, so outside one there is no button.
             cta={
-              <div className="flex flex-col gap-2">
-                <LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />
-                {tank && <LogMaintenanceCta to={`/tanks/${tank.id}/maintenance/new`} />}
-              </div>
+              tank && (
+                <div className="flex flex-col gap-2">
+                  <LogMeasurementCta to={`/tanks/${tank.id}/measure`} />
+                  <LogMaintenanceCta to={`/tanks/${tank.id}/maintenance/new`} />
+                </div>
+              )
             }
             footer={
               <>

@@ -23,6 +23,8 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
 
   // A new account has no tanks, and the empty list invites the first one.
   await expect(page.getByRole('link', { name: 'Start a new plate' })).toBeVisible()
+  // With no tank in view there is nothing to record into, so the side menu has no record buttons.
+  await expect(page.getByRole('link', { name: 'Log measurement' })).toHaveCount(0)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
 
   // A name and a start date are needed before anything is sent.

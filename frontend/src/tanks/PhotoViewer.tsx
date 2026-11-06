@@ -14,16 +14,19 @@ import { useLanguage } from './useLanguage'
 export function PhotoViewer({
   tank,
   photos,
+  start = 0,
   onClose,
 }: {
   tank: { id: string; name: string; readOnly?: boolean }
   photos: readonly Photo[]
+  /** The index of the photo to show first. */
+  start?: number
   onClose: () => void
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const dialog = useRef<HTMLDialogElement>(null)
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(start)
   const photo = photos[index]
   const when = formatMoment(photo.takenAt, language)
 

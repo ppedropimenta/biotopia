@@ -40,10 +40,13 @@ test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and 
   await page.getByRole('button', { name: 'Save photo' }).click()
 
   await expect(page.getByRole('heading', { name: 'Photos', level: 1 })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'January 10, 2026' })).toBeVisible()
+  // The gallery groups by month and writes the day on each polaroid.
+  await expect(page.getByRole('heading', { name: 'January 2026' })).toBeVisible()
+  await expect(page.getByText('Jan 10, 2026', { exact: true })).toBeVisible()
   await expect(page.getByText('First plants in')).toBeVisible()
   await expect(page.getByText(/^Using \d+ KB of 200 MB/)).toBeVisible()
-  const picture = page.getByRole('img', { name: /^Photo of Photo tank from/ })
+  await expect(page.getByRole('button', { name: /^Enlarge the photo from Jan 10, 2026/ })).toBeVisible()
+  const picture = page.locator('main ul img')
   await expect(picture).toBeVisible()
   // The stored file is served, so the picture really loaded.
   await expect.poll(() => picture.evaluate((img) => (img as unknown as { naturalWidth: number }).naturalWidth)).toBe(1)
@@ -72,7 +75,8 @@ test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and 
 
   // Editing fixes the note and the date; a date in the future is refused.
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Photos' }).click()
-  await page.getByRole('link', { name: /^Edit the photo from/ }).click()
+  await page.getByRole('button', { name: /^Enlarge the photo from/ }).click()
+  await page.getByRole('link', { name: 'Edit this photo' }).click()
   await expect(page.getByRole('heading', { name: 'Edit photo', level: 1 })).toBeVisible()
   await page.getByLabel('Note').fill('First plants in, rotala')
   await page.getByLabel('When it was taken').fill('2999-01-01T08:30')
@@ -80,11 +84,12 @@ test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and 
   await expect(page.getByText('This moment has not happened yet.')).toBeVisible()
   await page.getByLabel('When it was taken').fill('2026-01-11T08:30')
   await page.getByRole('button', { name: 'Save changes' }).click()
-  await expect(page.getByRole('heading', { name: 'January 11, 2026' })).toBeVisible()
+  await expect(page.getByText('Jan 11, 2026', { exact: true })).toBeVisible()
   await expect(page.getByText('First plants in, rotala')).toBeVisible()
 
   // Deleting frees the storage and brings the invitation back.
-  await page.getByRole('link', { name: /^Edit the photo from/ }).click()
+  await page.getByRole('button', { name: /^Enlarge the photo from/ }).click()
+  await page.getByRole('link', { name: 'Edit this photo' }).click()
   await page.getByRole('button', { name: 'Delete this photo' }).click()
   await page.getByRole('button', { name: 'Yes, delete' }).click()
   await expect(page.getByText('No photos yet.')).toBeVisible()

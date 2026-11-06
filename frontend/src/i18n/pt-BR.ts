@@ -351,7 +351,10 @@ export const ptBR: Messages = {
     form: {
       newTitle: 'Adicionar uma foto',
       editTitle: 'Editar foto',
-      lead: 'JPEG, PNG ou WebP, até {{max}}. Localização e dados da câmera são removidos e imagens grandes ficam menores.',
+      fileHint: 'JPEG, PNG ou WebP, até {{max}}. Localização e dados da câmera são removidos.',
+      choose: 'Escolher uma foto',
+      change: 'Escolher outra foto',
+      preview: 'Prévia da foto escolhida',
       back: 'Voltar às fotos',
       file: 'Foto',
       moment: 'Quando foi tirada',

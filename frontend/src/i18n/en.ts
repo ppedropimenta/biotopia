@@ -349,7 +349,10 @@ export const en = {
     form: {
       newTitle: 'Add a photo',
       editTitle: 'Edit photo',
-      lead: 'JPEG, PNG or WebP, up to {{max}}. Location and camera data are removed and big pictures are made smaller.',
+      fileHint: 'JPEG, PNG or WebP, up to {{max}}. Location and camera data are removed.',
+      choose: 'Choose a photo',
+      change: 'Choose another photo',
+      preview: 'Preview of the chosen photo',
       back: 'Back to photos',
       file: 'Photo',
       moment: 'When it was taken',

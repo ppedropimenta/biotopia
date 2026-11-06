@@ -1,21 +1,46 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { api } from '../auth/api'
 import { ButtonLink } from '../components/ui/Button'
 import { SectionHeader, PageHeader } from '../components/ui/Structure'
 import { formatDay } from '../tanks/dates'
-import { buildHistory } from '../tanks/history'
 import { LoadError } from '../tanks/LoadError'
-import { formatBytes, type PhotoUsage } from '../tanks/photos'
+import { formatBytes, type Photo, type PhotoUsage } from '../tanks/photos'
 import { PhotoCard } from '../tanks/PhotoCard'
+import { PhotoViewer } from '../tanks/PhotoViewer'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 
-/** A tank's Tank Photos as polaroids, a day at a time, newest day first, with how much of the storage is used. */
+const localDay = (iso: string) => {
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const capitalized = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** The photos of one month, newest first. `from` is the index of the first one in the whole list. */
+type Month = { key: string; label: string; photos: Photo[]; from: number }
+
+function groupByMonth(photos: readonly Photo[], language: string): Month[] {
+  const label = new Intl.DateTimeFormat(language, { month: 'long', year: 'numeric' })
+  const months: Month[] = []
+  photos.forEach((photo, index) => {
+    const taken = new Date(photo.takenAt)
+    const key = `${taken.getFullYear()}-${taken.getMonth()}`
+    const last = months[months.length - 1]
+    if (last?.key === key) last.photos.push(photo)
+    else months.push({ key, label: capitalized(label.format(taken)), photos: [photo], from: index })
+  })
+  return months
+}
+
+/** A tank's Tank Photos as polaroids in one grid, a month at a time, newest first, with how much storage is used. */
 export function PhotosPage() {
   const { t } = useTranslation()
   const language = useLanguage()
   const { id = '' } = useParams()
+  const [viewing, setViewing] = useState<number | null>(null)
   const loaded = useLoad(() => Promise.all([api.tank(id), api.photos(id)]).then(async ([tank, photos]) => [tank, photos, tank.readOnly ? null : await api.photoUsage()] as const), `photos-${id}`)
 
   const crumbs = [{ label: t('ui.nav.myTanks'), to: '/tanks' }]
@@ -30,16 +55,14 @@ export function PhotosPage() {
   }
 
   const [tank, photos, usage] = loaded.data
-  const days = buildHistory([], [], photos)
   const subtitle =
-    days.length === 0
+    photos.length === 0
       ? undefined
       : t('photos.subtitle', {
           count: photos.length,
-          from: formatDay(days[days.length - 1].day, language),
-          to: formatDay(days[0].day, language),
+          from: formatDay(localDay(photos[photos.length - 1].takenAt), language),
+          to: formatDay(localDay(photos[0].takenAt), language),
         })
-  let index = 0
   return (
     <>
       <PageHeader
@@ -54,7 +77,6 @@ export function PhotosPage() {
           )
         }
       />
-      {usage && <Usage usage={usage} />}
       {photos.length === 0 ? (
         <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
           <p className="m-0">{t('photos.empty')}</p>
@@ -65,23 +87,23 @@ export function PhotosPage() {
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
-          {days.map((day) => (
-            <section key={day.day} className="flex flex-col gap-4">
-              <SectionHeader title={formatDay(day.day, language)} level={3} />
-              <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(220px,100%),1fr))] items-start gap-6 p-0">
-                {day.entries.map((entry) =>
-                  entry.kind === 'photo' ? (
-                    <li key={entry.photo.id}>
-                      <PhotoCard tank={tank} photo={entry.photo} index={index++} />
-                    </li>
-                  ) : null,
-                )}
+        <div className="flex flex-col gap-9">
+          {groupByMonth(photos, language).map((month) => (
+            <section key={month.key} className="flex flex-col gap-5">
+              <SectionHeader title={month.label} level={3} aside={t('photos.count', { count: month.photos.length })} />
+              <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(min(200px,100%),240px))] items-start gap-x-7 gap-y-8 p-0">
+                {month.photos.map((photo, i) => (
+                  <li key={photo.id}>
+                    <PhotoCard tank={tank} photo={photo} index={month.from + i} showDate onOpen={() => setViewing(month.from + i)} />
+                  </li>
+                ))}
               </ul>
             </section>
           ))}
         </div>
       )}
+      {usage && <Usage usage={usage} />}
+      {viewing !== null && <PhotoViewer tank={tank} photos={photos} start={viewing} onClose={() => setViewing(null)} />}
     </>
   )
 }

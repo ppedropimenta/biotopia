@@ -17,16 +17,29 @@ export function PhotoCard({
   photo,
   index,
   onOpen,
+  showDate = false,
 }: {
   tank: { id: string; name: string; readOnly?: boolean }
   photo: Photo
   index: number
   /** When given, the polaroid opens the photo larger (where the caller shows it) instead of linking to the edit page. */
   onOpen?: () => void
+  /** Writes the day the photo was taken above its note, for a gallery where nothing else says it. */
+  showDate?: boolean
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const when = formatMoment(photo.takenAt, language)
+  const caption = showDate ? (
+    <>
+      <span className="block font-mono text-caption text-ink-muted">
+        {new Intl.DateTimeFormat(language, { dateStyle: 'medium' }).format(new Date(photo.takenAt))}
+      </span>
+      {photo.note}
+    </>
+  ) : (
+    (photo.note ?? undefined)
+  )
   if (onOpen) {
     return (
       <button
@@ -40,7 +53,7 @@ export function PhotoCard({
           alt=""
           aspect={String(frameAspect(photo))}
           rotate={turns[index % turns.length]}
-          caption={photo.note ?? undefined}
+          caption={caption}
           imgClassName="size-full object-cover"
         />
       </button>
@@ -53,7 +66,7 @@ export function PhotoCard({
         alt={t('photos.alt', { name: tank.name, date: when })}
         aspect={String(frameAspect(photo))}
         rotate={turns[index % turns.length]}
-        caption={photo.note ?? undefined}
+        caption={caption}
         imgClassName="size-full object-cover"
       />
     )
@@ -69,7 +82,7 @@ export function PhotoCard({
         alt={t('photos.alt', { name: tank.name, date: when })}
         aspect={String(frameAspect(photo))}
         rotate={turns[index % turns.length]}
-        caption={photo.note ?? undefined}
+        caption={caption}
         imgClassName="size-full object-cover"
       />
     </Link>

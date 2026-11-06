@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router'
 import { api } from '../auth/api'
 import { FormError } from '../auth/FormError'
 import { Button, ButtonLink } from '../components/ui/Button'
+import { Icon } from '../components/ui/Icon'
 import { NoteField, TextField } from '../components/ui/Field'
+import { Polaroid } from '../components/ui/Paper'
 import { LoadError } from '../tanks/LoadError'
 import { MeasurementHeader } from '../tanks/MeasurementHeader'
 import { cleanNote, readMoment, toLocalInput } from '../tanks/measurements'
@@ -110,14 +112,13 @@ function FormScreen({ tank, photo, usage }: { tank: Tank; photo: Photo | null; u
             className="block max-h-80 w-full bg-paper-card object-contain"
           />
         ) : (
-          <>
-            <p className="m-0 text-ink-soft">{t('photos.form.lead', { max: formatBytes(usage.maxFileBytes, language) })}</p>
-            <FileField
-              label={t('photos.form.file')}
-              error={message(errors.file)}
-              onChange={(chosen) => setFile(chosen)}
-            />
-          </>
+          <FileField
+            label={t('photos.form.file')}
+            file={file}
+            hint={t('photos.form.fileHint', { max: formatBytes(usage.maxFileBytes, language) })}
+            error={message(errors.file)}
+            onChange={(chosen) => setFile(chosen)}
+          />
         )}
 
         <TextField
@@ -174,28 +175,80 @@ function FormScreen({ tank, photo, usage }: { tank: Tank; photo: Photo | null; u
   )
 }
 
-/** The file chooser, labelled like the other fields; an error replaces nothing, it is added with a mark and words. */
-function FileField({ label, error, onChange }: { label: string; error?: string; onChange: (file: File | null) => void }) {
+/**
+ * The file chooser, labelled like the other fields. The real input lies, invisible, over a box in the style of the
+ * app, so the label, the keyboard and the file dialog all work as they do natively. Once a file is picked, its
+ * picture is shown as a polaroid. An error is added with a mark and words.
+ */
+function FileField({
+  label,
+  file,
+  hint,
+  error,
+  onChange,
+}: {
+  label: string
+  file: File | null
+  hint: string
+  error?: string
+  onChange: (file: File | null) => void
+}) {
+  const { t } = useTranslation()
   const id = 'photo-file'
+  const [preview, setPreview] = useState<string | null>(null)
+  const current = useRef<string | null>(null)
+
+  // The picture is read from the file in the browser. Its address is let go when another file is picked or the form closes.
+  const pick = (chosen: File | null) => {
+    if (current.current) URL.revokeObjectURL(current.current)
+    current.current = chosen && chosen.type.startsWith('image/') ? URL.createObjectURL(chosen) : null
+    setPreview(current.current)
+    onChange(chosen)
+  }
+  useEffect(
+    () => () => {
+      if (current.current) URL.revokeObjectURL(current.current)
+    },
+    [],
+  )
+
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <label htmlFor={id} className="font-mono text-caption tracking-[0.12em] text-ink-muted uppercase">
         {label}
       </label>
-      <input
-        id={id}
-        name="file"
-        type="file"
-        accept={acceptedTypes.join(',')}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
-        onChange={(event) => onChange(event.target.files?.[0] ?? null)}
-        className="min-h-11 w-full border border-dashed border-ink/55 bg-transparent p-2 font-mono text-sm text-ink file:mr-3 file:cursor-pointer file:border file:border-ink file:bg-paper-card file:px-3 file:py-1.5 file:font-mono file:text-sm file:text-ink"
-      />
-      {error && (
+      {preview && (
+        <div className="w-full max-w-[280px] px-1.5 pt-1">
+          <Polaroid src={preview} alt={t('photos.form.preview')} rotate={-1.5} aspect="4 / 3" caption={file?.name} imgClassName="size-full object-cover" />
+        </div>
+      )}
+      <div className="relative has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink">
+        <span
+          aria-hidden="true"
+          className="flex min-h-11 items-center gap-2 border border-dashed border-ink/55 px-3 font-mono text-label text-ink"
+        >
+          <Icon name="camera" size={16} strokeWidth={1.8} />
+          {file ? t('photos.form.change') : t('photos.form.choose')}
+        </span>
+        <input
+          id={id}
+          name="file"
+          type="file"
+          accept={acceptedTypes.join(',')}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : `${id}-hint`}
+          onChange={(event) => pick(event.target.files?.[0] ?? null)}
+          className="absolute inset-0 size-full cursor-pointer opacity-0"
+        />
+      </div>
+      {error ? (
         <span id={`${id}-error`} className="font-mono text-xs text-cardinal">
           <span aria-hidden="true">× </span>
           {error}
+        </span>
+      ) : (
+        <span id={`${id}-hint`} className="font-mono text-xs text-ink-muted">
+          {hint}
         </span>
       )}
     </div>

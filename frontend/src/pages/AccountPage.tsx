@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { ApiError, api } from '../auth/api'
 import { useAuth } from '../auth/context'
 import { FormError } from '../auth/FormError'
+import { LanguageToggle } from '../components/ui/Brand'
 import { Button } from '../components/ui/Button'
 import { TextField } from '../components/ui/Field'
 import { PageHeader, SectionHeader } from '../components/ui/Structure'
 
-/** The account's own page. For now it holds one thing: deleting the account with everything in it. */
+/** The account's own page: its data, the language, and deleting the account with everything in it. */
 export function AccountPage() {
   const { t } = useTranslation()
   const { state, signedOut } = useAuth()
@@ -35,8 +36,20 @@ export function AccountPage() {
 
   return (
     <>
-      <PageHeader title={t('account.title')} subtitle={t('account.lead', { email: state.account.email })} />
+      <PageHeader title={t('account.title')} />
       <section className="flex max-w-[520px] flex-col gap-4">
+        <SectionHeader title={t('account.dataTitle')} level={3} />
+        <dl className="m-0 flex flex-col gap-1">
+          <dt className="font-mono text-caption tracking-[0.12em] text-ink-muted uppercase">{t('account.email')}</dt>
+          <dd className="m-0 text-lead [overflow-wrap:anywhere]">{state.account.email}</dd>
+        </dl>
+      </section>
+      <section className="flex max-w-[520px] flex-col gap-4">
+        <SectionHeader title={t('account.languageTitle')} level={3} />
+        <p className="m-0 text-lead text-ink-soft">{t('account.languageWhat')}</p>
+        <LanguageToggle tone="light" className="self-start" />
+      </section>
+      <section className="flex max-w-[520px] flex-col gap-4 border-t border-dashed border-ink/45 pt-6">
         <SectionHeader title={t('account.deleteTitle')} level={3} />
         <p className="m-0 text-lead text-ink-soft">{t('account.deleteWhat')}</p>
         {confirming ? (

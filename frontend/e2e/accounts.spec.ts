@@ -108,7 +108,9 @@ test('the language chosen in the app is saved on the account and restored on log
   await logIn(page, address)
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
 
+  await page.getByRole('link', { name: 'Account', exact: true }).click()
   await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await page.goBack()
   await expect(page.getByRole('heading', { name: 'Seus aquários' })).toBeVisible()
   await page.getByRole('navigation').getByRole('button', { name: 'Sair' }).click()
 

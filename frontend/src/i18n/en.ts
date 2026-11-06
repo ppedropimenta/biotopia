@@ -246,7 +246,10 @@ export const en = {
   },
   account: {
     title: 'Your account',
-    lead: 'Signed in as {{email}}.',
+    dataTitle: 'Your details',
+    email: 'Email',
+    languageTitle: 'Language',
+    languageWhat: 'Used across the app and saved to your account.',
     deleteTitle: 'Delete account',
     deleteWhat:
       'This deletes your account and every tank in it, with all measurements, maintenance and photos. It cannot be undone.',

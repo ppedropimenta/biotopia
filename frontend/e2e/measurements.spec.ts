@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { fillValue, loggedInKeeper } from './keeper.ts'
+import { choosePortuguese, fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -119,7 +119,7 @@ test('a keeper records several measurements at once, sees the latest values, edi
 
 test('in Brazilian Portuguese the decimal comma is typed and shown, and the point is refused', async ({ page }) => {
   await keeperWithATank(page)
-  await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await choosePortuguese(page)
   await page.getByRole('link', { name: 'Registrar a primeira medição' }).click()
 
   await fillValue(page, 'pH', '6.8')
@@ -206,7 +206,7 @@ test('a keeper reads the water over time: a chart for one parameter at a time, a
   await expect(table.getByRole('cell', { name: '5', exact: true })).toBeVisible()
 
   // Back to the chart, in Portuguese.
-  await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await choosePortuguese(page)
   await expect(page.getByRole('heading', { name: 'Linha do tempo', level: 1 })).toBeVisible()
   await page.getByRole('button', { name: 'Gráfico' }).click()
   await expect(page.getByRole('group', { name: /pH, ao longo do tempo, a partir de 1 data de medição/ })).toBeVisible()

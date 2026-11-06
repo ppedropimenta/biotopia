@@ -248,7 +248,10 @@ export const ptBR: Messages = {
   },
   account: {
     title: 'Sua conta',
-    lead: 'Você entrou como {{email}}.',
+    dataTitle: 'Seus dados',
+    email: 'E-mail',
+    languageTitle: 'Idioma',
+    languageWhat: 'Vale para todo o app e fica salvo na sua conta.',
     deleteTitle: 'Apagar conta',
     deleteWhat:
       'Isto apaga sua conta e todos os aquários dela, com todas as medições, manutenções e fotos. Não pode ser desfeito.',

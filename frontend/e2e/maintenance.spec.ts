@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { fillValue, loggedInKeeper } from './keeper.ts'
+import { choosePortuguese, fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -129,7 +129,7 @@ test('in Brazilian Portuguese the type names and the decimal comma are in Portug
   await page.getByLabel('Start date').fill('2025-03-01')
   await page.getByRole('button', { name: 'Save tank' }).click()
   await expect(page.getByRole('heading', { name: 'Diário', level: 1 })).toBeVisible()
-  await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await choosePortuguese(page)
 
   await page.getByRole('link', { name: 'Registrar manutenção' }).click()
   await page.getByLabel('Água trocada').fill('12.5')

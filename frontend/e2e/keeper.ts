@@ -11,6 +11,13 @@ export async function fillValue(page: Page, name: string, value: string) {
   await input.fill(value)
 }
 
+/** Switches the app to Portuguese from the account page and comes back to the screen the keeper was on. */
+export async function choosePortuguese(page: Page) {
+  await page.getByRole('link', { name: 'Account', exact: true }).click()
+  await page.getByRole('button', { name: 'PT', exact: true }).click()
+  await page.goBack()
+}
+
 /** Signs up a new keeper, confirms the email and logs in, ending on their (empty) list of tanks. */
 export async function loggedInKeeper(page: Page) {
   const address = `keeper-${Date.now()}-${Math.floor(Math.random() * 1000)}@example.com`

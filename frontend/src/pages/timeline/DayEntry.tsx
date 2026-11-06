@@ -14,6 +14,7 @@ import type { Photo } from '../../tanks/photos'
 import { plateOrder } from '../../tanks/plates'
 import type { Tank } from '../../tanks/types'
 import { useLanguage } from '../../tanks/useLanguage'
+import { volumeOf } from '../../tanks/volume'
 import { Delta } from './Controls'
 
 const turns = [-10, 6, -4, 8, -7]
@@ -32,7 +33,7 @@ export function DayEntry({
   day: HistoryDay
   parameters: readonly Parameter[]
   changes: ReadonlyMap<string, Change>
-  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'readOnly'>
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'lengthCm' | 'widthCm' | 'heightCm' | 'readOnly'>
   /** A photo was clicked: the caller shows it larger. */
   onOpenPhoto: (photo: Photo) => void
 }) {
@@ -83,7 +84,8 @@ export function DayEntry({
             const m = entry.entry
             const isWater = m.type === 'water_change' && m.percent !== null
             const percent = isWater ? number(m.percent!) : ''
-            const liters = isWater && tank.netVolumeLiters !== null ? litersOf(m.percent!, tank.netVolumeLiters) : null
+            const volume = volumeOf(tank)
+            const liters = isWater && volume !== null ? litersOf(m.percent!, volume.liters) : null
             return row(
               <div className="grid grid-cols-[64px_1fr] items-center gap-4">
                 <span aria-hidden="true" className="flex justify-center">

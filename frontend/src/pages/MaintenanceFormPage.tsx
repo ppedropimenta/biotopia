@@ -24,6 +24,7 @@ import { formatNumber } from '../tanks/numbers'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
+import { formatVolume, volumeOf } from '../tanks/volume'
 
 /** Records a Maintenance (`mode` "new") or fixes or removes one that exists ("edit"). */
 export function MaintenanceFormPage({ mode }: { mode: 'new' | 'edit' }) {
@@ -56,7 +57,8 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const [busy, setBusy] = useState(false)
   const [confirming, setConfirming] = useState(false)
 
-  const liters = litersOfText(form.percent, language, tank.netVolumeLiters)
+  const volume = volumeOf(tank)
+  const liters = litersOfText(form.percent, language, volume?.liters ?? null)
 
   const message = (key: ErrorKey | undefined) =>
     key && t(key, { example: formatNumber(12.5, language) })
@@ -134,7 +136,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
             autoComplete="off"
             label={t('maintenance.form.percent')}
             unit="%"
-            hint={liters !== null && t('maintenance.form.litersHint', { liters: formatNumber(liters, language), total: formatNumber(tank.netVolumeLiters!, language) })}
+            hint={liters !== null && volume !== null && t(volume.kind === 'net' ? 'maintenance.form.litersHint' : 'maintenance.form.litersHintGross', { liters: formatNumber(liters, language), total: formatVolume(volume, language) })}
             error={message(errors.percent)}
             value={form.percent}
             onChange={(event) => setForm({ ...form, percent: event.target.value })}

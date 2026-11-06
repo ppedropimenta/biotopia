@@ -1,15 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { choosePortuguese, fillValue, loggedInKeeper } from './keeper.ts'
+import { choosePortuguese, createTank, fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
 test('a keeper records a water change and other care, edits one, deletes one and sees the last water change', async ({ page }) => {
   await loggedInKeeper(page)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
-  await page.getByLabel('Name').fill('Care log')
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByLabel('Net volume (liters)').fill('120')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name: 'Care log', netVolume: '120' })
   await expect(page.getByRole('heading', { name: 'Care log', level: 1 })).toBeVisible()
 
   // A tank with no maintenance has no diary on its page; the menu and a button lead to the log.
@@ -96,10 +93,7 @@ test('a keeper records a water change and other care, edits one, deletes one and
 test('a keeper records a water change, a filter cleaning and a substrate cleaning in one go', async ({ page }) => {
   await loggedInKeeper(page)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
-  await page.getByLabel('Name').fill('Weekly care')
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByLabel('Net volume (liters)').fill('100')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name: 'Weekly care', netVolume: '100' })
   await expect(page.getByRole('heading', { name: 'Weekly care', level: 1 })).toBeVisible()
   await page.getByRole('link', { name: 'Log maintenance' }).click()
 
@@ -125,9 +119,7 @@ test('a keeper records a water change, a filter cleaning and a substrate cleanin
 test('in Brazilian Portuguese the type names and the decimal comma are in Portuguese', async ({ page }) => {
   await loggedInKeeper(page)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
-  await page.getByLabel('Name').fill('Diário')
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name: 'Diário' })
   await expect(page.getByRole('heading', { name: 'Diário', level: 1 })).toBeVisible()
   await choosePortuguese(page)
 

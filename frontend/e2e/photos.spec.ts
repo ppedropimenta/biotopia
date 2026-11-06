@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { loggedInKeeper } from './keeper.ts'
+import { createTank, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
@@ -12,9 +12,7 @@ const png = Buffer.from(
 test('a keeper adds a photo, sees it everywhere the tank shows up, edits it and deletes it', async ({ page }) => {
   await loggedInKeeper(page)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
-  await page.getByLabel('Name').fill('Photo tank')
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name: 'Photo tank' })
   await expect(page.getByRole('heading', { name: 'Photo tank', level: 1 })).toBeVisible()
 
   // No photos: no strip on the tank page, an invitation and an empty meter on the photos page.

@@ -11,24 +11,25 @@ import { useLanguage } from './useLanguage'
 const turns = [-10, 6, -4, 8, -7]
 
 /**
- * One Maintenance as a row of the log: its stamp, when it was done and what, and the note. A Water Change shows the liters when the tank's Net Volume is known.
+ * One Maintenance as a row of the log: its stamp, when it was done and what, and the note. A Water Change shows the liters when the tank's volume is known.
  */
 export function MaintenanceEntry({
   entry,
   index,
-  netVolumeLiters,
+  volumeLiters,
   size = 'lg',
 }: {
   entry: Maintenance
   index: number
-  netVolumeLiters: number | null
+  /** The volume the water change is a share of: the tank's Net Volume or, without one, its Gross Volume. */
+  volumeLiters: number | null
   size?: 'md' | 'lg'
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
   const isWaterChange = entry.type === 'water_change' && entry.percent !== null
   const percent = isWaterChange ? formatNumber(entry.percent!, language) : ''
-  const liters = isWaterChange && netVolumeLiters !== null ? litersOf(entry.percent!, netVolumeLiters) : null
+  const liters = isWaterChange && volumeLiters !== null ? litersOf(entry.percent!, volumeLiters) : null
   const type = t(`maintenance.types.${entry.type}`)
   const moment = formatMoment(entry.performedAt, language)
 

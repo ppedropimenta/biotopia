@@ -22,6 +22,7 @@ import { plateNumber } from '../tanks/plates'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
+import { formatVolume, volumeOf } from '../tanks/volume'
 
 /** One tank as its page in the notebook: the drawn plate with the record card, then its water. */
 export function TankPage() {
@@ -108,8 +109,9 @@ function RecordCard({ tank }: { tank: Tank }) {
   const sizes = [tank.lengthCm, tank.widthCm, tank.heightCm]
   const size = (value: number | null) => (value === null ? missing : formatNumber(value, language))
   const facts: Array<[label: string, value: string]> = []
-  if (tank.netVolumeLiters !== null) {
-    facts.push([t('tanks.netVolume'), `${formatNumber(tank.netVolumeLiters, language)} L`])
+  const volume = volumeOf(tank)
+  if (volume !== null) {
+    facts.push([t(volume.kind === 'net' ? 'tanks.netVolume' : 'tanks.grossVolume'), `${formatVolume(volume, language)} L`])
   }
   if (sizes.some((value) => value !== null)) {
     facts.push([t('tanks.page.dimensions'), t('tanks.plate.size', { length: size(sizes[0]), width: size(sizes[1]), height: size(sizes[2]) })])

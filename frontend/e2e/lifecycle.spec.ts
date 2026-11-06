@@ -1,13 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
-import { loggedInKeeper } from './keeper.ts'
+import { createTank, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
 async function addTank(page: Page, name: string) {
   await page.goto('/tanks/new')
-  await page.getByLabel('Name').fill(name)
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name })
   await expect(page.getByRole('heading', { name })).toBeVisible()
 }
 

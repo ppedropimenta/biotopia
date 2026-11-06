@@ -37,7 +37,7 @@ export function Journal({
   maintenance: Maintenance[]
   photos: Photo[]
   parameters: Parameter[]
-  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'readOnly'>
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'lengthCm' | 'widthCm' | 'heightCm' | 'readOnly'>
   from: Date | null
   now: Date
 }) {

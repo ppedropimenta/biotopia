@@ -5,6 +5,7 @@ import { SectionHeader } from '../components/ui/Structure'
 import { MaintenanceEntry } from './MaintenanceEntry'
 import type { Tank } from './types'
 import { useLoad } from './useLoad'
+import { volumeOf } from './volume'
 
 /** How many of the newest entries the tank page shows; the log has the rest. */
 const diaryCount = 3
@@ -23,7 +24,7 @@ export function MaintenanceDiary({ tank }: { tank: Tank }) {
       />
       <ol className="m-0 flex list-none flex-col p-0">
         {loaded.data.map((entry, i) => (
-          <MaintenanceEntry key={entry.id} entry={entry} index={i} netVolumeLiters={tank.netVolumeLiters} size="md" />
+          <MaintenanceEntry key={entry.id} entry={entry} index={i} volumeLiters={volumeOf(tank)?.liters ?? null} size="md" />
         ))}
       </ol>
     </section>

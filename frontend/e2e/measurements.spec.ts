@@ -1,14 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { choosePortuguese, fillValue, loggedInKeeper } from './keeper.ts'
+import { choosePortuguese, createTank, fillValue, loggedInKeeper } from './keeper.ts'
 
 test.use({ locale: 'en-US' })
 
 async function keeperWithATank(page: Page) {
   await loggedInKeeper(page)
   await page.getByRole('link', { name: 'Start a new plate' }).click()
-  await page.getByLabel('Name').fill('Water tests')
-  await page.getByLabel('Start date').fill('2025-03-01')
-  await page.getByRole('button', { name: 'Save tank' }).click()
+  await createTank(page, { name: 'Water tests' })
   await expect(page.getByRole('heading', { name: 'Water tests' })).toBeVisible()
 }
 

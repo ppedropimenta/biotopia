@@ -21,6 +21,7 @@ import { recentSeries } from '../tanks/series'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
+import { formatVolume, volumeOf } from '../tanks/volume'
 
 /** How many of each tank's newest Measurements are read for the small lines on its plate. */
 const sparklineHistory = 100
@@ -113,8 +114,9 @@ function TankPlate({
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
+  const volume = volumeOf(tank)
   const facts = [
-    tank.netVolumeLiters !== null && t('tanks.plate.volume', { value: formatNumber(tank.netVolumeLiters, language) }),
+    volume !== null && t(volume.kind === 'net' ? 'tanks.plate.volume' : 'tanks.plate.volumeGross', { value: formatVolume(volume, language) }),
     tank.lengthCm !== null &&
       tank.widthCm !== null &&
       tank.heightCm !== null &&

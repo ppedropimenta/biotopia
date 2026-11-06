@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Icon } from '../components/ui/Icon'
-import { formatNumber } from './numbers'
 import type { Tank } from './types'
 import { useLanguage } from './useLanguage'
+import { formatVolume, volumeOf } from './volume'
 
 /** The dark head of the measurement and maintenance forms: a way back, the title, and the tank's name and Net Volume. */
 export function MeasurementHeader({
@@ -11,16 +11,17 @@ export function MeasurementHeader({
   title,
   back,
 }: {
-  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters'>
+  tank: Pick<Tank, 'id' | 'name' | 'netVolumeLiters' | 'lengthCm' | 'widthCm' | 'heightCm'>
   title: string
   /** Where the arrow goes and what it says, when not back to the tank. */
   back?: { to: string; label: string }
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
+  const volume = volumeOf(tank)
   const about = [
     tank.name,
-    tank.netVolumeLiters !== null && t('tanks.plate.volume', { value: formatNumber(tank.netVolumeLiters, language) }),
+    volume !== null && t(volume.kind === 'net' ? 'tanks.plate.volume' : 'tanks.plate.volumeGross', { value: formatVolume(volume, language) }),
   ]
     .filter(Boolean)
     .join(' · ')

@@ -324,6 +324,8 @@ export const ptBR: Messages = {
     noWaterChange: 'Nenhuma TPA no período',
     waterChanges_one: '{{count}} troca de água',
     waterChanges_other: '{{count}} trocas de água',
+    prunings_one: '{{count}} poda',
+    prunings_other: '{{count}} podas',
     otherCare_one: '{{count}} outro cuidado',
     otherCare_other: '{{count}} outros cuidados',
     calendar: 'Dias com registro',

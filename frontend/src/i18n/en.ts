@@ -322,6 +322,8 @@ export const en = {
     noWaterChange: 'No water change in the period',
     waterChanges_one: '{{count}} water change',
     waterChanges_other: '{{count}} water changes',
+    prunings_one: '{{count}} pruning',
+    prunings_other: '{{count}} prunings',
     otherCare_one: '{{count}} other care',
     otherCare_other: '{{count}} other care',
     calendar: 'Days with a record',

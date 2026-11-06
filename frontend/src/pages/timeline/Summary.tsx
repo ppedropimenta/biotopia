@@ -50,7 +50,8 @@ const labelWithMark = (kind: Kind, text: string) => (
 )
 
 /**
- * What a keeper wants to know about the tank, in three short lists: when each thing was last done, what the period
+ * What a keeper wants to know about the tank, in three short lists: when each thing was last done (water changes and
+ * pruning have a line of their own among the care), what the period
  * holds (the counts also say what each mark of the calendar means) and the rhythm of the care. The rhythm rows appear
  * only with enough days behind them to mean something.
  */
@@ -74,11 +75,13 @@ export function Summary({
   const entries = days.flatMap((d) => d.entries)
   const water = entries.flatMap((e) => (e.kind === 'maintenance' && e.entry.type === 'water_change' ? [e.entry] : []))
   const measured = entries.filter((e) => e.kind === 'measurements').length
-  const care = entries.filter((e) => e.kind === 'maintenance' && e.entry.type !== 'water_change').length
+  const pruned = entries.filter((e) => e.kind === 'maintenance' && e.entry.type === 'pruning').length
+  const care = entries.filter((e) => e.kind === 'maintenance' && e.entry.type !== 'water_change' && e.entry.type !== 'pruning').length
   const shots = entries.filter((e) => e.kind === 'photo').length
 
   const lastMeasured = newest(measurements.map((m) => m.measuredAt))
   const lastWater = maintenance.filter((m) => m.type === 'water_change').reduce<Maintenance | null>((best, m) => (best === null || Date.parse(m.performedAt) > Date.parse(best.performedAt) ? m : best), null)
+  const lastPruning = newest(maintenance.filter((m) => m.type === 'pruning').map((m) => m.performedAt))
   const lastPhoto = newest(photos.map((p) => p.takenAt))
   const none = <>{t('timeline.none')}</>
 
@@ -97,12 +100,14 @@ export function Summary({
       ),
       muted: !lastWater,
     },
+    { key: 'pruning', label: labelWithMark('care', t('maintenance.types.pruning')), value: ago(lastPruning) ?? none, muted: !lastPruning },
     { key: 'photo', label: labelWithMark('photo', t('timeline.photo')), value: ago(lastPhoto) ?? none, muted: !lastPhoto },
   ]
 
   const counts: Row[] = [
     { key: 'measured', label: labelWithMark('measured', t('timeline.points', { count: measured }).replace(/^\d+\s*/, '')), value: formatNumber(measured, language) },
     { key: 'water', label: labelWithMark('water', t('timeline.waterChanges', { count: water.length }).replace(/^\d+\s*/, '')), value: formatNumber(water.length, language) },
+    { key: 'pruning', label: labelWithMark('care', t('timeline.prunings', { count: pruned }).replace(/^\d+\s*/, '')), value: formatNumber(pruned, language) },
     { key: 'care', label: labelWithMark('care', t('timeline.otherCare', { count: care }).replace(/^\d+\s*/, '')), value: formatNumber(care, language) },
     { key: 'photo', label: labelWithMark('photo', t('photos.count', { count: shots }).replace(/^\d+\s*/, '')), value: formatNumber(shots, language) },
   ]

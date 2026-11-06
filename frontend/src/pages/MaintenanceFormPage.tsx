@@ -43,7 +43,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const { t } = useTranslation()
   const language = useLanguage()
   const navigate = useNavigate()
-  const list = `/tanks/${tank.id}/maintenance`
+  const list = `/tanks/${tank.id}/timeline`
   // "Now" is only prefilled for the person to see; a new record sends no moment unless they change it.
   const [form, setForm] = useState<MaintenanceForm>(() => ({
     types: [entry?.type ?? 'water_change'],

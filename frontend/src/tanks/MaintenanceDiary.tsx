@@ -19,7 +19,7 @@ export function MaintenanceDiary({ tank }: { tank: Tank }) {
     <section className="flex flex-col gap-1">
       <SectionHeader
         title={t('maintenance.diary.title')}
-        aside={<Link to={`/tanks/${tank.id}/maintenance`}>{t('maintenance.diary.seeAll')}</Link>}
+        aside={<Link to={`/tanks/${tank.id}/timeline`}>{t('maintenance.diary.seeAll')}</Link>}
       />
       <ol className="m-0 flex list-none flex-col p-0">
         {loaded.data.map((entry, i) => (

@@ -8,9 +8,9 @@ export const en = {
       myTanks: 'My tanks',
       overview: 'Overview',
       timeline: 'Timeline',
-      maintenance: 'Maintenance',
       photos: 'Photos',
       logMeasurement: 'Log measurement',
+      logMaintenance: 'Log maintenance',
       logIn: 'Log in',
       logOut: 'Log out',
       credits: 'Credits',
@@ -378,8 +378,6 @@ export const en = {
     },
   },
   maintenance: {
-    title: 'Maintenance',
-    lead: 'Care work already done, newest first.',
     record: 'Maintenance',
     recordLabel: 'Record maintenance',
     types: {
@@ -405,16 +403,13 @@ export const en = {
     diary: { title: 'Maintenance diary', seeAll: 'All maintenance →' },
     lastWaterChange: 'Last water change: {{percent}}% · {{when}}',
     list: {
-      empty: 'No maintenance yet. Record a water change, a pruning or any other care and it shows up here.',
-      emptyCta: 'Record the first maintenance',
-      loadFailed: 'The maintenance could not be loaded. Try again in a moment.',
       edit: 'Edit',
       editLabel: 'Edit {{type}} from {{moment}}',
     },
     form: {
       newTitle: 'Record maintenance',
       editTitle: 'Edit maintenance',
-      back: 'Back to maintenance',
+      back: 'Back to the timeline',
       type: 'What was done',
       typeHint: 'Pick everything you did. Each becomes its own record.',
       percent: 'Water replaced',

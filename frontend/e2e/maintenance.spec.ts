@@ -14,10 +14,7 @@ test('a keeper records a water change and other care, edits one, deletes one and
 
   // A tank with no maintenance has no diary on its page; the menu and a button lead to the log.
   await expect(page.getByRole('heading', { name: 'Maintenance diary' })).toHaveCount(0)
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Maintenance' }).click()
-  await expect(page.getByRole('heading', { name: 'Maintenance', level: 1 })).toBeVisible()
-  await expect(page.getByText('No maintenance yet.')).toBeVisible()
-  await page.getByRole('link', { name: 'Record the first maintenance' }).click()
+  await page.getByRole('link', { name: 'Log maintenance' }).click()
 
   // A water change is the first choice and needs a percentage above 0 and at most 100.
   await expect(page.getByRole('heading', { name: 'Record maintenance', level: 1 })).toBeVisible()
@@ -31,14 +28,14 @@ test('a keeper records a water change and other care, edits one, deletes one and
   await page.getByLabel('Note').fill('RO water')
   await page.getByRole('button', { name: 'Save maintenance' }).click()
 
-  // The log shows it, with the liters worked out from the net volume.
-  await expect(page.getByRole('heading', { name: 'Maintenance', level: 1 })).toBeVisible()
+  // The timeline's journal shows it, with the liters worked out from the net volume.
+  await expect(page.getByRole('heading', { name: 'Timeline', level: 1 })).toBeVisible()
   await expect(page.getByText('Water change · 30% of the water')).toBeVisible()
   await expect(page.getByText('RO water')).toBeVisible()
   await expect(page.getByText('36 L')).toBeVisible()
 
   // Other has no percentage and needs a note.
-  await page.getByRole('main').getByRole('link', { name: 'Maintenance', exact: true }).click()
+  await page.getByRole('link', { name: 'Log maintenance' }).click()
   await page.getByRole('button', { name: 'Water change', pressed: true }).click()
   await page.getByRole('button', { name: 'Other', pressed: false }).click()
   await expect(page.getByLabel('Water replaced')).toHaveCount(0)
@@ -104,8 +101,7 @@ test('a keeper records a water change, a filter cleaning and a substrate cleanin
   await page.getByLabel('Net volume (liters)').fill('100')
   await page.getByRole('button', { name: 'Save tank' }).click()
   await expect(page.getByRole('heading', { name: 'Weekly care', level: 1 })).toBeVisible()
-  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Maintenance' }).click()
-  await page.getByRole('link', { name: 'Record the first maintenance' }).click()
+  await page.getByRole('link', { name: 'Log maintenance' }).click()
 
   // At least one type is needed.
   await page.getByRole('button', { name: 'Water change', pressed: true }).click()

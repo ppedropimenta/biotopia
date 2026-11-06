@@ -121,3 +121,13 @@ export function LogMeasurementCta({ to }: { to: string }) {
     </ButtonLink>
   )
 }
+
+/** The quieter "Log maintenance" button under it, for the screens of one tank. */
+export function LogMaintenanceCta({ to }: { to: string }) {
+  const { t } = useTranslation()
+  return (
+    <ButtonLink to={to} variant="onDark" icon="plus" className="w-full" aria-label={t('ui.nav.logMaintenance')}>
+      {t('maintenance.record')}
+    </ButtonLink>
+  )
+}

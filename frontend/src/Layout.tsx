@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link, Outlet, useLocation } from 'react-router'
 import { useAuth } from './auth/context'
-import { AppShell, LogMeasurementCta, SideNav, SkipLink } from './components/layout/AppShell'
+import { AppShell, LogMaintenanceCta, LogMeasurementCta, SideNav, SkipLink } from './components/layout/AppShell'
 import { DemoBanner } from './components/layout/DemoBanner'
 import { demoNavGroups, navGroups } from './components/layout/navGroups'
 import { PublicHeader } from './components/layout/PublicHeader'
@@ -32,7 +32,12 @@ export function Layout() {
         nav={
           <SideNav
             groups={navGroups(t, tank)}
-            cta={<LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />}
+            cta={
+              <div className="flex flex-col gap-2">
+                <LogMeasurementCta to={tank ? `/tanks/${tank.id}/measure` : '/tanks'} />
+                {tank && <LogMaintenanceCta to={`/tanks/${tank.id}/maintenance/new`} />}
+              </div>
+            }
             footer={
               <>
                 <Link to="/account" className={footerLink}>

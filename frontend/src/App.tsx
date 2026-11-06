@@ -13,7 +13,6 @@ import { DemoPage } from './pages/DemoPage'
 import { HomePage } from './pages/HomePage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { MaintenanceFormPage } from './pages/MaintenanceFormPage'
-import { MaintenancePage } from './pages/MaintenancePage'
 import { PhotoFormPage } from './pages/PhotoFormPage'
 import { PhotosPage } from './pages/PhotosPage'
 import { MeasurementEditPage } from './pages/MeasurementEditPage'
@@ -52,7 +51,6 @@ export default function App() {
             <Route element={<RequireAuthUnlessDemo />}>
               <Route path="tanks/:id" element={<TankPage />} />
               <Route path="tanks/:id/timeline" element={<TimelinePage />} />
-              <Route path="tanks/:id/maintenance" element={<MaintenancePage />} />
               <Route path="tanks/:id/photos" element={<PhotosPage />} />
             </Route>
             <Route element={<RequireAuth />}>

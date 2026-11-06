@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { Handwritten } from '../../components/ui/Paper'
 import { Stamp } from '../../components/ui/Stamp'
 import { cx } from '../../lib/cx'
 import type { HistoryDay } from '../../tanks/history'
 import type { Change } from '../../tanks/latest'
 import { litersOf, stampTones } from '../../tanks/maintenance'
-import { valueDecimals, type Parameter } from '../../tanks/measurements'
+import { formatMoment, valueDecimals, type Parameter } from '../../tanks/measurements'
 import { formatNumber } from '../../tanks/numbers'
 import { PhotoCard } from '../../tanks/PhotoCard'
 import type { Photo } from '../../tanks/photos'
@@ -105,6 +106,18 @@ export function DayEntry({
                     <Handwritten as="p" size="sm" className="m-0 whitespace-pre-line [overflow-wrap:anywhere]">
                       {m.note}
                     </Handwritten>
+                  )}
+                  {!tank.readOnly && (
+                    <Link
+                      to={`/tanks/${tank.id}/maintenance/${m.id}/edit`}
+                      aria-label={t('maintenance.list.editLabel', {
+                        type: t(`maintenance.types.${m.type}`),
+                        moment: formatMoment(m.performedAt, language),
+                      })}
+                      className="inline-flex min-h-11 items-center self-start font-mono text-label"
+                    >
+                      {t('maintenance.list.edit')}
+                    </Link>
                   )}
                 </div>
               </div>,

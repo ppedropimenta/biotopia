@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
 import { Handwritten } from '../components/ui/Paper'
 import { Stamp } from '../components/ui/Stamp'
 import { cx } from '../lib/cx'
@@ -12,21 +11,18 @@ import { useLanguage } from './useLanguage'
 const turns = [-10, 6, -4, 8, -7]
 
 /**
- * One Maintenance as a row of the log: its stamp, when it was done and what, and the note. With `editTo`, a link
- * to edit it. A Water Change shows the liters when the tank's Net Volume is known.
+ * One Maintenance as a row of the log: its stamp, when it was done and what, and the note. A Water Change shows the liters when the tank's Net Volume is known.
  */
 export function MaintenanceEntry({
   entry,
   index,
   netVolumeLiters,
   size = 'lg',
-  editTo,
 }: {
   entry: Maintenance
   index: number
   netVolumeLiters: number | null
   size?: 'md' | 'lg'
-  editTo?: string
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
@@ -64,15 +60,6 @@ export function MaintenanceEntry({
           <Handwritten as="p" size="sm" className="m-0 whitespace-pre-line [overflow-wrap:anywhere]">
             {entry.note}
           </Handwritten>
-        )}
-        {editTo && (
-          <Link
-            to={editTo}
-            aria-label={t('maintenance.list.editLabel', { type, moment })}
-            className="inline-flex min-h-11 items-center self-start font-mono text-label"
-          >
-            {t('maintenance.list.edit')}
-          </Link>
         )}
       </div>
     </li>

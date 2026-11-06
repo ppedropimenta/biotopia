@@ -10,9 +10,9 @@ export const ptBR: Messages = {
       myTanks: 'Meus aquários',
       overview: 'Visão geral',
       timeline: 'Linha do tempo',
-      maintenance: 'Manutenção',
       photos: 'Fotos',
       logMeasurement: 'Registrar medição',
+      logMaintenance: 'Registrar manutenção',
       logIn: 'Entrar',
       logOut: 'Sair',
       credits: 'Créditos',
@@ -380,8 +380,6 @@ export const ptBR: Messages = {
     },
   },
   maintenance: {
-    title: 'Manutenção',
-    lead: 'O cuidado já feito, do mais recente para o mais antigo.',
     record: 'Manutenção',
     recordLabel: 'Registrar manutenção',
     types: {
@@ -407,16 +405,13 @@ export const ptBR: Messages = {
     diary: { title: 'Diário de manutenção', seeAll: 'Toda a manutenção →' },
     lastWaterChange: 'Última troca de água: {{percent}}% · {{when}}',
     list: {
-      empty: 'Nenhuma manutenção ainda. Registre uma troca de água, uma poda ou outro cuidado e ele aparece aqui.',
-      emptyCta: 'Registrar a primeira manutenção',
-      loadFailed: 'Não foi possível carregar a manutenção. Tente de novo em instantes.',
       edit: 'Editar',
       editLabel: 'Editar {{type}} de {{moment}}',
     },
     form: {
       newTitle: 'Registrar manutenção',
       editTitle: 'Editar manutenção',
-      back: 'Voltar à manutenção',
+      back: 'Voltar à linha do tempo',
       type: 'O que foi feito',
       typeHint: 'Marque tudo o que fez. Cada item vira um registro.',
       percent: 'Água trocada',

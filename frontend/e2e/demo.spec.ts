@@ -16,11 +16,11 @@ test('a visitor opens the demo tank from the landing page and can only read it',
 
   // The rest of the demo reads the same way, from its own menu.
   const menu = page.getByRole('navigation', { name: 'Main navigation' })
-  await menu.getByRole('link', { name: 'Maintenance' }).click()
-  await expect(page.getByRole('heading', { level: 1, name: 'Maintenance' })).toBeVisible()
-  await expect(page.getByRole('link', { name: /^Edit/ })).toHaveCount(0)
+  await expect(menu.getByRole('link', { name: 'Maintenance' })).toHaveCount(0)
   await menu.getByRole('link', { name: 'Timeline' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Timeline' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Edit/ })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Log maintenance' })).toHaveCount(0)
   await menu.getByRole('link', { name: 'Photos' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Photos' })).toBeVisible()
 

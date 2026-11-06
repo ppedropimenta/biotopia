@@ -12,6 +12,8 @@ test('a keeper who is logged in sees the landing page in the public frame, with 
   // No side menu (its Account link is part of it) and no Log in: only the way back to the tanks.
   await expect(page.getByRole('link', { name: 'Account', exact: true })).toHaveCount(0)
   await expect(header.getByRole('link', { name: 'Log in' })).toHaveCount(0)
+  // The language is chosen on the account page once logged in, so the header has no PT / EN.
+  await expect(header.getByRole('button', { name: 'PT', exact: true })).toHaveCount(0)
 
   await header.getByRole('link', { name: 'My tanks' }).click()
   await expect(page).toHaveURL(/\/tanks$/)

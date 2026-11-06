@@ -5,7 +5,7 @@ import { buttonClasses } from '../ui/buttonClasses'
 
 /**
  * The bar of the public pages on blackwater: the brand, PT / EN and Log in. For a keeper who is logged in
- * (`signedIn`) the last button is "My tanks" instead.
+ * (`signedIn`) the last button is "My tanks" instead and there is no PT / EN: the language is on the account page.
  */
 export function PublicHeader({
   links = [],
@@ -22,13 +22,14 @@ export function PublicHeader({
       <nav aria-label={t('ui.nav.label')} className="relative mx-auto flex max-w-site flex-wrap items-center gap-x-7 gap-y-4 px-6 py-4.5">
         <Wordmark size="lg" />
         <div className="flex-auto" />
-        <div className="flex flex-wrap items-center gap-5.5 font-mono text-sm tracking-[0.04em]">
+        <div className="flex min-h-11.5 flex-wrap items-center gap-5.5 font-mono text-sm tracking-[0.04em]">
           {links.map((link) => (
             <Link key={link.to} to={link.to} className="inline-flex min-h-11 items-center text-river-bright no-underline hover:text-amber">
               {link.label}
             </Link>
           ))}
-          <LanguageToggle tone="dark" />
+          {/* Once logged in, the language is chosen on the account page. */}
+          {!signedIn && <LanguageToggle tone="dark" />}
           <Link to={signedIn ? '/tanks' : logInTo} className={buttonClasses('onDark')}>
             {t(signedIn ? 'ui.nav.myTanks' : 'ui.nav.logIn')}
           </Link>

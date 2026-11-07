@@ -413,6 +413,7 @@ export const en = {
       in_future: 'This moment has not happened yet.',
       note_too_long: 'Use at most 2000 characters.',
       quota: 'Your photo storage is full. Delete a photo to make room.',
+      busy: 'The server is busy with other photos. Try again in a few seconds.',
       not_found: 'This photo does not exist.',
       archived: 'This tank is archived, so it takes no new records. Restore it first.',
       generic: 'Something went wrong. Try again in a moment.',

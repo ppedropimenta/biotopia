@@ -39,6 +39,10 @@ describe('describePhotoError', () => {
     expect(describePhotoError(new ApiError(404, 'tank_not_found'))).toEqual({ general: 'photos.errors.not_found' })
   })
 
+  it('tells that the server is busy with other photos', () => {
+    expect(describePhotoError(new ApiError(503, 'photo_busy'))).toEqual({ general: 'photos.errors.busy' })
+  })
+
   it('falls back to a generic message for anything else', () => {
     expect(describePhotoError(new Error('network'))).toEqual({ general: 'photos.errors.generic' })
     expect(describePhotoError(new ApiError(500, 'unknown'))).toEqual({ general: 'photos.errors.generic' })

@@ -415,6 +415,7 @@ export const ptBR: Messages = {
       in_future: 'Este momento ainda não aconteceu.',
       note_too_long: 'Use no máximo 2000 caracteres.',
       quota: 'Seu armazenamento de fotos está cheio. Apague uma foto para abrir espaço.',
+      busy: 'O servidor está ocupado com outras fotos. Tente de novo em alguns segundos.',
       not_found: 'Esta foto não existe.',
       archived: 'Este aquário está arquivado e não recebe novos registros. Restaure-o antes.',
       generic: 'Algo deu errado. Tente de novo em instantes.',

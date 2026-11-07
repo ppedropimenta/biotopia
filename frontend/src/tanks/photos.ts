@@ -35,6 +35,7 @@ export type ErrorKey =
   | 'photos.errors.in_future'
   | 'photos.errors.note_too_long'
   | 'photos.errors.quota'
+  | 'photos.errors.busy'
   | 'photos.errors.not_found'
   | 'photos.errors.archived'
   | 'photos.errors.generic'
@@ -60,6 +61,7 @@ export function describePhotoError(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) return { general: 'photos.errors.generic' }
   if (error.code === 'tank_archived') return { general: 'photos.errors.archived' }
   if (error.code === 'photo_quota_exceeded') return { general: 'photos.errors.quota' }
+  if (error.code === 'photo_busy') return { general: 'photos.errors.busy' }
   if (error.code === 'tank_not_found' || error.code === 'photo_not_found') return { general: 'photos.errors.not_found' }
 
   if (error.code === 'validation_failed') {

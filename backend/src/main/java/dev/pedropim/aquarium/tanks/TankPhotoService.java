@@ -1,20 +1,25 @@
 package dev.pedropim.aquarium.tanks;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Limit;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import dev.pedropim.aquarium.web.ApiException;
 
@@ -28,6 +33,12 @@ class TankPhotoService {
 
 	private static final int MAX_LIST = 1000;
 
+	/**
+	 * How many pictures are decoded at the same time. Decoding takes a core and up to about 100 MB of memory, so more
+	 * than two at once could starve everything else on a small server.
+	 */
+	private static final int MAX_DECODES = 2;
+
 	private final TankService tanks;
 
 	private final TankPhotoRepository photos;
@@ -40,14 +51,24 @@ class TankPhotoService {
 
 	private final long quotaBytes;
 
+	private final TransactionTemplate transaction;
+
+	private final Semaphore decodeSlots = new Semaphore(MAX_DECODES);
+
+	/** How long an upload waits for a free slot before it is told to try later. Bounded, since each waiting upload holds up to 10 MB. */
+	private final Duration decodeWait;
+
 	TankPhotoService(TankService tanks, TankPhotoRepository photos, PhotoStorage storage, PhotoProcessor processor,
-			Clock clock, @Value("${app.photos.quota-bytes}") long quotaBytes) {
+			Clock clock, PlatformTransactionManager transactions, @Value("${app.photos.quota-bytes}") long quotaBytes,
+			@Value("${app.photos.decode-wait:3s}") Duration decodeWait) {
 		this.tanks = tanks;
 		this.photos = photos;
 		this.storage = storage;
 		this.processor = processor;
 		this.clock = clock;
 		this.quotaBytes = quotaBytes;
+		this.transaction = new TransactionTemplate(transactions);
+		this.decodeWait = decodeWait;
 	}
 
 	/** The newest Tank Photos first (by their date), at most {@code limit} of them, kept between 1 and {@value #MAX_LIST}. */
@@ -89,8 +110,11 @@ class TankPhotoService {
 	/**
 	 * Stores an uploaded picture: checks it, strips and shrinks it, and refuses it when the user's quota cannot hold
 	 * the result. {@code takenAt} is the text the client sent (an instant); missing means now.
+	 * <p>
+	 * The decode, the slow part, runs with no transaction and so with no database connection. Only the last step,
+	 * the one that reads and writes rows, is a transaction (started by hand: a {@code @Transactional} method called from
+	 * this class would not go through the proxy).
 	 */
-	@Transactional
 	PhotoView upload(UUID ownerId, UUID tankId, byte[] original, String takenAtText, String note) {
 		tanks.requireActive(ownerId, tankId);
 		Instant now = clock.instant();
@@ -99,7 +123,32 @@ class TankPhotoService {
 		if (original.length > MAX_UPLOAD_BYTES) {
 			throw new ApiException(HttpStatus.CONTENT_TOO_LARGE, "validation_failed", Map.of("file", "too_large"));
 		}
-		PhotoProcessor.Processed processed = processor.process(original);
+		PhotoProcessor.Processed processed = decodeInASlot(original);
+		return transaction.execute(status -> store(ownerId, tankId, processed, takenAt, cleanNote(note), now));
+	}
+
+	private PhotoProcessor.Processed decodeInASlot(byte[] original) {
+		try {
+			if (!decodeSlots.tryAcquire(decodeWait.toMillis(), TimeUnit.MILLISECONDS)) {
+				throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "photo_busy");
+			}
+		}
+		catch (InterruptedException interrupted) {
+			Thread.currentThread().interrupt();
+			throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "photo_busy");
+		}
+		try {
+			return processor.process(original);
+		}
+		finally {
+			decodeSlots.release();
+		}
+	}
+
+	/** The part of an upload that needs the database. The Tank is checked again: it may have been archived while decoding. */
+	private PhotoView store(UUID ownerId, UUID tankId, PhotoProcessor.Processed processed, Instant takenAt, String note,
+			Instant now) {
+		tanks.requireActive(ownerId, tankId);
 		photos.lockUploadsOf(ownerId);
 		if (photos.storedBytesOf(ownerId) + processed.jpeg().length > quotaBytes) {
 			throw new ApiException(HttpStatus.CONTENT_TOO_LARGE, "photo_quota_exceeded");
@@ -117,8 +166,8 @@ class TankPhotoService {
 				}
 			}
 		});
-		return PhotoView.of(photos.saveAndFlush(new TankPhoto(id, tankId, takenAt, cleanNote(note), key,
-				processed.jpeg().length, processed.width(), processed.height(), now)));
+		return PhotoView.of(photos.saveAndFlush(new TankPhoto(id, tankId, takenAt, note, key, processed.jpeg().length,
+				processed.width(), processed.height(), now)));
 	}
 
 	@Transactional

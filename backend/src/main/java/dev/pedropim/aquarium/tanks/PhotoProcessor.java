@@ -36,6 +36,14 @@ class PhotoProcessor {
 	/** Decoding needs about 4 bytes a pixel, so this keeps one upload under roughly 100 MB of memory. */
 	private static final long MAX_PIXELS = 25_000_000L;
 
+	/**
+	 * A progressive JPEG is drawn in passes called scans, and the decoder goes over the whole picture for each one,
+	 * at roughly 40 ms a scan for 25 megapixels. A file of a few KB can ask for thousands of them. Real encoders write
+	 * about 10 (libjpeg's default progressive script has 10, and the Java encoder writes 10 too), so 100 leaves room
+	 * for unusual encoders and still caps the work at a few seconds.
+	 */
+	static final int MAX_SCANS = 100;
+
 	private static final float JPEG_QUALITY = 0.85f;
 
 	/** The names ImageIO gives the readers of the accepted formats. */
@@ -46,6 +54,9 @@ class PhotoProcessor {
 	}
 
 	Processed process(byte[] original) {
+		if (scansOf(original) > MAX_SCANS) {
+			throw unsupported();
+		}
 		BufferedImage decoded = decode(original);
 		BufferedImage upright = orient(decoded, readOrientation(original));
 		BufferedImage resized = fit(upright);
@@ -118,6 +129,47 @@ class PhotoProcessor {
 			i += 2 + length;
 		}
 		return 1;
+	}
+
+	/**
+	 * The number of scans (SOS segments) of a JPEG, 0 when the bytes are not one. The segments are walked one by one
+	 * instead of searching for the bytes FF DA, because those bytes can appear by chance inside metadata. Inside the
+	 * data of a scan an FF is only a marker when the byte after it is not 00 (a stuffed FF), D0 to D7 (a restart) or
+	 * another FF (padding).
+	 */
+	static int scansOf(byte[] jpeg) {
+		if (jpeg.length < 4 || (jpeg[0] & 0xFF) != 0xFF || (jpeg[1] & 0xFF) != 0xD8) {
+			return 0;
+		}
+		int scans = 0;
+		int i = 2;
+		while (i + 2 <= jpeg.length) {
+			if ((jpeg[i] & 0xFF) != 0xFF) {
+				i++;
+				continue;
+			}
+			int marker = jpeg[i + 1] & 0xFF;
+			if (marker == 0xFF) {
+				i++;
+			}
+			else if (marker == 0x00 || marker == 0x01 || marker >= 0xD0 && marker <= 0xD8) {
+				i += 2;
+			}
+			else if (marker == 0xD9) {
+				break;
+			}
+			else {
+				if (marker == 0xDA) {
+					scans++;
+				}
+				if (i + 4 > jpeg.length) {
+					break;
+				}
+				// The length counts its own two bytes; for a scan, what follows is entropy data, skipped above.
+				i += 2 + u16(jpeg, i + 2, false);
+			}
+		}
+		return scans;
 	}
 
 	private static int tiffOrientation(byte[] b, int tiff, int end) {

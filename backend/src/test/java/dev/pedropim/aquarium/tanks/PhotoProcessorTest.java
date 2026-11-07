@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 
 import org.junit.jupiter.api.Test;
 
@@ -107,6 +110,46 @@ class PhotoProcessorTest {
 	}
 
 	@Test
+	void aJpegWithThousandsOfScansIsRefusedAtOnce() throws IOException {
+		byte[] hostile = ManyScanJpeg.build(64, 64, 3000);
+
+		long started = System.nanoTime();
+		assertThatThrownBy(() -> processor.process(hostile))
+			.isInstanceOfSatisfying(ApiException.class, e -> assertThat(e.fields()).containsEntry("file", "unsupported_type"));
+
+		assertThat((System.nanoTime() - started) / 1_000_000).isLessThan(500);
+	}
+
+	@Test
+	void aRealProgressiveJpegIsAccepted() throws IOException {
+		BufferedImage image = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = image.createGraphics();
+		g.setPaint(new java.awt.GradientPaint(0, 0, Color.RED, 400, 300, Color.BLUE));
+		g.fillRect(0, 0, 400, 300);
+		g.dispose();
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+		ImageWriteParam params = writer.getDefaultWriteParam();
+		params.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try (var stream = ImageIO.createImageOutputStream(out)) {
+			writer.setOutput(stream);
+			writer.write(null, new IIOImage(image, null, null), params);
+		}
+		writer.dispose();
+		assertThat(Images.scans(out.toByteArray())).isGreaterThan(1);
+
+		assertThat(processor.process(out.toByteArray()).width()).isEqualTo(400);
+	}
+
+	@Test
+	void scanMarkerBytesInsideMetadataAreNotCounted() {
+		// 500 look-alikes in a comment-sized Exif text; the real image has one scan.
+		byte[] noisy = Images.withExif(Images.jpeg(60, 40), 1, "ÿÚ".repeat(500));
+
+		assertThat(processor.process(noisy).width()).isEqualTo(60);
+	}
+
+	@Test
 	void aPictureWithTooManyPixelsIsRefusedBeforeItIsDecoded() throws IOException {
 		// 10 000 x 10 000 compresses to a few KB when blank, but needs 400 MB to decode.
 		BufferedImage huge = new BufferedImage(10_000, 10_000, BufferedImage.TYPE_BYTE_GRAY);
@@ -180,6 +223,17 @@ class PhotoProcessorTest {
 			out.writeBytes(tiff.toByteArray());
 			out.write(jpeg, 2, jpeg.length - 2);
 			return out.toByteArray();
+		}
+
+		/** How many scans (SOS segments) the JPEG has, counted with the test's own simple walk of the markers. */
+		static int scans(byte[] jpeg) {
+			int count = 0;
+			for (int i = 2; i + 1 < jpeg.length; i++) {
+				if ((jpeg[i] & 0xFF) == 0xFF && (jpeg[i + 1] & 0xFF) == 0xDA) {
+					count++;
+				}
+			}
+			return count;
 		}
 
 		/** The marker codes of the segments before the image data starts. */

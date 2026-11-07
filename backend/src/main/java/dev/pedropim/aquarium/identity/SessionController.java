@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @RestController
 class SessionController {
@@ -130,7 +131,8 @@ class SessionController {
 	}
 
 	/** {@code remember} is optional: callers that do not send it get the 30-day session as before. */
-	record LoginRequest(@NotBlank(message = "invalid") String email, @NotBlank(message = "invalid") String password,
+	record LoginRequest(@NotBlank(message = "invalid") @Size(max = Limits.EMAIL, message = "invalid") String email,
+			@NotBlank(message = "invalid") @Size(max = Limits.PASSWORD, message = "invalid") String password,
 			Boolean remember) {
 
 		boolean keepLoggedIn() {
@@ -139,7 +141,7 @@ class SessionController {
 
 	}
 
-	record DeletionRequest(@NotBlank(message = "invalid") String password) {
+	record DeletionRequest(@NotBlank(message = "invalid") @Size(max = Limits.PASSWORD, message = "invalid") String password) {
 	}
 
 	record LanguageRequest(@Pattern(regexp = "en|pt-BR", message = "unsupported") String language) {

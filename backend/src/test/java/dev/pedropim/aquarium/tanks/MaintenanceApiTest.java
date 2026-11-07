@@ -208,6 +208,16 @@ class MaintenanceApiTest {
 		assertThat(keeper.get(maintenance(tankId)).items().getFirst().get("type")).isEqualTo("top_up");
 	}
 
+	/** The largest request a person can legitimately send (about 25 KB) must pass the body size limits. */
+	@Test
+	void theLargestBatchStillPassesTheBodyLimits() {
+		Response response = keeper.post(maintenance(tankId) + "/batch",
+				Collections.nCopies(10, Map.of("type", "pruning", "note", "n".repeat(2000))));
+
+		assertThat(response.status()).isEqualTo(201);
+		assertThat(response.items()).hasSize(10);
+	}
+
 	@Test
 	void severalMaintenanceDoneTogetherAreRecordedAtTheSameMoment() {
 		Instant now = clock.instant();

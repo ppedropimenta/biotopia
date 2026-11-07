@@ -3,7 +3,24 @@
 {$DOMAIN} {
 	encode zstd gzip
 
+	# Body size limits: a body over the limit gets a 413 before the backend reads it (the same limit is checked again
+	# by the backend's JSON parser). Only a Tank Photo upload (POST /api/tanks/<id>/photos) may be large: the
+	# backend accepts 10 MB plus form fields. "MB" here is 1,000,000 bytes.
+	@photoUpload {
+		method POST
+		path_regexp ^/api/tanks/[^/]+/photos/?$
+	}
+	handle @photoUpload {
+		request_body {
+			max_size 12MB
+		}
+		reverse_proxy backend:8080
+	}
+
 	handle /api/* {
+		request_body {
+			max_size 1MB
+		}
 		reverse_proxy backend:8080
 	}
 

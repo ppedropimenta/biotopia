@@ -54,10 +54,13 @@ class AccountService {
 
 	private final String publicUrl;
 
+	private final RateLimits limits;
+
 	AccountService(UserRepository users, ConfirmationTokenRepository tokens,
 			PasswordResetTokenRepository resetTokens, PasswordEncoder passwordEncoder, EmailSender emailSender,
 			TankErasure tankErasure, Clock clock, PlatformTransactionManager transactions,
-			@Value("${app.public-url}") String publicUrl) {
+			RateLimits limits, @Value("${app.public-url}") String publicUrl) {
+		this.limits = limits;
 		this.users = users;
 		this.tokens = tokens;
 		this.resetTokens = resetTokens;
@@ -96,7 +99,11 @@ class AccountService {
 
 	/** Silent about who has an account: unknown and already confirmed addresses get nothing, and no error. */
 	void resendConfirmation(String email) {
-		Email confirmation = transaction.execute(status -> users.findByEmail(Emails.normalized(email))
+		String address = Emails.normalized(email);
+		if (!limits.mayEmail(address)) {
+			return;
+		}
+		Email confirmation = transaction.execute(status -> users.findByEmail(address)
 			.filter(user -> !user.isConfirmed())
 			.map(user -> {
 				tokens.deleteByUserId(user.id());
@@ -119,7 +126,11 @@ class AccountService {
 
 	/** Silent about who has an account: an unknown address gets no email, and the same answer as a known one. */
 	void requestPasswordReset(String email) {
-		Email reset = transaction.execute(status -> users.findByEmail(Emails.normalized(email)).map(user -> {
+		String address = Emails.normalized(email);
+		if (!limits.mayEmail(address)) {
+			return;
+		}
+		Email reset = transaction.execute(status -> users.findByEmail(address).map(user -> {
 			resetTokens.deleteByUserId(user.id());
 			String token = LinkTokens.generate();
 			resetTokens.save(

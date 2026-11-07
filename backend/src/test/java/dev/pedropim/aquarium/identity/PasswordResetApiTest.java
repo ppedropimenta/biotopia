@@ -190,6 +190,8 @@ class PasswordResetApiTest {
 		confirmedAccount("en");
 		forgotPassword(email);
 		String first = resetToken();
+		// Asking again within 2 minutes sends nothing (RateLimitApiTest), so the second request waits.
+		clock.advance(Duration.ofMinutes(3));
 		forgotPassword(email);
 		String second = resetToken();
 

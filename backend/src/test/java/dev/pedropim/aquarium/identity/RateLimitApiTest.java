@@ -186,6 +186,81 @@ class RateLimitApiTest {
 		assertThat(viaHttp.strictTransportSecurity()).isNull();
 	}
 
+	@Test
+	void aSecondResetRequestWithinTwoMinutesSendsNothingAndTheFirstLinkKeepsWorking() {
+		String email = confirmedAccount();
+		ApiClient visitor = new ApiClient(port);
+		mail.clear();
+		assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", email)).status()).isEqualTo(204);
+		String firstLink = tokenIn(mail.sentTo(email).getLast().body());
+
+		clock.advance(Duration.ofSeconds(90));
+		assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", email)).status()).isEqualTo(204);
+		assertThat(new ApiClient(port).post("/api/auth/forgot-password", Map.of("email", email)).status()).isEqualTo(204);
+
+		assertThat(mail.sentTo(email)).hasSize(1);
+		assertThat(visitor.post("/api/auth/reset-password", Map.of("token", firstLink, "password", "a brand new passphrase"))
+			.status()).isEqualTo(204);
+	}
+
+	@Test
+	void afterTwoMinutesANewResetEmailGoesOutAndReplacesTheOlderLink() {
+		String email = confirmedAccount();
+		ApiClient visitor = new ApiClient(port);
+		mail.clear();
+		visitor.post("/api/auth/forgot-password", Map.of("email", email));
+		String firstLink = tokenIn(mail.sentTo(email).getLast().body());
+
+		clock.advance(Duration.ofMinutes(2).plusSeconds(1));
+		visitor.post("/api/auth/forgot-password", Map.of("email", email));
+
+		assertThat(mail.sentTo(email)).hasSize(2);
+		assertThat(visitor.post("/api/auth/reset-password", Map.of("token", firstLink, "password", "a brand new passphrase"))
+			.status()).isEqualTo(400);
+	}
+
+	@Test
+	void fiveEmailsADayToOneAddressThenNothingUntilTheDayIsOver() {
+		String email = confirmedAccount();
+		ApiClient visitor = new ApiClient(port);
+		mail.clear();
+		for (int i = 0; i < 8; i++) {
+			assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", email)).status()).isEqualTo(204);
+			clock.advance(Duration.ofMinutes(3));
+		}
+		assertThat(mail.sentTo(email)).hasSize(5);
+
+		clock.advance(Duration.ofHours(24));
+		visitor.post("/api/auth/forgot-password", Map.of("email", email));
+		assertThat(mail.sentTo(email)).hasSize(6);
+	}
+
+	@Test
+	void resendConfirmationHasTheSameLimitAndTheSameAddressSharesItWhateverTheCase() {
+		String email = "ana-" + UUID.randomUUID() + "@example.com";
+		ApiClient visitor = new ApiClient(port);
+		visitor.post("/api/auth/signup", Map.of("email", email, "password", PASSWORD, "language", "en"));
+		mail.clear();
+
+		assertThat(visitor.post("/api/auth/resend-confirmation", Map.of("email", " " + email.toUpperCase() + " ")).status())
+			.isEqualTo(204);
+		assertThat(visitor.post("/api/auth/resend-confirmation", Map.of("email", email)).status()).isEqualTo(204);
+		assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", email)).status()).isEqualTo(204);
+
+		assertThat(mail.sentTo(email)).hasSize(1);
+	}
+
+	@Test
+	void anUnknownAddressGetsTheSameAnswerForEveryRequest() {
+		String unknown = "nobody-" + UUID.randomUUID() + "@example.com";
+		ApiClient visitor = new ApiClient(port);
+
+		assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", unknown)).status()).isEqualTo(204);
+		assertThat(visitor.post("/api/auth/forgot-password", Map.of("email", unknown)).status()).isEqualTo(204);
+		assertThat(visitor.post("/api/auth/resend-confirmation", Map.of("email", unknown)).status()).isEqualTo(204);
+		assertThat(mail.sentTo(unknown)).isEmpty();
+	}
+
 	private String confirmedAccount() {
 		String email = "keeper-" + UUID.randomUUID() + "@example.com";
 		ApiClient browser = new ApiClient(port);

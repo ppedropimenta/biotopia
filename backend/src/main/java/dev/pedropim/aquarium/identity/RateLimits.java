@@ -31,6 +31,12 @@ class RateLimits {
 
 	private final RecentEvents signUps;
 
+	/** Emails with a link (confirmation again, password reset) to one address: one every 2 minutes... */
+	private final RecentEvents emailsToAddressPerTwoMinutes = new RecentEvents(1, Duration.ofMinutes(2), MAX_KEYS);
+
+	/** ...and five a day. */
+	private final RecentEvents emailsToAddressPerDay = new RecentEvents(5, Duration.ofDays(1), MAX_KEYS);
+
 	private final Clock clock;
 
 	/**
@@ -51,6 +57,23 @@ class RateLimits {
 
 	void signUp(HttpServletRequest request) {
 		refuseUnless(signUps.tryAdd(ClientAddress.of(request), clock.instant()));
+	}
+
+	/**
+	 * Whether a link email may go to this (normalized) address now. A request held back is not an error and is not
+	 * counted, so the link the person already has keeps working (a new email would replace it). The caller counts every
+	 * request the same, whether or not the address has an account, so the answer reveals nothing.
+	 */
+	boolean mayEmail(String address) {
+		var now = clock.instant();
+		synchronized (this) {
+			if (emailsToAddressPerTwoMinutes.isFull(address, now) || emailsToAddressPerDay.isFull(address, now)) {
+				return false;
+			}
+			emailsToAddressPerTwoMinutes.add(address, now);
+			emailsToAddressPerDay.add(address, now);
+			return true;
+		}
 	}
 
 	/** Refuses a login before any hash is computed. Counts nothing: only failures count. */

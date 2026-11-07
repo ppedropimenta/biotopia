@@ -293,6 +293,32 @@ class AccountsApiTest {
 		assertThat(new ApiClient(port).get("/api/me").status()).isEqualTo(401);
 	}
 
+	@Test
+	void aSessionOfADeletedAccountEndsOnTheOtherBrowser() {
+		confirmedAccount("en");
+		logIn(email, PASSWORD);
+		ApiClient otherBrowser = new ApiClient(port);
+		otherBrowser.post("/api/auth/login", Map.of("email", email, "password", PASSWORD));
+		assertThat(otherBrowser.get("/api/me").status()).isEqualTo(200);
+
+		assertThat(browser.post("/api/me/deletion", Map.of("password", PASSWORD)).status()).isEqualTo(204);
+
+		assertThat(otherBrowser.get("/api/me").status()).isEqualTo(401);
+		assertThat(otherBrowser.get("/api/tanks").status()).isEqualTo(401);
+		assertThat(otherBrowser.post("/api/tanks", Map.of("name", "Ghost", "startDate", "2025-03-01")).status())
+			.isEqualTo(401);
+	}
+
+	@Test
+	void anAccountThatNeverHadAPasswordResetStaysLoggedIn() {
+		confirmedAccount("en");
+		logIn(email, PASSWORD);
+		clock.advance(Duration.ofDays(1));
+
+		assertThat(browser.get("/api/me").status()).isEqualTo(200);
+		assertThat(browser.get("/api/tanks").status()).isEqualTo(200);
+	}
+
 	private void confirmedAccount(String language) {
 		signUp(email, PASSWORD, language);
 		confirm(confirmationToken(mail.sentTo(email).getFirst()));

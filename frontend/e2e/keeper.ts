@@ -34,7 +34,7 @@ export async function createTank(page: Page, { name, netVolume }: { name: string
   await page.getByRole('button', { name: 'Save tank' }).click()
 }
 
-/** Signs up a new keeper, confirms the email and logs in, ending on their (empty) list of tanks. */
+/** Signs up a new keeper, confirms the email and logs in, ending on their (empty) list of tanks. Returns the address. */
 export async function loggedInKeeper(page: Page) {
   const address = `keeper-${Date.now()}-${Math.floor(Math.random() * 1000)}@example.com`
   await page.goto('/signup')
@@ -49,4 +49,5 @@ export async function loggedInKeeper(page: Page) {
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: 'Log in' }).click()
   await expect(page.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+  return address
 }

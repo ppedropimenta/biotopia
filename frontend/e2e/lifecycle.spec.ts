@@ -48,3 +48,25 @@ test('a keeper deletes the account with the password and is sent to the log in s
   await page.getByRole('button', { name: 'Delete my account for good' }).click()
   await expect(page).toHaveURL(/\/login/)
 })
+
+test('a browser still logged in to a deleted account lands on a working public page', async ({ page, browser }) => {
+  const address = await loggedInKeeper(page)
+  const other = await browser.newContext({ locale: 'en-US' })
+  const otherPage = await other.newPage()
+  await otherPage.goto('/login')
+  await otherPage.getByLabel('Email').fill(address)
+  await otherPage.getByLabel('Password').fill('correct horse battery')
+  await otherPage.getByRole('button', { name: 'Log in' }).click()
+  await expect(otherPage.getByRole('heading', { name: 'Your tanks' })).toBeVisible()
+
+  await page.getByRole('link', { name: 'Account' }).click()
+  await page.getByRole('button', { name: 'Delete my account for good' }).click()
+  await page.getByLabel('Your password').fill('correct horse battery')
+  await page.getByRole('button', { name: 'Delete my account for good' }).click()
+  await expect(page).toHaveURL(/\/login/)
+
+  await otherPage.reload()
+  await expect(otherPage).toHaveURL(/\/login/)
+  await expect(otherPage.getByRole('button', { name: 'Log in' })).toBeVisible()
+  await other.close()
+})

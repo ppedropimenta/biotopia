@@ -1,6 +1,5 @@
 package dev.pedropim.aquarium.identity;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,8 +12,11 @@ interface UserRepository extends JpaRepository<User, UUID> {
 
 	boolean existsByEmail(String email);
 
-	/** Empty when the account has no reset yet (or does not exist). Asked on every request, so it reads one column. */
-	@Query("select u.passwordChangedAt from User u where u.id = :id")
-	Optional<Instant> findPasswordChangedAt(UUID id);
+	/**
+	 * Empty only when the account does not exist; an account with no reset yet answers a row whose {@code changedAt} is
+	 * null. Asked on every request, so it reads one column.
+	 */
+	@Query("select new dev.pedropim.aquarium.identity.PasswordChange(u.passwordChangedAt) from User u where u.id = :id")
+	Optional<PasswordChange> findPasswordChange(UUID id);
 
 }

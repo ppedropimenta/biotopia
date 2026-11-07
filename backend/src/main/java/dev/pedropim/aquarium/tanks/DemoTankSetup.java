@@ -29,7 +29,12 @@ class DemoTankSetup implements ApplicationRunner {
 		this.configuredId = configuredId;
 	}
 
+	/**
+	 * Transactional here, not only on {@link #flag}: Spring calls this method from outside, through the proxy, while
+	 * {@code run} calling {@code flag} on {@code this} would skip it.
+	 */
 	@Override
+	@Transactional
 	public void run(ApplicationArguments args) {
 		if (configuredId.isBlank()) {
 			return;

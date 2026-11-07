@@ -14,10 +14,12 @@ import java.util.Set;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import dev.pedropim.aquarium.web.ApiException;
@@ -33,8 +35,18 @@ class PhotoProcessor {
 
 	static final int MAX_EDGE = 2000;
 
-	/** Decoding needs about 4 bytes a pixel, so this keeps one upload under roughly 100 MB of memory. */
+	/**
+	 * Decoding time depends on the number of pixels, so this stays a limit of its own. Memory depends on the pixels
+	 * and on the bytes a pixel, which varies with the format (a 16-bit PNG with alpha takes 8), so it has its own
+	 * limit below.
+	 */
 	private static final long MAX_PIXELS = 25_000_000L;
+
+	/** The most memory the pixels of one picture may take once decoded, worked out before decoding. */
+	static final long MAX_DECODED_BYTES = 100_000_000L;
+
+	/** Used when the reader does not say how many bytes a pixel takes: the common case of RGB with alpha. */
+	private static final int DEFAULT_BYTES_A_PIXEL = 4;
 
 	/**
 	 * A progressive JPEG is drawn in passes called scans, and the decoder goes over the whole picture for each one,
@@ -76,7 +88,11 @@ class PhotoProcessor {
 				}
 				reader.setInput(in, true, true);
 				// The size is in the header, so a picture that is a bomb is refused before it takes memory.
-				if ((long) reader.getWidth(0) * reader.getHeight(0) > MAX_PIXELS) {
+				long pixels = (long) reader.getWidth(0) * reader.getHeight(0);
+				if (pixels > MAX_PIXELS) {
+					throw ApiException.invalidField("file", "too_many_pixels");
+				}
+				if (pixels * bytesAPixel(reader) > MAX_DECODED_BYTES) {
 					throw ApiException.invalidField("file", "too_many_pixels");
 				}
 				return reader.read(0);
@@ -89,9 +105,64 @@ class PhotoProcessor {
 			if (broken instanceof ApiException api) {
 				throw api;
 			}
-			// A file that has the signature of an image and cannot be read is as good as no image.
-			throw unsupported();
+			throw readFailure(broken);
 		}
+		catch (OutOfMemoryError tooBig) {
+			throw busy();
+		}
+	}
+
+	/**
+	 * What a failed read means. The PNG reader catches everything and rethrows it as an {@code IIOException}, so a
+	 * decode that ran out of memory looked like a damaged file and a valid picture was refused as "unsupported". When
+	 * memory is the cause the answer is "busy, try again". Any other failure is a file that has the signature of an
+	 * image and cannot be read, as good as no image.
+	 */
+	static ApiException readFailure(Throwable broken) {
+		for (Throwable cause = broken; cause != null; cause = cause.getCause() == cause ? null : cause.getCause()) {
+			if (cause instanceof OutOfMemoryError) {
+				return busy();
+			}
+		}
+		return unsupported();
+	}
+
+	private static ApiException busy() {
+		return new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "photo_busy");
+	}
+
+	/** Bytes one pixel takes once decoded, as the reader will decode it (header only, nothing is decoded). */
+	private static int bytesAPixel(ImageReader reader) throws IOException {
+		return bytesAPixel(reader.getRawImageType(0), reader.getImageTypes(0));
+	}
+
+	/** Bytes a pixel for the bytes of a picture, read from its header. For tests of the estimate. */
+	static int bytesAPixel(byte[] picture) throws IOException {
+		try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(picture))) {
+			ImageReader reader = ImageIO.getImageReaders(in).next();
+			try {
+				reader.setInput(in, true, true);
+				return bytesAPixel(reader);
+			}
+			finally {
+				reader.dispose();
+			}
+		}
+	}
+
+	/**
+	 * The reader's raw type is what {@code read(0)} produces. By its contract it can be null, and then the most
+	 * demanding of the types it offers is used; a reader that offers none gets the default.
+	 */
+	static int bytesAPixel(ImageTypeSpecifier raw, Iterator<ImageTypeSpecifier> offered) {
+		if (raw != null) {
+			return Math.max(1, raw.getColorModel().getPixelSize() / 8);
+		}
+		int largest = 0;
+		while (offered != null && offered.hasNext()) {
+			largest = Math.max(largest, offered.next().getColorModel().getPixelSize() / 8);
+		}
+		return largest > 0 ? largest : DEFAULT_BYTES_A_PIXEL;
 	}
 
 	private static ApiException unsupported() {

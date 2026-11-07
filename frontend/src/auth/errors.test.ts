@@ -48,6 +48,14 @@ describe('describeError', () => {
     })
   })
 
+  it('says to wait when the server refuses too many requests, in every form', () => {
+    for (const form of ['signup', 'login', 'reset'] as const) {
+      expect(describeError(new ApiError(429, 'too_many_requests'), form)).toEqual({
+        general: 'auth.errors.too_many_requests',
+      })
+    }
+  })
+
   it('falls back to a generic message for anything unexpected', () => {
     expect(describeError(new TypeError('network down'), 'login')).toEqual({ general: 'auth.errors.generic' })
     expect(describeError(new ApiError(500, 'unknown'), 'signup')).toEqual({ general: 'auth.errors.generic' })

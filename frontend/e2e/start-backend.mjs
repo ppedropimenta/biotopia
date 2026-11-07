@@ -19,7 +19,10 @@ if (process.env.BACKEND_JVM_ARGS) mavenArgs.push(`-Dspring-boot.run.jvmArguments
 // On Windows the Maven wrapper is a .cmd file, which only cmd.exe can run.
 const [command, args] = windows ? ['cmd.exe', ['/c', '.\\mvnw.cmd', ...mavenArgs]] : ['./mvnw', mavenArgs]
 
-const backend = spawn(command, args, { cwd: backendDir, stdio: ['ignore', 'pipe', 'pipe'] })
+// Every journey reaches the backend from this one machine, so the per-address limits (5 sign-ups an hour, 30 requests
+// a minute on the open routes) would stop the run. They are raised here; the limits per account stay as they are.
+const env = { ...process.env, APP_RATE_LIMITS_SIGN_UPS_PER_HOUR: '10000', APP_RATE_LIMITS_OPEN_ROUTE_REQUESTS_PER_MINUTE: '10000' }
+const backend = spawn(command, args, { cwd: backendDir, env, stdio: ['ignore', 'pipe', 'pipe'] })
 backend.stdout.pipe(log)
 backend.stderr.pipe(log)
 backend.on('exit', (code) => process.exit(code ?? 1))

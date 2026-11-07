@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpMethod;
@@ -29,12 +30,41 @@ public class ApiClient {
 
 	private final RestClient http;
 
+	private static final AtomicInteger NEXT_ADDRESS = new AtomicInteger();
+
+	/**
+	 * Each client is one browser with an address of its own, sent the way Caddy sends it (X-Forwarded-For), so the
+	 * per-address limits count a test's browsers apart. The addresses are in 198.18.0.0/15, which the server does not
+	 * treat as a proxy.
+	 */
 	public ApiClient(int port) {
+		this(port, nextAddress());
+	}
+
+	public ApiClient(int port, String clientAddress) {
 		this.baseUrl = "http://localhost:" + port;
 		this.http = RestClient.builder()
 			.baseUrl(baseUrl)
+			.defaultHeader("X-Forwarded-For", clientAddress)
 			.requestFactory(new JdkClientHttpRequestFactory(HttpClient.newBuilder().cookieHandler(cookies).build()))
 			.build();
+	}
+
+	public static String nextAddress() {
+		int n = NEXT_ADDRESS.incrementAndGet();
+		return "198.18." + (n / 250 % 250) + "." + (n % 250 + 1);
+	}
+
+	/** The Set-Cookie and Strict-Transport-Security headers of a response, to see what the server tells a browser. */
+	public Headers headersOf(String path, String forwardedProto) {
+		return http.get()
+			.uri(path)
+			.header("X-Forwarded-Proto", forwardedProto)
+			.exchange((request, response) -> new Headers(response.getHeaders().getOrDefault("Set-Cookie", List.of()),
+					response.getHeaders().getFirst("Strict-Transport-Security")));
+	}
+
+	public record Headers(List<String> setCookies, String strictTransportSecurity) {
 	}
 
 	public Response get(String path) {

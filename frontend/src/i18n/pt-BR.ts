@@ -146,6 +146,8 @@ export const ptBR: Messages = {
       failedTitle: 'Este link não funciona',
       failedText:
         'Ele já foi usado ou expirou. Se você já confirmou, entre. Se não, tente entrar e peça um link novo ali.',
+      limitedTitle: 'Tentativas demais',
+      limitedText: 'Espere alguns minutos e abra o link de novo.',
     },
     errors: {
       invalid_credentials: 'Esse e-mail e essa senha não conferem.',
@@ -154,6 +156,7 @@ export const ptBR: Messages = {
       password_too_short: 'Use pelo menos 8 caracteres.',
       password_too_long: 'Use no máximo 72 caracteres.',
       login_incomplete: 'Digite o seu e-mail e a sua senha.',
+      too_many_requests: 'Tentativas demais. Espere alguns minutos e tente de novo.',
       generic: 'Algo deu errado. Tente de novo em instantes.',
     },
   },

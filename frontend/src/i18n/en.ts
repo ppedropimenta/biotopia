@@ -144,6 +144,8 @@ export const en = {
       failedTitle: 'This link does not work',
       failedText:
         'It was already used or has expired. If you have confirmed already, log in. If not, try to log in and ask for a new link there.',
+      limitedTitle: 'Too many attempts',
+      limitedText: 'Wait a few minutes and open the link again.',
     },
     errors: {
       invalid_credentials: 'That email and password do not match.',
@@ -152,6 +154,7 @@ export const en = {
       password_too_short: 'Use at least 8 characters.',
       password_too_long: 'Use at most 72 characters.',
       login_incomplete: 'Enter your email and your password.',
+      too_many_requests: 'Too many attempts. Wait a few minutes and try again.',
       generic: 'Something went wrong. Try again in a moment.',
     },
   },

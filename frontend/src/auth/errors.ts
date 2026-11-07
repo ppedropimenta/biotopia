@@ -7,6 +7,7 @@ export type ErrorKey =
   | 'auth.errors.password_too_short'
   | 'auth.errors.password_too_long'
   | 'auth.errors.login_incomplete'
+  | 'auth.errors.too_many_requests'
   | 'auth.errors.generic'
 
 /** What to say and where: a message under one field, or one for the whole form. */
@@ -20,6 +21,7 @@ export function describeError(error: unknown, form: 'signup' | 'login' | 'reset'
   if (!(error instanceof ApiError)) return { general: 'auth.errors.generic' }
 
   if (error.code === 'invalid_credentials') return { general: 'auth.errors.invalid_credentials' }
+  if (error.code === 'too_many_requests') return { general: 'auth.errors.too_many_requests' }
   if (error.code === 'email_taken') return { email: 'auth.errors.email_taken' }
 
   if (error.code === 'validation_failed') {

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.pedropim.aquarium.web.ApiException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,13 +21,18 @@ class RegistrationController {
 
 	private final AccountService accounts;
 
-	RegistrationController(AccountService accounts) {
+	private final RateLimits limits;
+
+	RegistrationController(AccountService accounts, RateLimits limits) {
 		this.accounts = accounts;
+		this.limits = limits;
 	}
 
 	@PostMapping("/signup")
 	@ResponseStatus(HttpStatus.CREATED)
-	void signUp(@Valid @RequestBody SignUpRequest request) {
+	void signUp(@Valid @RequestBody SignUpRequest request, HttpServletRequest httpRequest) {
+		limits.openRoute(httpRequest);
+		limits.signUp(httpRequest);
 		Language language = Language.fromCode(request.language())
 			.orElseThrow(() -> ApiException.invalidField("language", "unsupported"));
 		accounts.signUp(request.email(), request.password(), language);
@@ -34,25 +40,29 @@ class RegistrationController {
 
 	@PostMapping("/confirm")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	void confirm(@Valid @RequestBody ConfirmRequest request) {
+	void confirm(@Valid @RequestBody ConfirmRequest request, HttpServletRequest httpRequest) {
+		limits.openRoute(httpRequest);
 		accounts.confirm(request.token());
 	}
 
 	@PostMapping("/resend-confirmation")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	void resendConfirmation(@Valid @RequestBody EmailRequest request) {
+	void resendConfirmation(@Valid @RequestBody EmailRequest request, HttpServletRequest httpRequest) {
+		limits.openRoute(httpRequest);
 		accounts.resendConfirmation(request.email());
 	}
 
 	@PostMapping("/forgot-password")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	void forgotPassword(@Valid @RequestBody EmailRequest request) {
+	void forgotPassword(@Valid @RequestBody EmailRequest request, HttpServletRequest httpRequest) {
+		limits.openRoute(httpRequest);
 		accounts.requestPasswordReset(request.email());
 	}
 
 	@PostMapping("/reset-password")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+	void resetPassword(@Valid @RequestBody ResetPasswordRequest request, HttpServletRequest httpRequest) {
+		limits.openRoute(httpRequest);
 		accounts.resetPassword(request.token(), request.password());
 	}
 

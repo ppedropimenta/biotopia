@@ -45,8 +45,11 @@ class SessionController {
 
 	private final Clock clock;
 
+	private final RateLimits limits;
+
 	SessionController(AuthenticationManager authenticationManager, SecurityContextRepository securityContextRepository,
-			UserRepository users, AccountService accounts, Clock clock) {
+			UserRepository users, AccountService accounts, Clock clock, RateLimits limits) {
+		this.limits = limits;
 		this.clock = clock;
 		this.authenticationManager = authenticationManager;
 		this.securityContextRepository = securityContextRepository;
@@ -57,13 +60,18 @@ class SessionController {
 	@PostMapping("/api/auth/login")
 	AccountView logIn(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse) {
+		String email = Emails.normalized(request.email());
+		// Before the hash: a refused attempt costs nothing. The answer is the same for an address with no account.
+		limits.openRoute(httpRequest);
+		limits.checkLogin(email, httpRequest);
 		AccountDetails account;
 		try {
-			Authentication checked = authenticationManager.authenticate(UsernamePasswordAuthenticationToken
-				.unauthenticated(Emails.normalized(request.email()), request.password()));
+			Authentication checked = authenticationManager
+				.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(email, request.password()));
 			account = (AccountDetails) checked.getPrincipal();
 		}
 		catch (AuthenticationException wrongEmailOrPassword) {
+			limits.loginFailed(email, httpRequest);
 			throw new ApiException(HttpStatus.UNAUTHORIZED, "invalid_credentials");
 		}
 		if (!account.confirmed()) {

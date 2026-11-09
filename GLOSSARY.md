@@ -47,7 +47,7 @@ _Avoid_: Volume, liters
 **Gross Volume**:
 The volume of a tank worked out from its dimensions (length × width × height). It is calculated by the app,
 never typed, and it stands in for the Net Volume in the calculations (a water change in liters, for one) for as
-long as the owner has not stated one.
+long as the owner has not stated one. Anything worked out from it is shown as possibly not exact.
 _Avoid_: Capacity, glass volume
 
 ### Water
@@ -60,6 +60,11 @@ _Avoid_: Metric, value, reading type
 **Measurement**:
 One value of one parameter in one tank at one point in time, with an optional note.
 _Avoid_: Reading, test, sample, test session
+
+**Conditions**:
+What is known about a tank's water at one moment: its volume and the latest value of each parameter, each with
+when it was measured. A tank has them, and so does a set of values someone types in to check.
+_Avoid_: State, snapshot, profile
 
 **Total Ammonia**:
 The combined ammonia and ammonium (NH3 + NH4+) that a test kit reports. Free ammonia (NH3), the toxic

@@ -31,34 +31,31 @@ class TankPhotoController {
 
 	private final TankPhotoService photos;
 
-	private final TankService tanks;
-
-	TankPhotoController(TankPhotoService photos, TankService tanks) {
+	TankPhotoController(TankPhotoService photos) {
 		this.photos = photos;
-		this.tanks = tanks;
 	}
 
 	@GetMapping
 	List<PhotoView> list(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@RequestParam(defaultValue = "1000") int limit) {
-		return photos.list(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), limit);
+		return photos.list(TankController.viewerId(user), TankController.tankId(tankId), limit);
 	}
 
 	@GetMapping("/summary")
 	PhotoSummary summary(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId) {
-		return photos.summary(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId));
+		return photos.summary(TankController.viewerId(user), TankController.tankId(tankId));
 	}
 
 	@GetMapping("/{id}")
 	PhotoView read(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId, @PathVariable String id) {
-		return photos.read(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), photoId(id));
+		return photos.read(TankController.viewerId(user), TankController.tankId(tankId), photoId(id));
 	}
 
 	/** The picture. Only the owner and, for the Demo Tank, any visitor can read it. A stored file never changes, so the browser may keep it. */
 	@GetMapping("/{id}/file")
 	ResponseEntity<byte[]> file(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@PathVariable String id) {
-		byte[] jpeg = photos.file(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), photoId(id));
+		byte[] jpeg = photos.file(TankController.viewerId(user), TankController.tankId(tankId), photoId(id));
 		return ResponseEntity.ok()
 			.contentType(MediaType.IMAGE_JPEG)
 			.cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).cachePrivate().immutable())

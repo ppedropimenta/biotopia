@@ -31,14 +31,14 @@ class MaintenanceService {
 	/** The most Maintenance one submission records together. */
 	private static final int MAX_BATCH = 10;
 
-	private final TankService tanks;
+	private final TankAccess access;
 
 	private final MaintenanceRepository maintenance;
 
 	private final Clock clock;
 
-	MaintenanceService(TankService tanks, MaintenanceRepository maintenance, Clock clock) {
-		this.tanks = tanks;
+	MaintenanceService(TankAccess access, MaintenanceRepository maintenance, Clock clock) {
+		this.access = access;
 		this.maintenance = maintenance;
 		this.clock = clock;
 	}
@@ -47,8 +47,8 @@ class MaintenanceService {
 	 * The newest Maintenance first, at most {@code limit} of them (kept between 1 and {@value #MAX_LIST}), of one
 	 * type when {@code type} is given.
 	 */
-	List<MaintenanceView> list(UUID ownerId, UUID tankId, String type, int limit) {
-		tanks.requireOwned(ownerId, tankId);
+	List<MaintenanceView> list(UUID viewerId, UUID tankId, String type, int limit) {
+		access.readable(viewerId, tankId);
 		Limit newest = Limit.of(Math.clamp(limit, 1, MAX_LIST));
 		List<Maintenance> found = type == null
 				? maintenance.findByTankIdOrderByPerformedAtDescIdAsc(tankId, newest)
@@ -58,14 +58,14 @@ class MaintenanceService {
 			.toList();
 	}
 
-	MaintenanceView read(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+	MaintenanceView read(UUID viewerId, UUID tankId, UUID id) {
+		access.readable(viewerId, tankId);
 		return MaintenanceView.of(find(tankId, id));
 	}
 
 	@Transactional
 	MaintenanceView record(UUID ownerId, UUID tankId, MaintenanceDetails details) {
-		tanks.requireActive(ownerId, tankId);
+		access.active(ownerId, tankId);
 		return save(tankId, details, clock.instant());
 	}
 
@@ -82,7 +82,7 @@ class MaintenanceService {
 	 */
 	@Transactional
 	List<MaintenanceView> recordAll(UUID ownerId, UUID tankId, List<MaintenanceDetails> entries) {
-		tanks.requireActive(ownerId, tankId);
+		access.active(ownerId, tankId);
 		if (entries == null || entries.isEmpty()) {
 			throw ApiException.invalidField("entries", "required");
 		}
@@ -95,7 +95,7 @@ class MaintenanceService {
 
 	@Transactional
 	MaintenanceView edit(UUID ownerId, UUID tankId, UUID id, MaintenanceDetails details) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		Maintenance found = find(tankId, id);
 		MaintenanceType type = check(details, details.performedAt(), clock.instant());
 		found.change(type, details.percent(), details.performedAt(), cleanNote(details.note()));
@@ -104,7 +104,7 @@ class MaintenanceService {
 
 	@Transactional
 	void delete(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		maintenance.delete(find(tankId, id));
 	}
 

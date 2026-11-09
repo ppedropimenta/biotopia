@@ -29,35 +29,35 @@ class MeasurementService {
 
 	private static final int MAX_LIST = 1000;
 
-	private final TankService tanks;
+	private final TankAccess access;
 
 	private final MeasurementRepository measurements;
 
 	private final Clock clock;
 
-	MeasurementService(TankService tanks, MeasurementRepository measurements, Clock clock) {
-		this.tanks = tanks;
+	MeasurementService(TankAccess access, MeasurementRepository measurements, Clock clock) {
+		this.access = access;
 		this.measurements = measurements;
 		this.clock = clock;
 	}
 
 	/** The newest Measurements first, at most {@code limit} of them (kept between 1 and {@value #MAX_LIST}). */
-	List<MeasurementView> list(UUID ownerId, UUID tankId, int limit) {
-		tanks.requireOwned(ownerId, tankId);
+	List<MeasurementView> list(UUID viewerId, UUID tankId, int limit) {
+		access.readable(viewerId, tankId);
 		return measurements.findByTankIdOrderByMeasuredAtDescIdAsc(tankId, Limit.of(Math.clamp(limit, 1, MAX_LIST)))
 			.stream()
 			.map(MeasurementView::of)
 			.toList();
 	}
 
-	MeasurementView read(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+	MeasurementView read(UUID viewerId, UUID tankId, UUID id) {
+		access.readable(viewerId, tankId);
 		return MeasurementView.of(find(tankId, id));
 	}
 
 	/** One Measurement per Parameter that has any, in the order the Parameters are listed. */
-	List<MeasurementView> latest(UUID ownerId, UUID tankId) {
-		tanks.requireOwned(ownerId, tankId);
+	List<MeasurementView> latest(UUID viewerId, UUID tankId) {
+		access.readable(viewerId, tankId);
 		return measurements.findLatestByParameter(tankId)
 			.stream()
 			.sorted(Comparator.comparing(Measurement::parameter))
@@ -67,7 +67,7 @@ class MeasurementService {
 
 	@Transactional
 	List<MeasurementView> record(UUID ownerId, UUID tankId, NewMeasurements request) {
-		tanks.requireActive(ownerId, tankId);
+		access.active(ownerId, tankId);
 		Instant now = clock.instant();
 		Instant measuredAt = request.measuredAt() == null ? now : request.measuredAt();
 		Map<String, String> problems = new TreeMap<>();
@@ -86,7 +86,7 @@ class MeasurementService {
 
 	@Transactional
 	MeasurementView edit(UUID ownerId, UUID tankId, UUID id, MeasurementChange change) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		Measurement measurement = find(tankId, id);
 		Map<String, String> problems = new TreeMap<>();
 		if (change.measuredAt() == null) {
@@ -109,7 +109,7 @@ class MeasurementService {
 
 	@Transactional
 	void delete(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		measurements.delete(find(tankId, id));
 	}
 

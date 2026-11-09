@@ -21,14 +21,17 @@ class TankService implements TankErasure {
 
 	private final TankRepository tanks;
 
+	private final TankAccess access;
+
 	private final TankPhotoRepository photos;
 
 	private final PhotoStorage storage;
 
 	private final Clock clock;
 
-	TankService(TankRepository tanks, TankPhotoRepository photos, PhotoStorage storage, Clock clock) {
+	TankService(TankRepository tanks, TankAccess access, TankPhotoRepository photos, PhotoStorage storage, Clock clock) {
 		this.tanks = tanks;
+		this.access = access;
 		this.photos = photos;
 		this.storage = storage;
 		this.clock = clock;
@@ -38,21 +41,10 @@ class TankService implements TankErasure {
 		return tanks.findOwnedBy(ownerId).stream().map(TankView::of).toList();
 	}
 
-	/** The Tank as {@code viewerId} (null for a visitor) may read it: their own, or the Demo Tank. */
+	/** The Tank as {@code viewerId} (null for a Visitor) may read it: their own, or the Demo Tank. */
 	TankView find(UUID viewerId, UUID id) {
-		Tank tank = tanks.findById(id).filter(Tank::isDemo).orElse(null);
-		if (tank != null) {
-			return TankView.of(tank, !tank.ownerId().equals(viewerId));
-		}
-		return TankView.of(owned(requireViewer(viewerId), id));
-	}
-
-	/**
-	 * Whose Tank a read is answered from. Anyone reads the Demo Tank as its owner would; anything else is the
-	 * viewer's own, and a visitor with no session is refused.
-	 */
-	UUID readerOf(UUID viewerId, UUID tankId) {
-		return tanks.findById(tankId).filter(Tank::isDemo).map(Tank::ownerId).orElseGet(() -> requireViewer(viewerId));
+		Tank tank = access.readable(viewerId, id);
+		return TankView.of(tank, !tank.ownerId().equals(viewerId));
 	}
 
 	/** The Demo Tank, if one is flagged. */
@@ -62,30 +54,23 @@ class TankService implements TankErasure {
 			.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "demo_not_found"));
 	}
 
-	private static UUID requireViewer(UUID viewerId) {
-		if (viewerId == null) {
-			throw new ApiException(HttpStatus.UNAUTHORIZED, "unauthorized");
-		}
-		return viewerId;
-	}
-
 	@Transactional
 	TankView edit(UUID ownerId, UUID id, TankDetails details) {
-		Tank tank = owned(ownerId, id);
+		Tank tank = access.owned(ownerId, id);
 		tank.change(details);
 		return TankView.of(tank);
 	}
 
 	@Transactional
 	TankView archive(UUID ownerId, UUID id) {
-		Tank tank = owned(ownerId, id);
+		Tank tank = access.owned(ownerId, id);
 		tank.archive(clock.instant());
 		return TankView.of(tank);
 	}
 
 	@Transactional
 	TankView restore(UUID ownerId, UUID id) {
-		Tank tank = owned(ownerId, id);
+		Tank tank = access.owned(ownerId, id);
 		tank.restore();
 		return TankView.of(tank);
 	}
@@ -96,7 +81,7 @@ class TankService implements TankErasure {
 	 */
 	@Transactional
 	void delete(UUID ownerId, UUID id) {
-		Tank tank = owned(ownerId, id);
+		Tank tank = access.owned(ownerId, id);
 		List<String> keys = photos.storageKeysOf(List.of(id));
 		tanks.delete(tank);
 		tanks.flush();
@@ -132,27 +117,6 @@ class TankService implements TankErasure {
 				}
 			}
 		});
-	}
-
-	/** Fails as not found unless the user owns the Tank. */
-	void requireOwned(UUID ownerId, UUID id) {
-		owned(ownerId, id);
-	}
-
-	/** Like {@link #requireOwned}, and also refuses an Archived Tank: it takes no new records. */
-	void requireActive(UUID ownerId, UUID id) {
-		if (owned(ownerId, id).isArchived()) {
-			throw new ApiException(HttpStatus.CONFLICT, "tank_archived");
-		}
-	}
-
-	/** Someone else's Tank answers exactly like one that does not exist, so its existence is not revealed. */
-	private Tank owned(UUID ownerId, UUID id) {
-		return tanks.findByIdAndOwnerId(id, ownerId).orElseThrow(() -> notFound());
-	}
-
-	static ApiException notFound() {
-		return new ApiException(HttpStatus.NOT_FOUND, "tank_not_found");
 	}
 
 	TankView create(UUID ownerId, TankDetails details) {

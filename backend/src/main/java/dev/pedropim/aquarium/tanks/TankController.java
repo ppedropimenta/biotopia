@@ -75,7 +75,7 @@ class TankController {
 			return UUID.fromString(id);
 		}
 		catch (IllegalArgumentException malformed) {
-			throw TankService.notFound();
+			throw TankAccess.notFound();
 		}
 	}
 

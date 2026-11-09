@@ -25,23 +25,20 @@ class MaintenanceController {
 
 	private final MaintenanceService maintenance;
 
-	private final TankService tanks;
-
-	MaintenanceController(MaintenanceService maintenance, TankService tanks) {
+	MaintenanceController(MaintenanceService maintenance) {
 		this.maintenance = maintenance;
-		this.tanks = tanks;
 	}
 
 	@GetMapping
 	List<MaintenanceView> list(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@RequestParam(required = false) String type, @RequestParam(defaultValue = "1000") int limit) {
-		return maintenance.list(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), type, limit);
+		return maintenance.list(TankController.viewerId(user), TankController.tankId(tankId), type, limit);
 	}
 
 	@GetMapping("/{id}")
 	MaintenanceView read(@AuthenticationPrincipal SessionUser user, @PathVariable String tankId,
 			@PathVariable String id) {
-		return maintenance.read(tanks.readerOf(TankController.viewerId(user), TankController.tankId(tankId)), TankController.tankId(tankId), maintenanceId(id));
+		return maintenance.read(TankController.viewerId(user), TankController.tankId(tankId), maintenanceId(id));
 	}
 
 	@PostMapping

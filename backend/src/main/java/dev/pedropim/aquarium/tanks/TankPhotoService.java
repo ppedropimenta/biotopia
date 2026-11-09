@@ -39,7 +39,7 @@ class TankPhotoService {
 	 */
 	private static final int MAX_DECODES = 2;
 
-	private final TankService tanks;
+	private final TankAccess access;
 
 	private final TankPhotoRepository photos;
 
@@ -58,10 +58,10 @@ class TankPhotoService {
 	/** How long an upload waits for a free slot before it is told to try later. Bounded, since each waiting upload holds up to 10 MB. */
 	private final Duration decodeWait;
 
-	TankPhotoService(TankService tanks, TankPhotoRepository photos, PhotoStorage storage, PhotoProcessor processor,
+	TankPhotoService(TankAccess access, TankPhotoRepository photos, PhotoStorage storage, PhotoProcessor processor,
 			Clock clock, PlatformTransactionManager transactions, @Value("${app.photos.quota-bytes}") long quotaBytes,
 			@Value("${app.photos.decode-wait:3s}") Duration decodeWait) {
-		this.tanks = tanks;
+		this.access = access;
 		this.photos = photos;
 		this.storage = storage;
 		this.processor = processor;
@@ -72,8 +72,8 @@ class TankPhotoService {
 	}
 
 	/** The newest Tank Photos first (by their date), at most {@code limit} of them, kept between 1 and {@value #MAX_LIST}. */
-	List<PhotoView> list(UUID ownerId, UUID tankId, int limit) {
-		tanks.requireOwned(ownerId, tankId);
+	List<PhotoView> list(UUID viewerId, UUID tankId, int limit) {
+		access.readable(viewerId, tankId);
 		return photos.findByTankIdOrderByTakenAtDescIdAsc(tankId, Limit.of(Math.clamp(limit, 1, MAX_LIST)))
 			.stream()
 			.map(PhotoView::of)
@@ -81,8 +81,8 @@ class TankPhotoService {
 	}
 
 	/** How many Tank Photos a Tank has and which one is the latest, for the lists that show a Tank. */
-	PhotoSummary summary(UUID ownerId, UUID tankId) {
-		tanks.requireOwned(ownerId, tankId);
+	PhotoSummary summary(UUID viewerId, UUID tankId) {
+		access.readable(viewerId, tankId);
 		UUID latest = photos.findByTankIdOrderByTakenAtDescIdAsc(tankId, Limit.of(1))
 			.stream()
 			.findFirst()
@@ -91,14 +91,14 @@ class TankPhotoService {
 		return new PhotoSummary(photos.countByTankId(tankId), latest);
 	}
 
-	PhotoView read(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+	PhotoView read(UUID viewerId, UUID tankId, UUID id) {
+		access.readable(viewerId, tankId);
 		return PhotoView.of(find(tankId, id));
 	}
 
 	/** The stored JPEG of a Tank Photo. */
-	byte[] file(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+	byte[] file(UUID viewerId, UUID tankId, UUID id) {
+		access.readable(viewerId, tankId);
 		TankPhoto photo = find(tankId, id);
 		return storage.get(photo.storageKey()).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "photo_not_found"));
 	}
@@ -116,7 +116,7 @@ class TankPhotoService {
 	 * this class would not go through the proxy).
 	 */
 	PhotoView upload(UUID ownerId, UUID tankId, byte[] original, String takenAtText, String note) {
-		tanks.requireActive(ownerId, tankId);
+		access.active(ownerId, tankId);
 		Instant now = clock.instant();
 		Instant takenAt = readMoment(takenAtText, now);
 		checkDetails(takenAt, note, now);
@@ -148,7 +148,7 @@ class TankPhotoService {
 	/** The part of an upload that needs the database. The Tank is checked again: it may have been archived while decoding. */
 	private PhotoView store(UUID ownerId, UUID tankId, PhotoProcessor.Processed processed, Instant takenAt, String note,
 			Instant now) {
-		tanks.requireActive(ownerId, tankId);
+		access.active(ownerId, tankId);
 		photos.lockUploadsOf(ownerId);
 		if (photos.storedBytesOf(ownerId) + processed.jpeg().length > quotaBytes) {
 			throw new ApiException(HttpStatus.CONTENT_TOO_LARGE, "photo_quota_exceeded");
@@ -172,7 +172,7 @@ class TankPhotoService {
 
 	@Transactional
 	PhotoView edit(UUID ownerId, UUID tankId, UUID id, PhotoDetails details) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		TankPhoto photo = find(tankId, id);
 		if (details.takenAt() == null) {
 			throw ApiException.invalidField("takenAt", "required");
@@ -184,7 +184,7 @@ class TankPhotoService {
 
 	@Transactional
 	void delete(UUID ownerId, UUID tankId, UUID id) {
-		tanks.requireOwned(ownerId, tankId);
+		access.owned(ownerId, tankId);
 		TankPhoto photo = find(tankId, id);
 		photos.delete(photo);
 		// Only once the row is really gone: a file removed before a failed commit would leave a broken picture.

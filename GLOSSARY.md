@@ -5,6 +5,20 @@ species, compatibility and biotopes against data that always shows its source.
 
 ## Language
 
+### People
+
+**Owner**:
+The person a tank belongs to. A tank has exactly one.
+_Avoid_: Keeper, user
+
+**Visitor**:
+Someone with no session, who can only see what is open to anyone.
+_Avoid_: Guest, anonymous user
+
+**Viewer**:
+Whoever is looking at a tank: its owner, someone else who is logged in, or a visitor.
+_Avoid_: Reader
+
 ### Tanks
 
 **Tank**:

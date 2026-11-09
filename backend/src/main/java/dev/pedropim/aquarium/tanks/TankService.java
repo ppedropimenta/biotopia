@@ -4,36 +4,27 @@ import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import dev.pedropim.aquarium.web.ApiException;
 
 @Service
 class TankService implements TankErasure {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TankService.class);
-
 	private final TankRepository tanks;
 
 	private final TankAccess access;
 
-	private final TankPhotoRepository photos;
-
-	private final PhotoStorage storage;
+	private final TankPhotoService photos;
 
 	private final Clock clock;
 
-	TankService(TankRepository tanks, TankAccess access, TankPhotoRepository photos, PhotoStorage storage, Clock clock) {
+	TankService(TankRepository tanks, TankAccess access, TankPhotoService photos, Clock clock) {
 		this.tanks = tanks;
 		this.access = access;
 		this.photos = photos;
-		this.storage = storage;
 		this.clock = clock;
 	}
 
@@ -82,10 +73,9 @@ class TankService implements TankErasure {
 	@Transactional
 	void delete(UUID ownerId, UUID id) {
 		Tank tank = access.owned(ownerId, id);
-		List<String> keys = photos.storageKeysOf(List.of(id));
+		photos.deleteFilesOf(List.of(id));
 		tanks.delete(tank);
 		tanks.flush();
-		deleteFilesAfterCommit(keys);
 	}
 
 	@Override
@@ -95,28 +85,9 @@ class TankService implements TankErasure {
 		if (ids.isEmpty()) {
 			return;
 		}
-		List<String> keys = photos.storageKeysOf(ids);
+		photos.deleteFilesOf(ids);
 		tanks.deleteAllById(ids);
 		tanks.flush();
-		deleteFilesAfterCommit(keys);
-	}
-
-	/** Only once the rows are really gone: a file removed before a failed commit would leave broken pictures. */
-	private void deleteFilesAfterCommit(List<String> keys) {
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-			@Override
-			public void afterCommit() {
-				// The rows are already gone, so one file that cannot be removed must not stop the others.
-				for (String key : keys) {
-					try {
-						storage.delete(key);
-					}
-					catch (RuntimeException failed) {
-						LOG.warn("Could not delete photo file {}", key, failed);
-					}
-				}
-			}
-		});
 	}
 
 	TankView create(UUID ownerId, TankDetails details) {

@@ -11,6 +11,8 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Limit;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,8 @@ import dev.pedropim.aquarium.web.ApiException;
 
 @Service
 class TankPhotoService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(TankPhotoService.class);
 
 	/** The most an uploaded file may weigh: 10 MB. */
 	static final long MAX_UPLOAD_BYTES = 10L * 1024 * 1024;
@@ -162,7 +166,7 @@ class TankPhotoService {
 			@Override
 			public void afterCompletion(int status) {
 				if (status != STATUS_COMMITTED) {
-					storage.delete(key);
+					deleteFile(key);
 				}
 			}
 		});
@@ -187,13 +191,38 @@ class TankPhotoService {
 		access.owned(ownerId, tankId);
 		TankPhoto photo = find(tankId, id);
 		photos.delete(photo);
-		// Only once the row is really gone: a file removed before a failed commit would leave a broken picture.
+		deleteFilesAfterCommit(List.of(photo.storageKey()));
+	}
+
+	/**
+	 * Removes the photo files of these Tanks once the transaction that deletes their rows has committed. Called inside
+	 * that transaction and before the rows go, since it reads which files they are.
+	 */
+	void deleteFilesOf(List<UUID> tankIds) {
+		deleteFilesAfterCommit(photos.storageKeysOf(tankIds));
+	}
+
+	/** Only once the rows are really gone: a file removed before a failed commit would leave a broken picture. */
+	private void deleteFilesAfterCommit(List<String> keys) {
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 			@Override
 			public void afterCommit() {
-				storage.delete(photo.storageKey());
+				keys.forEach(TankPhotoService.this::deleteFile);
 			}
 		});
+	}
+
+	/**
+	 * The rows are already gone or were never saved, so a file that cannot be removed only wastes disk: it is logged for
+	 * the operator and the request still succeeds. One failure does not stop the other files.
+	 */
+	private void deleteFile(String key) {
+		try {
+			storage.delete(key);
+		}
+		catch (RuntimeException failed) {
+			LOG.warn("Could not delete photo file {}", key, failed);
+		}
 	}
 
 	/** A Tank Photo of another Tank answers like one that does not exist, even for the owner of both. */

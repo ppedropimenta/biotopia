@@ -22,7 +22,8 @@ export type NavGroup = {
 
 /**
  * The side menu on blackwater. The active item is a paper tab leaning on the content. Below `md` it becomes
- * a strip at the top with a Menu button; from `md` up it is always open.
+ * a bar fixed at the top with a Menu button, so the menu and the record buttons stay in reach on a long page; an
+ * open menu taller than the screen scrolls inside the bar. From `md` up it is always open.
  */
 export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: ReactNode; footer?: ReactNode }) {
   const { t } = useTranslation()
@@ -31,7 +32,8 @@ export function SideNav({ groups, cta, footer }: { groups: NavGroup[]; cta?: Rea
   return (
     <nav
       aria-label={t('ui.nav.label')}
-      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5 min-[808px]:sticky min-[808px]:top-0 min-[808px]:h-svh min-[808px]:self-start min-[808px]:overflow-y-auto"
+      data-app-nav
+      className="flex max-w-full flex-[1_1_var(--spacing-nav)] flex-col gap-4 texture-river py-4 pr-0 pl-4.5 font-mono text-sm text-river-text md:gap-6.5 md:py-6.5 max-md:sticky max-md:top-0 max-md:z-20 max-md:max-h-svh max-md:overflow-y-auto min-[808px]:sticky min-[808px]:top-0 min-[808px]:h-svh min-[808px]:self-start min-[808px]:overflow-y-auto"
     >
       <div className="flex items-center justify-between gap-3 pr-4.5 md:pr-0">
         <Wordmark stacked className="pl-2" />
@@ -116,8 +118,8 @@ export function AppShell({ nav, children }: { nav: ReactNode; children: ReactNod
 export function LogMeasurementCta({ to }: { to: string }) {
   const { t } = useTranslation()
   return (
-    <ButtonLink to={to} variant="amber" icon="plus" className="w-full">
-      {t('ui.nav.logMeasurement')}
+    <ButtonLink to={to} variant="amber" icon="plus" className="w-full max-md:px-2.5" aria-label={t('ui.nav.logMeasurement')}>
+      {t('ui.nav.measurement')}
     </ButtonLink>
   )
 }
@@ -126,7 +128,7 @@ export function LogMeasurementCta({ to }: { to: string }) {
 export function LogMaintenanceCta({ to }: { to: string }) {
   const { t } = useTranslation()
   return (
-    <ButtonLink to={to} variant="onDark" icon="plus" className="w-full" aria-label={t('ui.nav.logMaintenance')}>
+    <ButtonLink to={to} variant="onDark" icon="plus" className="w-full max-md:px-2.5" aria-label={t('ui.nav.logMaintenance')}>
       {t('maintenance.record')}
     </ButtonLink>
   )

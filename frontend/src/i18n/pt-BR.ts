@@ -11,6 +11,7 @@ export const ptBR: Messages = {
       overview: 'Visão geral',
       timeline: 'Linha do tempo',
       photos: 'Fotos',
+      measurement: 'Medição',
       logMeasurement: 'Registrar medição',
       logMaintenance: 'Registrar manutenção',
       logIn: 'Entrar',
@@ -575,7 +576,8 @@ export const ptBR: Messages = {
     publicDomain: 'Domínio público',
   },
   footer: {
-    made: 'Feito por um aquarista, para aquaristas · Português e inglês',
+    made: 'Feito por um aquarista, para aquaristas',
+    languages: 'Português e inglês',
     credits: 'Créditos e licenças',
   },
 }

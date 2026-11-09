@@ -32,10 +32,11 @@ export function Layout() {
         nav={
           <SideNav
             groups={navGroups(t, tank)}
-            // Recording needs a tank to record into, so outside one there is no button.
+            // Recording needs a tank to record into, so outside one there is no button. In the bar at the top of a
+            // phone the two buttons share one row, to keep the fixed bar short.
             cta={
               tank && (
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:flex md:flex-col">
                   <LogMeasurementCta to={`/tanks/${tank.id}/measure`} />
                   <LogMaintenanceCta to={`/tanks/${tank.id}/maintenance/new`} />
                 </div>
@@ -108,7 +109,12 @@ export function Layout() {
       <footer className="texture-river-wide text-river-text">
         <div className="mx-auto flex max-w-site flex-wrap items-center justify-between gap-x-10 gap-y-5 px-6 py-11">
           <span className="text-h3 font-semibold text-river-bright italic">{t('ui.brand.name')}</span>
-          <span className="font-mono text-label text-river-caption">{t('footer.made')}</span>
+          {/* On a phone the two parts take a line each and the dot is left to screen readers, so it never ends a line alone. */}
+          <span className="font-mono text-label text-river-caption">
+            {t('footer.made')}
+            <span className="max-sm:sr-only"> · </span>
+            <span className="max-sm:block">{t('footer.languages')}</span>
+          </span>
           <Link to="/credits" className="inline-flex min-h-11 items-center font-mono text-sm text-river-bright">
             {t('footer.credits')}
           </Link>

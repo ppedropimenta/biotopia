@@ -9,6 +9,7 @@ export const en = {
       overview: 'Overview',
       timeline: 'Timeline',
       photos: 'Photos',
+      measurement: 'Measurement',
       logMeasurement: 'Log measurement',
       logMaintenance: 'Log maintenance',
       logIn: 'Log in',
@@ -573,7 +574,8 @@ export const en = {
     publicDomain: 'Public domain',
   },
   footer: {
-    made: 'Made by a fishkeeper, for fishkeepers · English and Portuguese',
+    made: 'Made by a fishkeeper, for fishkeepers',
+    languages: 'English and Portuguese',
     credits: 'Credits and licences',
   },
 }

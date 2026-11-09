@@ -206,6 +206,13 @@
   html {
     color-scheme: light;
   }
+  /* Below md the side menu is a bar fixed at the top of the logged-in screens (about 136px with the two record
+     buttons). Scrolling to an element, or to a field that takes the focus, stops below it instead of behind it. */
+  @media (width < 48rem) {
+    html:has([data-app-nav]) {
+      scroll-padding-top: 9rem;
+    }
+  }
   body {
     margin: 0;
     background-color: var(--color-blackwater);

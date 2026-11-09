@@ -16,9 +16,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import dev.pedropim.aquarium.support.ApiClient;
 import dev.pedropim.aquarium.support.ApiClient.Response;
 import dev.pedropim.aquarium.support.ApiTest;
-import dev.pedropim.aquarium.support.MutableClock;
 import dev.pedropim.aquarium.support.RecordingEmailSender;
-import dev.pedropim.aquarium.support.TestSubstitutes;
 
 /** What a password being chosen must be, on sign-up and on reset, and how it is compared afterwards. */
 @ApiTest
@@ -34,16 +32,12 @@ class NewPasswordApiTest {
 	@Autowired
 	RecordingEmailSender mail;
 
-	@Autowired
-	MutableClock clock;
-
 	ApiClient browser;
 
 	String email;
 
 	@BeforeEach
 	void aNewVisitor() {
-		clock.set(TestSubstitutes.START);
 		browser = new ApiClient(port);
 		email = "loach-" + UUID.randomUUID() + "@example.com";
 	}

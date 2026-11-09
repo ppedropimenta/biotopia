@@ -19,7 +19,6 @@ import dev.pedropim.aquarium.support.ApiClient.Response;
 import dev.pedropim.aquarium.support.MutableClock;
 import dev.pedropim.aquarium.support.RecordingEmailSender;
 import dev.pedropim.aquarium.support.ApiTest;
-import dev.pedropim.aquarium.support.TestSubstitutes;
 
 @ApiTest
 class AccountsApiTest {
@@ -43,7 +42,6 @@ class AccountsApiTest {
 
 	@BeforeEach
 	void aNewVisitor() {
-		clock.set(TestSubstitutes.START);
 		browser = new ApiClient(port);
 		email = "fish-" + UUID.randomUUID() + "@example.com";
 	}

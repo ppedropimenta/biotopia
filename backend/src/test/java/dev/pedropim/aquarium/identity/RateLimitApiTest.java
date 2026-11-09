@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -18,7 +17,6 @@ import dev.pedropim.aquarium.support.ApiClient.Response;
 import dev.pedropim.aquarium.support.ApiTest;
 import dev.pedropim.aquarium.support.MutableClock;
 import dev.pedropim.aquarium.support.RecordingEmailSender;
-import dev.pedropim.aquarium.support.TestSubstitutes;
 
 /**
  * Guessing passwords and hammering the open routes stop at volume. Each test uses its own addresses and accounts,
@@ -39,12 +37,6 @@ class RateLimitApiTest {
 
 	@Autowired
 	MutableClock clock;
-
-	/** The clock is shared with the other tests of the run: these tests move it, so it goes back. */
-	@AfterEach
-	void putTheClockBack() {
-		clock.set(TestSubstitutes.START);
-	}
 
 	@Test
 	void fiveWrongPasswordsFromOneAddressStopThatAddressEvenWithTheRightPassword() {

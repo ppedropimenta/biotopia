@@ -6,6 +6,7 @@ export type ErrorKey =
   | 'auth.errors.email_invalid'
   | 'auth.errors.password_too_short'
   | 'auth.errors.password_too_long'
+  | 'auth.errors.password_personal'
   | 'auth.errors.login_incomplete'
   | 'auth.errors.too_many_requests'
   | 'auth.errors.generic'
@@ -30,6 +31,7 @@ export function describeError(error: unknown, form: 'signup' | 'login' | 'reset'
     const errors: FormErrors = {}
     if (error.fields.email) errors.email = 'auth.errors.email_invalid'
     if (error.fields.password === 'too_long') errors.password = 'auth.errors.password_too_long'
+    else if (error.fields.password === 'personal') errors.password = 'auth.errors.password_personal'
     else if (error.fields.password) errors.password = 'auth.errors.password_too_short'
     return Object.keys(errors).length > 0 ? errors : { general: 'auth.errors.generic' }
   }

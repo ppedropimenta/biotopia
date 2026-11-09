@@ -16,6 +16,7 @@ export function TextField({
   hint,
   error,
   nudge,
+  trailing,
   keepCase = false,
   className,
   inputClassName,
@@ -25,6 +26,8 @@ export function TextField({
   unit?: string
   hint?: ReactNode
   error?: string
+  /** A control at the end of the line, after the input (a password's Show button). */
+  trailing?: ReactNode
   /** − and + buttons beside the input, for values that move in steps. The labels are in the chosen language. */
   nudge?: { onNudge: (direction: 1 | -1) => void; decrementLabel: string; incrementLabel: string }
   /** Keeps the label's own capitals, for a name whose case means something (pH, Fe). */
@@ -56,6 +59,7 @@ export function TextField({
           {...input}
         />
         {unit && <span className="font-mono text-xs">{unit}</span>}
+        {trailing}
         {nudge && (
           <button type="button" aria-label={nudge.incrementLabel} className={nudgeButton} onClick={() => nudge.onNudge(1)}>
             +

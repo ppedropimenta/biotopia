@@ -91,6 +91,8 @@ export const en = {
   auth: {
     email: 'Email',
     password: 'Password',
+    showPassword: 'Show',
+    hidePassword: 'Hide',
     working: 'One moment…',
     demoTitle: 'See the demo tank',
     demoHint: 'Read-only · no account',
@@ -103,7 +105,7 @@ export const en = {
     },
     signup: {
       title: 'Start your logbook',
-      passwordHint: 'At least 8 characters.',
+      passwordHint: 'At least 10 characters. A few words in a row are easy to remember and hard to guess.',
       submit: 'Create account',
     },
     sent: {
@@ -151,8 +153,9 @@ export const en = {
       invalid_credentials: 'That email and password do not match.',
       email_taken: 'This email already has an account. Log in instead.',
       email_invalid: 'Enter a valid email address.',
-      password_too_short: 'Use at least 8 characters.',
-      password_too_long: 'Use at most 72 characters.',
+      password_too_short: 'Use at least 10 characters. A few words in a row work well.',
+      password_too_long: 'Too long: use at most 72 characters (an accented letter counts as two).',
+      password_personal: 'Leave your email and the name Biotopia out of the password.',
       login_incomplete: 'Enter your email and your password.',
       too_many_requests: 'Too many attempts. Wait a few minutes and try again.',
       generic: 'Something went wrong. Try again in a moment.',

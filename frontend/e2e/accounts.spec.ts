@@ -141,7 +141,7 @@ test('someone who forgot the password gets a link, sets a new one, and the link 
   await page.goto(link)
   await page.getByLabel('Password').fill('short')
   await page.getByRole('button', { name: 'Save password' }).click()
-  await expect(page.getByText('Use at least 8 characters.')).toBeVisible()
+  await expect(page.getByText('Use at least 10 characters.', { exact: false })).toBeVisible()
   await page.getByLabel('Password').fill(newPassword)
   await page.getByRole('button', { name: 'Save password' }).click()
   await expect(page.getByRole('heading', { name: 'Password changed' })).toBeVisible()

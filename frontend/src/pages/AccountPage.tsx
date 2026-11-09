@@ -5,7 +5,7 @@ import { useAuth } from '../auth/context'
 import { FormError } from '../auth/FormError'
 import { LanguageToggle } from '../components/ui/Brand'
 import { Button } from '../components/ui/Button'
-import { TextField } from '../components/ui/Field'
+import { PasswordField } from '../components/ui/PasswordField'
 import { PageHeader, SectionHeader } from '../components/ui/Structure'
 
 /** The account's own page: its data, the language, and deleting the account with everything in it. */
@@ -54,9 +54,8 @@ export function AccountPage() {
         <p className="m-0 text-lead text-ink-soft">{t('account.deleteWhat')}</p>
         {confirming ? (
           <form onSubmit={submit} noValidate className="flex flex-col gap-4">
-            <TextField
+            <PasswordField
               name="password"
-              type="password"
               autoComplete="current-password"
               label={t('account.password')}
               value={password}

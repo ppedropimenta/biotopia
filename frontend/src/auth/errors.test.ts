@@ -26,6 +26,13 @@ describe('describeError', () => {
     expect(describeError(tooLong, 'reset')).toEqual({ password: 'auth.errors.password_too_long' })
   })
 
+  it('says why a password that mentions the email or the app is refused', () => {
+    const personal = new ApiError(400, 'validation_failed', { password: 'personal' })
+
+    expect(describeError(personal, 'signup')).toEqual({ password: 'auth.errors.password_personal' })
+    expect(describeError(personal, 'reset')).toEqual({ password: 'auth.errors.password_personal' })
+  })
+
   it('puts a bad address under the email field when asking for a reset link', () => {
     const error = new ApiError(400, 'validation_failed', { email: 'invalid' })
 

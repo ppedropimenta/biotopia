@@ -10,7 +10,7 @@ final class Limits {
 	static final int EMAIL = 254;
 
 	/**
-	 * Counts characters, while bcrypt counts bytes (72, checked in {@code AccountService}). A character takes at
+	 * Counts characters, while bcrypt counts bytes (72, checked in {@code PasswordRules}). A character takes at
 	 * least one byte, so no valid password has more than 72 characters; 128 leaves room and never refuses a valid one.
 	 */
 	static final int PASSWORD = 128;

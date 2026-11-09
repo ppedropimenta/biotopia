@@ -1,6 +1,5 @@
 package dev.pedropim.aquarium.identity;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.UUID;
@@ -25,11 +24,6 @@ import dev.pedropim.aquarium.web.ApiException;
 class AccountService {
 
 	private static final Logger log = LoggerFactory.getLogger(AccountService.class);
-
-	static final int MIN_PASSWORD_LENGTH = 8;
-
-	/** BCrypt only looks at the first 72 bytes, so longer passwords are refused instead of silently cut. */
-	private static final int MAX_PASSWORD_BYTES = 72;
 
 	private static final Duration CONFIRMATION_LINK_LIFETIME = Duration.ofHours(24);
 
@@ -80,7 +74,7 @@ class AccountService {
 	 */
 	void signUp(String email, String password, Language language) {
 		String address = Emails.normalized(email);
-		refuseIfTooLong(password);
+		refuseIfPersonal(password, address);
 		Email confirmation = transaction.execute(status -> {
 			if (users.existsByEmail(address)) {
 				throw emailTaken();
@@ -147,13 +141,17 @@ class AccountService {
 	 */
 	@Transactional
 	void resetPassword(String token, String newPassword) {
-		refuseIfTooLong(newPassword);
 		String tokenHash = LinkTokens.hash(token);
 		PasswordResetToken found = resetTokens.findById(tokenHash).orElseThrow(AccountService::invalidLink);
-		if (found.isExpiredAt(clock.instant()) || resetTokens.claim(tokenHash) == 0) {
+		if (found.isExpiredAt(clock.instant())) {
 			throw invalidLink();
 		}
 		User user = users.findById(found.userId()).orElseThrow(AccountService::invalidLink);
+		// Before the link is used up, so it still works with a better password.
+		refuseIfPersonal(newPassword, user.email());
+		if (resetTokens.claim(tokenHash) == 0) {
+			throw invalidLink();
+		}
 		user.changePassword(passwordEncoder.encode(newPassword), clock.instant());
 		if (!user.isConfirmed()) {
 			user.confirm(clock.instant());
@@ -206,9 +204,10 @@ class AccountService {
 		}
 	}
 
-	private static void refuseIfTooLong(String password) {
-		if (password.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES) {
-			throw ApiException.invalidField("password", "too_long");
+	/** The length is checked with the request ({@link NewPassword}); this needs the account's address. */
+	private static void refuseIfPersonal(String password, String email) {
+		if (PasswordRules.isPersonal(password, email)) {
+			throw ApiException.invalidField("password", "personal");
 		}
 	}
 

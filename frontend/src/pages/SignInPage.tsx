@@ -11,6 +11,7 @@ import { Button, ButtonLink } from '../components/ui/Button'
 import { Illustration } from '../components/ui/Brand'
 import { Icon } from '../components/ui/Icon'
 import { TextField } from '../components/ui/Field'
+import { PasswordField } from '../components/ui/PasswordField'
 import { plateClasses } from '../components/ui/plateClasses'
 import { cx } from '../lib/cx'
 import { isLanguage } from '../i18n/language'
@@ -115,11 +116,10 @@ function LogInForm() {
           error={errors.email && t(errors.email)}
         />
         <div className="flex flex-col items-end gap-2">
-          <TextField
+          <PasswordField
             className="w-full"
             label={t('auth.password')}
             name="password"
-            type="password"
             autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -188,10 +188,9 @@ function SignUpForm({ onSignedUp }: FormProps) {
         onChange={(event) => setEmail(event.target.value)}
         error={errors.email && t(errors.email)}
       />
-      <TextField
+      <PasswordField
         label={t('auth.password')}
         name="password"
-        type="password"
         autoComplete="new-password"
         hint={t('auth.signup.passwordHint')}
         value={password}

@@ -24,9 +24,10 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @Configuration(proxyBeanMethods = false)
 class SecurityConfig {
 
+	/** BCrypt (the delegating encoder's default), over the normalized password. */
 	@Bean
 	PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		return new NormalizingPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
 	}
 
 	@Bean

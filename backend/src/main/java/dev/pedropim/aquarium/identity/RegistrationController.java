@@ -68,7 +68,7 @@ class RegistrationController {
 
 	record SignUpRequest(
 			@NotBlank(message = "invalid") @Email(message = "invalid") @Size(max = Limits.EMAIL, message = "invalid") String email,
-			@NotBlank(message = "too_short") @Size(min = AccountService.MIN_PASSWORD_LENGTH, message = "too_short") @Size(max = Limits.PASSWORD, message = "too_long") String password,
+			@NotBlank(message = "too_short") @NewPassword @Size(max = Limits.PASSWORD, message = "too_long") String password,
 			@Pattern(regexp = "en|pt-BR", message = "unsupported") String language) {
 
 		SignUpRequest {
@@ -81,7 +81,7 @@ class RegistrationController {
 	}
 
 	record ResetPasswordRequest(@NotBlank(message = "invalid") @Size(max = Limits.TOKEN, message = "invalid") String token,
-			@NotBlank(message = "too_short") @Size(min = AccountService.MIN_PASSWORD_LENGTH, message = "too_short") @Size(max = Limits.PASSWORD, message = "too_long") String password) {
+			@NotBlank(message = "too_short") @NewPassword @Size(max = Limits.PASSWORD, message = "too_long") String password) {
 	}
 
 	/** The requests that only need an address: a new confirmation link or a reset link. */

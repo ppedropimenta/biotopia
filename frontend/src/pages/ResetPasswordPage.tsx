@@ -6,7 +6,7 @@ import { AuthScreen } from '../auth/AuthScreen'
 import { describeError, type FormErrors } from '../auth/errors'
 import { FormError } from '../auth/FormError'
 import { Button, ButtonLink } from '../components/ui/Button'
-import { TextField } from '../components/ui/Field'
+import { PasswordField } from '../components/ui/PasswordField'
 
 type Outcome = 'asking' | 'done' | 'failed'
 
@@ -59,10 +59,9 @@ export function ResetPasswordPage() {
   return (
     <AuthScreen title={t('auth.reset.title')} lead={t('auth.reset.lead')}>
       <form onSubmit={submit} noValidate aria-busy={submitting} className="flex flex-col gap-5.5">
-        <TextField
+        <PasswordField
           label={t('auth.password')}
           name="password"
-          type="password"
           autoComplete="new-password"
           hint={t('auth.signup.passwordHint')}
           value={password}

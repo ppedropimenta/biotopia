@@ -93,6 +93,8 @@ export const ptBR: Messages = {
   auth: {
     email: 'E-mail',
     password: 'Senha',
+    showPassword: 'Mostrar',
+    hidePassword: 'Ocultar',
     working: 'Um instante…',
     demoTitle: 'Ver o aquário demo',
     demoHint: 'Somente leitura · sem conta',
@@ -105,7 +107,7 @@ export const ptBR: Messages = {
     },
     signup: {
       title: 'Comece o seu diário',
-      passwordHint: 'Pelo menos 8 caracteres.',
+      passwordHint: 'Pelo menos 10 caracteres. Algumas palavras em sequência são fáceis de lembrar e difíceis de adivinhar.',
       submit: 'Criar conta',
     },
     sent: {
@@ -153,8 +155,9 @@ export const ptBR: Messages = {
       invalid_credentials: 'Esse e-mail e essa senha não conferem.',
       email_taken: 'Este e-mail já tem conta. Entre com ela.',
       email_invalid: 'Digite um e-mail válido.',
-      password_too_short: 'Use pelo menos 8 caracteres.',
-      password_too_long: 'Use no máximo 72 caracteres.',
+      password_too_short: 'Use pelo menos 10 caracteres. Algumas palavras em sequência funcionam bem.',
+      password_too_long: 'Longa demais: use no máximo 72 caracteres (letra acentuada conta como duas).',
+      password_personal: 'Deixe seu e-mail e o nome Biotopia fora da senha.',
       login_incomplete: 'Digite o seu e-mail e a sua senha.',
       too_many_requests: 'Tentativas demais. Espere alguns minutos e tente de novo.',
       generic: 'Algo deu errado. Tente de novo em instantes.',

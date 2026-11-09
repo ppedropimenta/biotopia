@@ -22,9 +22,6 @@ import dev.pedropim.aquarium.web.ApiException;
 @Service
 class MeasurementService {
 
-	/** The column keeps four decimals: photometers read nitrite to 0.001 and iron to 0.005 mg/L, and kits to 0.01. */
-	private static final int MAX_DECIMALS = 4;
-
 	private static final int MAX_NOTE_LENGTH = 2000;
 
 	private static final int MAX_LIST = 1000;
@@ -99,7 +96,7 @@ class MeasurementService {
 			problems.put("value", "required");
 		}
 		else {
-			valueProblem(measurement.parameter(), change.value()).ifPresent(code -> problems.put("value", code));
+			measurement.parameter().problemWith(change.value()).ifPresent(code -> problems.put("value", code));
 		}
 		checkNote(change.note(), problems);
 		refuseIfAny(problems);
@@ -148,7 +145,7 @@ class MeasurementService {
 				problems.put("values." + code, "unknown_parameter");
 			}
 			else {
-				valueProblem(parameter.get(), value).ifPresentOrElse(problem -> problems.put("values." + code, problem),
+				parameter.get().problemWith(value).ifPresentOrElse(problem -> problems.put("values." + code, problem),
 						() -> values.put(parameter.get(), value));
 			}
 		});
@@ -156,13 +153,6 @@ class MeasurementService {
 			problems.put("values", "required");
 		}
 		return values;
-	}
-
-	private static Optional<String> valueProblem(Parameter parameter, BigDecimal value) {
-		if (value.stripTrailingZeros().scale() > MAX_DECIMALS) {
-			return Optional.of("invalid");
-		}
-		return parameter.allows(value) ? Optional.empty() : Optional.of("out_of_range");
 	}
 
 	/** Refuses the whole submission with a code per field, so one form shows every problem at once. */

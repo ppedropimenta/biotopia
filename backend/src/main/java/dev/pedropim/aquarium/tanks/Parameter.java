@@ -22,6 +22,8 @@ enum Parameter {
 	IRON("iron", "mg/L", 0, 100),
 	POTASSIUM("potassium", "mg/L", 0, 1000);
 
+	private static final int MAX_DECIMALS = 4;
+
 	private final String code;
 
 	private final String unit;
@@ -53,8 +55,16 @@ enum Parameter {
 		return max;
 	}
 
-	boolean allows(BigDecimal value) {
-		return value.compareTo(min) >= 0 && value.compareTo(max) <= 0;
+	/**
+	 * What is wrong with this value for this Parameter, if anything: {@code invalid} with more than four decimals (the
+	 * column keeps four: photometers read nitrite to 0.001 and iron to 0.005 mg/L, and kits to 0.01), or
+	 * {@code out_of_range} outside the bounds.
+	 */
+	Optional<String> problemWith(BigDecimal value) {
+		if (value.stripTrailingZeros().scale() > MAX_DECIMALS) {
+			return Optional.of("invalid");
+		}
+		return value.compareTo(min) >= 0 && value.compareTo(max) <= 0 ? Optional.empty() : Optional.of("out_of_range");
 	}
 
 	static Optional<Parameter> ofCode(String code) {

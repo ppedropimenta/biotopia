@@ -111,6 +111,7 @@ class PasswordResetApiTest {
 		Email sent = mail.sentTo(email).getLast();
 		assertThat(sent.subject()).isEqualTo("Redefina sua senha");
 		assertThat(sent.body()).contains("nova senha");
+		assertThat(sent.html()).contains("lang=\"pt-BR\"", "nova senha", "/reset-password?token=", "/email/leaffish.png");
 	}
 
 	@Test

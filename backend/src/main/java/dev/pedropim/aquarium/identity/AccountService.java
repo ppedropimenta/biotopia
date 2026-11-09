@@ -130,7 +130,7 @@ class AccountService {
 			resetTokens.save(
 					new PasswordResetToken(LinkTokens.hash(token), user.id(), clock.instant().plus(RESET_LINK_LIFETIME)));
 			String link = publicUrl + "/reset-password?token=" + token;
-			return PasswordResetEmail.to(user.email(), user.language(), link);
+			return PasswordResetEmail.to(user.email(), user.language(), link, publicUrl);
 		}).orElse(null));
 		sendWithoutFailing(reset);
 	}
@@ -185,7 +185,7 @@ class AccountService {
 		tokens.save(new ConfirmationToken(LinkTokens.hash(token), user.id(),
 				clock.instant().plus(CONFIRMATION_LINK_LIFETIME)));
 		String link = publicUrl + "/confirm?token=" + token;
-		return ConfirmationEmail.to(user.email(), user.language(), link);
+		return ConfirmationEmail.to(user.email(), user.language(), link, publicUrl);
 	}
 
 	/**

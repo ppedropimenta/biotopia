@@ -1,11 +1,15 @@
 package dev.pedropim.aquarium.email;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
  * Sends emails through an SMTP server. Active only when {@code spring.mail.host} is not empty (production sets it from
@@ -24,11 +28,18 @@ class SmtpEmailSender implements EmailSender {
 
 	@Override
 	public void send(Email email) {
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setFrom(from);
-		message.setTo(email.to());
-		message.setSubject(email.subject());
-		message.setText(email.body());
+		MimeMessage message = mailSender.createMimeMessage();
+		try {
+			// Multipart: the client shows the HTML, or the plain text when it cannot.
+			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+			helper.setFrom(from);
+			helper.setTo(email.to());
+			helper.setSubject(email.subject());
+			helper.setText(email.body(), email.html());
+		}
+		catch (MessagingException failed) {
+			throw new MailPreparationException("Could not build the email to " + email.to(), failed);
+		}
 		mailSender.send(message);
 	}
 

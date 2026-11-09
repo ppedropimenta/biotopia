@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import demoTankFish from '../assets/illustrations/tanks/demo-tank-fish.svg?raw'
 import { Link } from 'react-router'
 import { useAuth } from '../auth/context'
 import { Binomial, Illustration } from '../components/ui/Brand'
@@ -105,7 +106,7 @@ function Demo() {
     <section id="demo" aria-labelledby="demo-title" className="texture-river-wide text-river-bright">
       <div className="mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(440px,100%),1fr))] items-center gap-12 px-6 py-18">
         <div data-reveal className="overflow-hidden rounded-paper bg-paper drop-shadow-[0_20px_30px_rgba(0,0,0,0.4)]">
-          <Illustration slug="blackwater" decorative className="drift" />
+          <DemoTankDrawing />
         </div>
         <div data-reveal="120" className="flex flex-col gap-4.5">
           <h2 id="demo-title" className="m-0 text-display leading-[1.08] font-normal">
@@ -121,6 +122,20 @@ function Demo() {
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * The Demo Tank as drawn: the still tank as an image, and its fish on top, the same size, swimming there and back.
+ * The fish are written into the page rather than shown as an image, because only then does the browser apply the
+ * visitor's "less motion" setting to them; for those visitors they stay still.
+ */
+function DemoTankDrawing() {
+  return (
+    <div className="grid">
+      <Illustration slug="demo-tank" decorative className="[grid-area:1/1]" />
+      <div aria-hidden className="[grid-area:1/1] [&>svg]:block [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: demoTankFish }} />
+    </div>
   )
 }
 

@@ -8,6 +8,7 @@
 import tankBlackwater from '../assets/illustrations/tanks/blackwater.svg'
 import tankPlanted from '../assets/illustrations/tanks/planted.svg'
 import tankPlantedDiscus from '../assets/illustrations/tanks/planted-discus.svg'
+import demoTank from '../assets/illustrations/tanks/demo-tank.svg'
 import apistogramma from '../assets/illustrations/fish/apistogramma-agassizii.svg'
 import cardinal from '../assets/illustrations/fish/cardinal.svg'
 import corydoras from '../assets/illustrations/fish/corydoras-adolfoi.svg'
@@ -38,9 +39,13 @@ export const plantArt = {
   'folhas-secas': art(folhas, 280, 190),
 } as const
 
-/** Decorations that are not a species: a strip of floating plants for the top of a page, full width. */
+/**
+ * Decorations that are not a species: a strip of floating plants for the top of a page, full width; and the Demo
+ * Tank as drawn for the landing page, without its fish (they are a separate layer, see DemoTankDrawing).
+ */
 export const decorationArt = {
   'floating-plants': art(floatingPlants, 1400, 150),
+  'demo-tank': art(demoTank, 540, 360),
 } as const
 
 /** Tank drawings, used until a tank has photos. */

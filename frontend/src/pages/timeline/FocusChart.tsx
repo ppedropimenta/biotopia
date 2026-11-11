@@ -73,6 +73,11 @@ export function FocusChart({
   const dots = panel.points.length <= 45
   const waterChanges = care.filter(isWaterChange)
   const others = care.filter((c) => !isWaterChange(c))
+  // Where a stamp or a label of `half` its width is centred: on its moment, but pushed inside the plot near an edge,
+  // so it never covers the lane names on the left. Its dashed line still marks the exact moment.
+  const placeAt = (at: number, half: number) =>
+    Math.min(Math.max(x(at), left + half), Math.max(left + half, width - right - half))
+  const stampRadius = 15
 
   // Labels of other care sit on the first row where they clear the one before. When no row is free (three rows
   // deep), the care is a plain square on a row of its own under them, so nothing is ever drawn over a label.
@@ -81,11 +86,11 @@ export function FocusChart({
   const placed = others.map((marker) => {
     const text = t(`maintenance.stamps.${marker.type}`)
     const w = text.length * 6.4 + 16
-    const start = x(marker.at) - w / 2
+    const start = placeAt(marker.at, w / 2) - w / 2
     const row = rowEnds.findIndex((end) => start >= end + 4)
     const at = row !== -1 ? row : rowEnds.length < labelRows ? rowEnds.length : -1
     if (at !== -1) rowEnds[at] = start + w
-    return { marker, text, w, row: at }
+    return { marker, text, w, row: at, cx: start + w / 2 }
   })
   const squares = placed.some((p) => p.row === -1)
   const careRows = rowEnds.length + (squares ? 1 : 0)
@@ -141,7 +146,8 @@ export function FocusChart({
   }
 
   // A stamp keeps its percentage only when its neighbour is far enough away.
-  const stampText = (i: number) => (i === 0 || x(waterChanges[i].at) - x(waterChanges[i - 1].at) >= 32) && width > 0
+  const stampAt = (i: number) => placeAt(waterChanges[i].at, stampRadius)
+  const stampText = (i: number) => (i === 0 || stampAt(i) - stampAt(i - 1) >= 32) && width > 0
   return (
     <div ref={ref} className="relative w-full" style={{ minHeight: height }}>
       <div ref={scroller} className="overflow-x-auto overflow-y-hidden [scrollbar-width:thin]">
@@ -223,22 +229,22 @@ export function FocusChart({
 
                 {waterChanges.map((entry, i) =>
                   stampText(i) ? (
-                    <g key={entry.id} transform={`translate(${x(entry.at)} ${waterY})`}>
-                      <circle r={15} fill="none" strokeWidth={2} className="stroke-neon" />
+                    <g key={entry.id} transform={`translate(${stampAt(i)} ${waterY})`}>
+                      <circle r={stampRadius} fill="none" strokeWidth={2} className="stroke-neon" />
                       <circle r={11.5} fill="none" strokeWidth={0.8} className="stroke-neon" />
                       <text textAnchor="middle" y={3.5} fontSize="10" className="fill-neon font-mono">
                         {entry.percent === null ? '' : `${formatNumber(entry.percent, language)}%`}
                       </text>
                     </g>
                   ) : (
-                    <circle key={entry.id} cx={x(entry.at)} cy={waterY} r={4.5} className="fill-neon" />
+                    <circle key={entry.id} cx={stampAt(i)} cy={waterY} r={4.5} className="fill-neon" />
                   ),
                 )}
 
-                {placed.map(({ marker, text, w, row }) => {
+                {placed.map(({ marker, text, w, row, cx }) => {
                   const rowY = otherY + (row === -1 ? rowEnds.length : row) * rowPitch
                   return row !== -1 ? (
-                    <g key={marker.id} transform={`translate(${x(marker.at)} ${rowY})`}>
+                    <g key={marker.id} transform={`translate(${cx} ${rowY})`}>
                       <rect x={-w / 2} y={-10} width={w} height={20} rx={10} fill="none" className="stroke-ink-muted" />
                       <text
                         textAnchor="middle"

@@ -12,7 +12,7 @@ export type ParameterCode =
   | 'nitrite'
   | 'nitrate'
   | 'phosphate'
-  | 'conductivity'
+  | 'tds'
   | 'iron'
   | 'potassium'
 
@@ -70,8 +70,8 @@ function hasAtMostValueDecimals(value: number): boolean {
 }
 
 /** The number typed for one Parameter, or what is wrong with it. An empty field is `null`: left out. */
-function readValue(text: string, parameter: Parameter, language: Language): number | null | ErrorKey {
-  const value = parseNumber(text, language)
+function readValue(text: string, parameter: Parameter): number | null | ErrorKey {
+  const value = parseNumber(text)
   if (value === null) return null
   if (value === 'invalid' || !hasAtMostValueDecimals(value)) return 'measurements.errors.number_invalid'
   if (value < parameter.min || value > parameter.max) return 'measurements.errors.out_of_range'
@@ -90,12 +90,11 @@ export const cleanNote = (note: string) => (note.trim() === '' ? null : note.tri
 export function toNewMeasurements(
   form: RecordForm,
   parameters: Parameter[],
-  language: Language,
 ): { request: NewMeasurements } | { errors: FormErrors } {
   const errors: FormErrors = {}
   const values: Partial<Record<ParameterCode, number>> = {}
   for (const parameter of parameters) {
-    const value = readValue(form.values[parameter.code] ?? '', parameter, language)
+    const value = readValue(form.values[parameter.code] ?? '', parameter)
     if (typeof value === 'string') errors[parameter.code] = value
     else if (value !== null) values[parameter.code] = value
   }
@@ -117,10 +116,9 @@ export function toNewMeasurements(
 export function toChange(
   form: EditForm,
   parameter: Parameter,
-  language: Language,
 ): { change: MeasurementChange } | { errors: FormErrors } {
   const errors: FormErrors = {}
-  const value = readValue(form.value, parameter, language)
+  const value = readValue(form.value, parameter)
   if (value === null) errors.value = 'measurements.errors.number_invalid'
   else if (typeof value === 'string') errors.value = value
 

@@ -21,24 +21,23 @@ const parameters: Parameter[] = [
 const empty: RecordForm = { values: {}, moment: '2026-01-10T08:30', momentChanged: false, note: '' }
 
 describe('toNewMeasurements', () => {
-  it('sends only the parameters that were filled in, reading numbers in the language of the person', () => {
-    const result = toNewMeasurements({ ...empty, values: { ph: '6,8', nitrate: '20', temperature: '' } }, parameters, 'pt-BR')
+  it('sends only the parameters that were filled in, reading a decimal comma', () => {
+    const result = toNewMeasurements({ ...empty, values: { ph: '6,8', nitrate: '20', temperature: '' } }, parameters)
 
     expect(result).toEqual({ request: { measuredAt: null, note: null, values: { ph: 6.8, nitrate: 20 } } })
   })
 
   it('keeps a reading of 0 as 0', () => {
-    const result = toNewMeasurements({ ...empty, values: { nitrate: '0' } }, parameters, 'en')
+    const result = toNewMeasurements({ ...empty, values: { nitrate: '0' } }, parameters)
 
     expect(result).toEqual({ request: { measuredAt: null, note: null, values: { nitrate: 0 } } })
   })
 
   it('leaves the moment out while it is still the prefilled "now", so the server’s clock decides', () => {
-    const untouched = toNewMeasurements({ ...empty, values: { ph: '7' } }, parameters, 'en')
+    const untouched = toNewMeasurements({ ...empty, values: { ph: '7' } }, parameters)
     const changed = toNewMeasurements(
       { ...empty, values: { ph: '7' }, moment: '2026-01-09T20:15', momentChanged: true },
       parameters,
-      'en',
     )
 
     expect(untouched).toMatchObject({ request: { measuredAt: null } })
@@ -48,24 +47,23 @@ describe('toNewMeasurements', () => {
   })
 
   it('sends the note, or nothing when it is blank', () => {
-    const noted = toNewMeasurements({ ...empty, values: { ph: '7' }, note: ' API kit ' }, parameters, 'en')
-    const blank = toNewMeasurements({ ...empty, values: { ph: '7' }, note: '   ' }, parameters, 'en')
+    const noted = toNewMeasurements({ ...empty, values: { ph: '7' }, note: ' API kit ' }, parameters)
+    const blank = toNewMeasurements({ ...empty, values: { ph: '7' }, note: '   ' }, parameters)
 
     expect(noted).toMatchObject({ request: { note: 'API kit' } })
     expect(blank).toMatchObject({ request: { note: null } })
   })
 
   it('refuses a submission with no value, without calling the API', () => {
-    expect(toNewMeasurements({ ...empty, values: { ph: '  ' } }, parameters, 'en')).toEqual({
+    expect(toNewMeasurements({ ...empty, values: { ph: '  ' } }, parameters)).toEqual({
       errors: { general: 'measurements.errors.values_required' },
     })
   })
 
   it('reports a number written the wrong way, a value out of range and too many decimals, each under its own field', () => {
     const result = toNewMeasurements(
-      { ...empty, values: { ph: '6,8', temperature: '46', nitrate: '1.23456' } },
+      { ...empty, values: { ph: '6,8,1', temperature: '46', nitrate: '1.23456' } },
       parameters,
-      'en',
     )
 
     expect(result).toEqual({
@@ -78,13 +76,13 @@ describe('toNewMeasurements', () => {
   })
 
   it('keeps the decimals of a photometer reading, up to four', () => {
-    const result = toNewMeasurements({ ...empty, values: { nitrate: '0.0251' } }, parameters, 'en')
+    const result = toNewMeasurements({ ...empty, values: { nitrate: '0.0251' } }, parameters)
 
     expect(result).toEqual({ request: { measuredAt: null, note: null, values: { nitrate: 0.0251 } } })
   })
 
   it('accepts the bounds themselves', () => {
-    const result = toNewMeasurements({ ...empty, values: { ph: '14', temperature: '0' } }, parameters, 'en')
+    const result = toNewMeasurements({ ...empty, values: { ph: '14', temperature: '0' } }, parameters)
 
     expect(result).toEqual({ request: { measuredAt: null, note: null, values: { ph: 14, temperature: 0 } } })
   })
@@ -93,7 +91,6 @@ describe('toNewMeasurements', () => {
     const result = toNewMeasurements(
       { ...empty, values: { ph: '7' }, moment: '', momentChanged: true },
       parameters,
-      'en',
     )
 
     expect(result).toEqual({ errors: { moment: 'measurements.errors.moment_invalid' } })
@@ -104,7 +101,7 @@ describe('toChange', () => {
   const ph = parameters[1]
 
   it('always sends the moment, because an edit replaces the Measurement', () => {
-    const result = toChange({ value: '6,9', moment: '2026-01-10T08:30', note: '' }, ph, 'pt-BR')
+    const result = toChange({ value: '6,9', moment: '2026-01-10T08:30', note: '' }, ph)
 
     expect(result).toEqual({
       change: { value: 6.9, measuredAt: new Date(2026, 0, 10, 8, 30).toISOString(), note: null },
@@ -112,10 +109,10 @@ describe('toChange', () => {
   })
 
   it('checks the value against the bounds of its own parameter', () => {
-    expect(toChange({ value: '72', moment: '2026-01-10T08:30', note: '' }, ph, 'en')).toEqual({
+    expect(toChange({ value: '72', moment: '2026-01-10T08:30', note: '' }, ph)).toEqual({
       errors: { value: 'measurements.errors.out_of_range' },
     })
-    expect(toChange({ value: '', moment: '2026-01-10T08:30', note: '' }, ph, 'en')).toEqual({
+    expect(toChange({ value: '', moment: '2026-01-10T08:30', note: '' }, ph)).toEqual({
       errors: { value: 'measurements.errors.number_invalid' },
     })
   })

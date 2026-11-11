@@ -1,20 +1,19 @@
 import type { Measurement, Parameter, ParameterCode } from './measurements'
 
-/** The periods the timeline offers. The tank page's four weeks is not one of them: the shortest here is a month. */
+/** The periods the timeline offers. The tank page's two months is not one of them. */
 export const periods = ['m1', 'w12', 'm6', 'all'] as const
 export type TimelinePeriod = (typeof periods)[number]
-export type Period = TimelinePeriod | 'w4'
+export type Period = TimelinePeriod | 'm2'
 
 const msPerDay = 24 * 60 * 60 * 1000
 
 /** Where a period starts, counting back from `now`; the whole history has no start. */
 export function periodStart(period: Period, now: Date): Date | null {
   switch (period) {
-    case 'w4':
-      return new Date(now.getTime() - 28 * msPerDay)
-    case 'm1': {
+    case 'm1':
+    case 'm2': {
       const start = new Date(now)
-      start.setUTCMonth(start.getUTCMonth() - 1)
+      start.setUTCMonth(start.getUTCMonth() - (period === 'm1' ? 1 : 2))
       return start
     }
     case 'w12':

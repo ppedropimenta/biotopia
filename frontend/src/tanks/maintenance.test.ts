@@ -13,23 +13,23 @@ const form = (over: Partial<MaintenanceForm> = {}): MaintenanceForm => ({
 
 describe('toDetails', () => {
   it('sends the type, no percentage and no moment for a plain record made now', () => {
-    expect(toDetails(form(), 'en', null)).toEqual({
+    expect(toDetails(form(), null)).toEqual({
       details: [{ type: 'pruning', percent: null, performedAt: null, note: null }],
     })
   })
 
-  it('reads the percentage of a water change with the language decimal separator', () => {
+  it('reads the percentage of a water change with a comma or a point', () => {
     const typed = form({ types: ['water_change'], percent: '12,5' })
-    expect(toDetails(typed, 'pt-BR', null)).toEqual({
+    expect(toDetails(typed, null)).toEqual({
       details: [{ type: 'water_change', percent: 12.5, performedAt: null, note: null }],
     })
-    expect(toDetails({ ...typed, percent: '12.5' }, 'pt-BR', null)).toEqual({
-      errors: { percent: 'maintenance.errors.number_invalid' },
+    expect(toDetails({ ...typed, percent: '12.5' }, null)).toEqual({
+      details: [{ type: 'water_change', percent: 12.5, performedAt: null, note: null }],
     })
   })
 
   it('needs a percentage above 0 and at most 100 for a water change', () => {
-    const water = (percent: string) => toDetails(form({ types: ['water_change'], percent }), 'en', null)
+    const water = (percent: string) => toDetails(form({ types: ['water_change'], percent }), null)
     expect(water('')).toEqual({ errors: { percent: 'maintenance.errors.percent_required' } })
     expect(water('0')).toEqual({ errors: { percent: 'maintenance.errors.percent_out_of_range' } })
     expect(water('101')).toEqual({ errors: { percent: 'maintenance.errors.percent_out_of_range' } })
@@ -39,26 +39,26 @@ describe('toDetails', () => {
   })
 
   it('leaves out the percentage of any other type, even if one was typed before switching', () => {
-    expect(toDetails(form({ types: ['top_up'], percent: '30' }), 'en', null)).toEqual({
+    expect(toDetails(form({ types: ['top_up'], percent: '30' }), null)).toEqual({
       details: [{ type: 'top_up', percent: null, performedAt: null, note: null }],
     })
   })
 
   it('needs a note for Other, and trims and drops a blank one for the rest', () => {
-    expect(toDetails(form({ types: ['other'], note: '  ' }), 'en', null)).toEqual({
+    expect(toDetails(form({ types: ['other'], note: '  ' }), null)).toEqual({
       errors: { note: 'maintenance.errors.note_required' },
     })
-    expect(toDetails(form({ types: ['other'], note: ' moved the heater ' }), 'en', null)).toEqual({
+    expect(toDetails(form({ types: ['other'], note: ' moved the heater ' }), null)).toEqual({
       details: [{ type: 'other', percent: null, performedAt: null, note: 'moved the heater' }],
     })
-    expect(toDetails(form({ note: '   ' }), 'en', null)).toHaveProperty('details.0.note', null)
+    expect(toDetails(form({ note: '   ' }), null)).toHaveProperty('details.0.note', null)
   })
 
   it('sends the moment only when it was changed, and otherwise the one it already had', () => {
-    const changed = toDetails(form({ momentChanged: true, moment: '2026-01-09T20:15' }), 'en', null)
+    const changed = toDetails(form({ momentChanged: true, moment: '2026-01-09T20:15' }), null)
     expect('details' in changed && changed.details[0].performedAt).toBe(new Date('2026-01-09T20:15').toISOString())
-    expect(toDetails(form(), 'en', '2026-01-10T08:30:12Z')).toHaveProperty('details.0.performedAt', '2026-01-10T08:30:12Z')
-    expect(toDetails(form({ momentChanged: true, moment: '' }), 'en', null)).toEqual({
+    expect(toDetails(form(), '2026-01-10T08:30:12Z')).toHaveProperty('details.0.performedAt', '2026-01-10T08:30:12Z')
+    expect(toDetails(form({ momentChanged: true, moment: '' }), null)).toEqual({
       errors: { moment: 'maintenance.errors.moment_invalid' },
     })
   })
@@ -70,7 +70,7 @@ describe('toDetails', () => {
       moment: '2026-01-09T20:15',
     })
     const at = new Date('2026-01-09T20:15').toISOString()
-    expect(toDetails(typed, 'en', null)).toEqual({
+    expect(toDetails(typed, null)).toEqual({
       details: [
         { type: 'water_change', percent: 30, performedAt: at, note: null },
         { type: 'filter_cleaning', percent: null, performedAt: at, note: null },
@@ -81,7 +81,7 @@ describe('toDetails', () => {
 
   it('puts the note on Other when it is picked, and otherwise on the first record', () => {
     const noteOf = (types: MaintenanceForm['types']) => {
-      const checked = toDetails(form({ types, note: 'clogged', percent: '10' }), 'en', null)
+      const checked = toDetails(form({ types, note: 'clogged', percent: '10' }), null)
       return 'details' in checked ? checked.details.map((d) => d.note) : null
     }
     expect(noteOf(['water_change', 'filter_cleaning'])).toEqual(['clogged', null])
@@ -89,14 +89,14 @@ describe('toDetails', () => {
   })
 
   it('asks for the percentage only when a water change is among the types, and for a note only with Other', () => {
-    expect(toDetails(form({ types: ['water_change', 'other'], percent: '', note: '' }), 'en', null)).toEqual({
+    expect(toDetails(form({ types: ['water_change', 'other'], percent: '', note: '' }), null)).toEqual({
       errors: { percent: 'maintenance.errors.percent_required', note: 'maintenance.errors.note_required' },
     })
-    expect(toDetails(form({ types: ['filter_cleaning', 'pruning'], percent: 'abc' }), 'en', null)).toHaveProperty('details')
+    expect(toDetails(form({ types: ['filter_cleaning', 'pruning'], percent: 'abc' }), null)).toHaveProperty('details')
   })
 
   it('needs at least one type', () => {
-    expect(toDetails(form({ types: [] }), 'en', null)).toEqual({ errors: { type: 'maintenance.errors.type_required' } })
+    expect(toDetails(form({ types: [] }), null)).toEqual({ errors: { type: 'maintenance.errors.type_required' } })
   })
 })
 

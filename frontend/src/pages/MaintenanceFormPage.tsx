@@ -23,6 +23,7 @@ import { toLocalInput } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
+import { useReturnTo } from '../tanks/returnTo'
 import { useLoad } from '../tanks/useLoad'
 import { formatVolume, volumeOf } from '../tanks/volume'
 
@@ -44,7 +45,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const { t } = useTranslation()
   const language = useLanguage()
   const navigate = useNavigate()
-  const list = `/tanks/${tank.id}/timeline`
+  const list = useReturnTo(`/tanks/${tank.id}/timeline`)
   // "Now" is only prefilled for the person to see; a new record sends no moment unless they change it.
   const [form, setForm] = useState<MaintenanceForm>(() => ({
     types: [entry?.type ?? 'water_change'],
@@ -58,14 +59,14 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
   const [confirming, setConfirming] = useState(false)
 
   const volume = volumeOf(tank)
-  const liters = litersOfText(form.percent, language, volume?.liters ?? null)
+  const liters = litersOfText(form.percent, volume?.liters ?? null)
 
   const message = (key: ErrorKey | undefined) =>
     key && t(key, { example: formatNumber(12.5, language) })
 
   async function submit(event: FormEvent) {
     event.preventDefault()
-    const checked = toDetails(form, language, entry?.performedAt ?? null)
+    const checked = toDetails(form, entry?.performedAt ?? null)
     if ('errors' in checked) {
       setErrors(checked.errors)
       return
@@ -107,7 +108,7 @@ function FormScreen({ tank, entry }: { tank: Tank; entry: Maintenance | null }) 
       <MeasurementHeader
         tank={tank}
         title={t(entry ? 'maintenance.form.editTitle' : 'maintenance.form.newTitle')}
-        back={{ to: list, label: t('maintenance.form.back') }}
+        back={list.includes('/timeline') ? { to: list, label: t('maintenance.form.back') } : undefined}
       />
       <form onSubmit={submit} noValidate aria-busy={busy} className="flex flex-col gap-5 pt-5">
         <div role="group" aria-label={t('maintenance.form.type')} className="flex flex-col gap-2">

@@ -155,7 +155,7 @@ export function Stepper({
   const clamp = (v: number) => Math.min(max, Math.max(min, Math.round(v * 10 ** digits) / 10 ** digits))
   const commit = () => {
     if (draft === null) return
-    const parsed = parseNumber(draft, language)
+    const parsed = parseNumber(draft)
     if (typeof parsed === 'number') onChange(clamp(parsed))
     setDraft(null)
   }

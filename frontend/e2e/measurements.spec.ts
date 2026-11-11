@@ -115,16 +115,12 @@ test('a keeper records several measurements at once, sees the latest values, edi
   await expect(plate.getByText('not measured yet')).toHaveCount(0)
 })
 
-test('in Brazilian Portuguese the decimal comma is typed and shown, and the point is refused', async ({ page }) => {
+test('in Brazilian Portuguese the decimal comma is typed and shown, and a point is read too', async ({ page }) => {
   await keeperWithATank(page)
   await choosePortuguese(page)
   await page.getByRole('link', { name: 'Registrar a primeira medição' }).click()
 
   await fillValue(page, 'pH', '6.8')
-  await page.getByRole('button', { name: 'Salvar medições' }).click()
-  await expect(page.getByText('Digite um número com no máximo 4 casas decimais, como 6,8.')).toBeVisible()
-
-  await fillValue(page, 'pH', '6,8')
   await fillValue(page, 'Temperatura', '25,5')
   await page.getByRole('button', { name: 'Aumentar Temperatura' }).click()
   await expect(page.getByRole('textbox', { name: /^Temperatura/ })).toHaveValue('26')
@@ -170,8 +166,8 @@ test('a keeper reads the water over time: a chart for one parameter at a time, a
   await record(page, 20, { Nitrate: '20', pH: '6.8' })
   await record(page, 3, { Nitrate: '35' })
 
-  // The tank page has a small chart of the last 4 weeks, and a way to all of them.
-  await expect(page.getByRole('heading', { name: 'Last 4 weeks' })).toBeVisible()
+  // The tank page has a small chart of the last 2 months, and a way to all of them.
+  await expect(page.getByRole('heading', { name: 'Last 2 months' })).toBeVisible()
   await page.getByRole('link', { name: 'All charts' }).click()
 
   // 12 weeks is the default period: the measurement from 200 days ago is not in it. The chart shows one parameter

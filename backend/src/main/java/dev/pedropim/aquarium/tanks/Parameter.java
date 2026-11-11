@@ -18,7 +18,7 @@ enum Parameter {
 	NITRITE("nitrite", "mg/L", 0, 100),
 	NITRATE("nitrate", "mg/L", 0, 1000),
 	PHOSPHATE("phosphate", "mg/L", 0, 100),
-	CONDUCTIVITY("conductivity", "µS/cm", 0, 10000),
+	TDS("tds", "ppm", 0, 10000),
 	IRON("iron", "mg/L", 0, 100),
 	POTASSIUM("potassium", "mg/L", 0, 1000);
 

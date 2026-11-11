@@ -59,7 +59,7 @@ function TankFormScreen({ tank, number }: { tank: Tank | null; number: number })
   const [example, setExample] = useState(30)
 
   const read = (text: string) => {
-    const value = parseNumber(text, language)
+    const value = parseNumber(text)
     return typeof value === 'number' ? value : null
   }
   const dimensions = { length: read(form.lengthCm), width: read(form.widthCm), height: read(form.heightCm) }
@@ -73,7 +73,7 @@ function TankFormScreen({ tank, number }: { tank: Tank | null; number: number })
 
   /** What was typed, or the problems, in the order of the steps. */
   function check() {
-    return toDetails(unknownNetCleared(), language)
+    return toDetails(unknownNetCleared())
   }
 
   function next() {

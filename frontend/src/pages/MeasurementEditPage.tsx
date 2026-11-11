@@ -19,6 +19,7 @@ import {
 } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import { nudge, nudgeable } from '../tanks/nudge'
+import { useReturnTo } from '../tanks/returnTo'
 import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
@@ -45,6 +46,7 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
   const language = useLanguage()
   const navigate = useNavigate()
   const message = useMeasurementMessage()
+  const back = useReturnTo(`/tanks/${tank.id}`)
   const [form, setForm] = useState<EditForm>(() => ({
     value: formatNumber(measurement.value, language, { grouping: false, maxDecimals: valueDecimals }),
     moment: toLocalInput(measurement.measuredAt),
@@ -58,7 +60,7 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
 
   async function submit(event: FormEvent) {
     event.preventDefault()
-    const checked = toChange(form, parameter, language)
+    const checked = toChange(form, parameter)
     if ('errors' in checked) {
       setErrors(checked.errors)
       return
@@ -70,7 +72,7 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
     const change = momentUntouched ? { ...checked.change, measuredAt: measurement.measuredAt } : checked.change
     try {
       await api.editMeasurement(tank.id, measurement.id, change)
-      navigate(`/tanks/${tank.id}`)
+      navigate(back)
     } catch (error) {
       setErrors(describeMeasurementError(error))
       setBusy(false)
@@ -81,7 +83,7 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
     setBusy(true)
     try {
       await api.deleteMeasurement(tank.id, measurement.id)
-      navigate(`/tanks/${tank.id}`)
+      navigate(back)
     } catch (error) {
       setErrors(describeMeasurementError(error))
       setConfirming(false)
@@ -91,7 +93,11 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
 
   return (
     <div className="mx-auto w-full max-w-[520px]">
-      <MeasurementHeader tank={tank} title={t('measurements.edit.title')} />
+      <MeasurementHeader
+        tank={tank}
+        title={t('measurements.edit.title')}
+        back={back.includes('/timeline') ? { to: back, label: t('maintenance.form.back') } : undefined}
+      />
       <form onSubmit={submit} noValidate aria-busy={busy} className="flex flex-col gap-5 pt-5">
         <p className="m-0 text-lead">{name}</p>
         <TextField
@@ -135,7 +141,7 @@ function EditScreen({ tank, measurement, parameter }: { tank: Tank; measurement:
           <Button type="submit" size="lg" icon="check" disabled={busy} className="flex-1">
             {busy ? t('measurements.form.saving') : t('measurements.edit.save')}
           </Button>
-          <ButtonLink to={`/tanks/${tank.id}`} variant="secondary" size="lg">
+          <ButtonLink to={back} variant="secondary" size="lg">
             {t('measurements.form.cancel')}
           </ButtonLink>
         </div>

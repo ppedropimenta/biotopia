@@ -47,15 +47,15 @@ function isAcceptable(value: number, field: (typeof numberFields)[number]): bool
   return value > 0 && value <= largest[field] && Math.abs(hundredths - Math.round(hundredths)) < 1e-6
 }
 
-/** The request for what was typed, or the problems to show first: a number in the wrong notation, a missing name. */
-export function toDetails(form: TankForm, language: Language): { details: TankDetails } | { errors: FormErrors } {
+/** The request for what was typed, or the problems to show first: a number that is not one, a missing name. */
+export function toDetails(form: TankForm): { details: TankDetails } | { errors: FormErrors } {
   const errors: FormErrors = {}
   if (form.name.trim() === '') errors.name = 'tanks.errors.required'
   if (form.startDate === '') errors.startDate = 'tanks.errors.required'
 
   const numbers = {} as Record<(typeof numberFields)[number], number | null>
   for (const field of numberFields) {
-    const value = parseNumber(form[field], language)
+    const value = parseNumber(form[field])
     if (value === 'invalid' || (value !== null && !isAcceptable(value, field))) errors[field] = 'tanks.errors.number_invalid'
     else numbers[field] = value
   }

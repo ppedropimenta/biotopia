@@ -12,7 +12,7 @@ const steppers: Record<ParameterCode, { step: number; start: number }> = {
   nitrite: { step: 0.1, start: 0 },
   nitrate: { step: 5, start: 0 },
   phosphate: { step: 0.5, start: 0 },
-  conductivity: { step: 10, start: 0 },
+  tds: { step: 10, start: 0 },
   iron: { step: 0.1, start: 0 },
   potassium: { step: 1, start: 0 },
 }
@@ -28,7 +28,7 @@ export const nudgeable = (code: ParameterCode) => nudgeableCodes.includes(code)
  */
 export function nudge(text: string, direction: 1 | -1, parameter: Parameter, last: number | null, language: Language): string {
   const { step, start } = steppers[parameter.code]
-  const typed = parseNumber(text, language)
+  const typed = parseNumber(text)
   const base = typeof typed === 'number' ? typed : (last ?? start)
   const factor = 10 ** valueDecimals
   const moved = Math.round((base + direction * step) * factor) / factor

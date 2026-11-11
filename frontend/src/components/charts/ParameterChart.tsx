@@ -213,10 +213,17 @@ export function ParameterChart({
             })}
 
             <line x1={left} y1={axisY} x2={right} y2={axisY} className="stroke-ink" strokeWidth={1.2} />
-            {timeTicks(from, to, size === 'full' ? 6 : 4).map((instant) => (
+            {timeTicks(from, to, size === 'full' ? 6 : 4).map((instant, i, all) => (
               <g key={instant}>
                 <line x1={x(instant)} y1={axisY - 4} x2={x(instant)} y2={axisY + 4} className="stroke-ink" />
-                <text x={x(instant)} y={axisY + 22} textAnchor="middle" fontSize="10.5" className="fill-ink-muted font-mono">
+                {/* The first and last dates grow inward, so the edge of the chart never cuts them. */}
+                <text
+                  x={x(instant)}
+                  y={axisY + 22}
+                  textAnchor={i === 0 ? 'start' : i === all.length - 1 ? 'end' : 'middle'}
+                  fontSize="10.5"
+                  className="fill-ink-muted font-mono"
+                >
                   {dateLabel(instant)}
                 </text>
               </g>

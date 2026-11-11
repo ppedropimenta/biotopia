@@ -1,19 +1,15 @@
 import type { Language } from '../i18n/language'
 
-const decimalSeparator: Record<Language, string> = { en: '.', 'pt-BR': ',' }
-
 /**
  * Reads what someone typed in a number field: null for an empty field, 'invalid' for anything else that is not
- * a plain non-negative number with the language's decimal separator. The other language's separator and
- * thousands separators are refused, not guessed: in Portuguese "1.5" could be meant as fifteen.
+ * a plain non-negative number. A point and a comma both mark the decimals, in either language, since phones and
+ * habits mix them; so there is no thousands separator, and "1.500" is one and a half.
  */
-export function parseNumber(text: string, language: Language): number | null | 'invalid' {
+export function parseNumber(text: string): number | null | 'invalid' {
   const trimmed = text.trim()
   if (trimmed === '') return null
-  const separator = decimalSeparator[language]
-  const plain = new RegExp(String.raw`^\d+([${separator}]\d+)?$`)
-  if (!plain.test(trimmed)) return 'invalid'
-  return Number(trimmed.replace(separator, '.'))
+  if (!/^\d+([.,]\d+)?$/.test(trimmed)) return 'invalid'
+  return Number(trimmed.replace(',', '.'))
 }
 
 /** A number the way the language writes it, with at most two decimals unless `maxDecimals` says more. */

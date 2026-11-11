@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router'
 import { SectionHeader } from '../../components/ui/Structure'
 import { buildHistory, type HistoryDay } from '../../tanks/history'
 import type { Maintenance } from '../../tanks/maintenance'
@@ -56,6 +57,11 @@ export function Journal({
     [measurements, maintenance, photos, start],
   )
   const changes = useMemo(() => changesById(measurements), [measurements])
+  // Back from an edit form, the address names the day that was open: start there instead of at the top.
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash.startsWith('#d-')) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' })
+  }, [hash])
 
   if (days.length === 0) return <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('timeline.history.empty')}</p>
 

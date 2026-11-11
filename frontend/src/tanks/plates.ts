@@ -16,7 +16,7 @@ export const plateOrder = [
   'gh',
   'kh',
   'phosphate',
-  'conductivity',
+  'tds',
   'iron',
   'potassium',
 ] as const satisfies readonly ParameterCode[]

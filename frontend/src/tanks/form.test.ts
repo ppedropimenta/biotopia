@@ -5,10 +5,9 @@ import { describeTankError, emptyForm, formFromTank, toDetails } from './form'
 const filled = { ...emptyForm, name: 'Blackwater 120', startDate: '2025-03-01' }
 
 describe('toDetails', () => {
-  it('turns what was typed into the request, reading numbers in the language of the person', () => {
+  it('turns what was typed into the request, reading a decimal comma or point', () => {
     const result = toDetails(
       { ...filled, lengthCm: '80,5', widthCm: '35', heightCm: '45', netVolumeLiters: '98,5', note: 'Peat filter' },
-      'pt-BR',
     )
 
     expect(result).toEqual({
@@ -25,7 +24,7 @@ describe('toDetails', () => {
   })
 
   it('sends empty optional fields as no value, so Net Volume stays empty', () => {
-    expect(toDetails(filled, 'en')).toEqual({
+    expect(toDetails(filled)).toEqual({
       details: {
         name: 'Blackwater 120',
         startDate: '2025-03-01',
@@ -39,7 +38,7 @@ describe('toDetails', () => {
   })
 
   it('reports a number written the wrong way under its own field, without calling the API', () => {
-    const result = toDetails({ ...filled, lengthCm: '80,5', heightCm: 'tall' }, 'en')
+    const result = toDetails({ ...filled, lengthCm: '1.000,5', heightCm: 'tall' })
 
     expect(result).toEqual({
       errors: { lengthCm: 'tanks.errors.number_invalid', heightCm: 'tanks.errors.number_invalid' },
@@ -49,7 +48,6 @@ describe('toDetails', () => {
   it('applies the same limits as the API, so a number it would refuse never leaves the form', () => {
     const result = toDetails(
       { ...filled, lengthCm: '0', widthCm: '10,123', heightCm: '10001', netVolumeLiters: '1000001' },
-      'pt-BR',
     )
 
     expect(result).toEqual({
@@ -63,13 +61,13 @@ describe('toDetails', () => {
   })
 
   it('accepts the limits themselves', () => {
-    const result = toDetails({ ...filled, lengthCm: '10000', netVolumeLiters: '1000000' }, 'pt-BR')
+    const result = toDetails({ ...filled, lengthCm: '10000', netVolumeLiters: '1000000' })
 
     expect(result).toMatchObject({ details: { lengthCm: 10000, netVolumeLiters: 1000000 } })
   })
 
   it('reports a missing name or start date before asking the API', () => {
-    expect(toDetails({ ...emptyForm }, 'en')).toEqual({
+    expect(toDetails({ ...emptyForm })).toEqual({
       errors: { name: 'tanks.errors.required', startDate: 'tanks.errors.required' },
     })
   })

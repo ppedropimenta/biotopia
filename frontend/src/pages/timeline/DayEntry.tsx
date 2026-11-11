@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { Handwritten } from '../../components/ui/Paper'
 import { Stamp } from '../../components/ui/Stamp'
 import { cx } from '../../lib/cx'
@@ -12,6 +12,7 @@ import { formatNumber } from '../../tanks/numbers'
 import { PhotoCard } from '../../tanks/PhotoCard'
 import type { Photo } from '../../tanks/photos'
 import { plateOrder } from '../../tanks/plates'
+import { returnHere } from '../../tanks/returnTo'
 import type { Tank } from '../../tanks/types'
 import { useLanguage } from '../../tanks/useLanguage'
 import { volumeOf } from '../../tanks/volume'
@@ -22,6 +23,7 @@ const turns = [-10, 6, -4, 8, -7]
 /**
  * One day of the journal: the day number on the left and, on a vertical spine, what happened in it. Measurements are
  * a grid of cells with the change since the previous time, water changes and other care are stamps, photos are prints.
+ * For the owner each cell and each care opens its edit form, which comes back to this day.
  */
 export function DayEntry({
   day,
@@ -39,6 +41,8 @@ export function DayEntry({
 }) {
   const { t } = useTranslation()
   const language = useLanguage()
+  const location = useLocation()
+  const back = returnHere(location, `#d-${day.day}`)
   const [year, month, dayOfMonth] = day.day.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, dayOfMonth))
   const weekday = new Intl.DateTimeFormat(language, { weekday: 'short', timeZone: 'UTC' }).format(date)
@@ -112,6 +116,7 @@ export function DayEntry({
                   {!tank.readOnly && (
                     <Link
                       to={`/tanks/${tank.id}/maintenance/${m.id}/edit`}
+                      state={back}
                       aria-label={t('maintenance.list.editLabel', {
                         type: t(`maintenance.types.${m.type}`),
                         moment: formatMoment(m.performedAt, language),
@@ -149,8 +154,9 @@ export function DayEntry({
               <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(118px,1fr))] gap-2 p-0">
                 {items.map((m) => {
                   const change = changes.get(m.id)
-                  return (
-                    <li key={m.id} className="flex flex-col justify-between gap-3 border border-ink/45 texture-card px-2.5 py-2.5">
+                  const cell = 'flex h-full flex-col justify-between gap-3 border border-ink/45 texture-card px-2.5 py-2.5'
+                  const content = (
+                    <>
                       <span className="font-mono text-caption leading-snug text-ink-muted">{t(`parameters.${m.parameter}`)}</span>
                       <span className="flex flex-col gap-1">
                         <span className="flex items-baseline gap-1.5">
@@ -159,6 +165,23 @@ export function DayEntry({
                         </span>
                         <span className="block min-h-[1lh] font-mono text-caption text-ink">{change && <Delta change={change} />}</span>
                       </span>
+                    </>
+                  )
+                  return (
+                    <li key={m.id}>
+                      {tank.readOnly ? (
+                        <div className={cell}>{content}</div>
+                      ) : (
+                        <Link
+                          to={`/tanks/${tank.id}/measurements/${m.id}/edit`}
+                          state={back}
+                          className={cx(cell, 'text-ink no-underline hover:border-ink hover:text-ink')}
+                        >
+                          {content}
+                          {/* The cell reads as its value; this says what the link does. */}
+                          <span className="sr-only">{t('measurements.recent.edit')}</span>
+                        </Link>
+                      )}
                     </li>
                   )
                 })}

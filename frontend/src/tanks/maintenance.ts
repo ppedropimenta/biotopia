@@ -1,6 +1,5 @@
 import { ApiError } from '../auth/api'
 import type { StampTone } from '../components/ui/Stamp'
-import type { Language } from '../i18n/language'
 import { cleanNote, readMoment } from './measurements'
 import { parseNumber } from './numbers'
 
@@ -77,14 +76,14 @@ export type FormErrors = Partial<Record<'type' | 'percent' | 'moment' | 'note' |
 const percentDecimals = 2
 
 /** The liters a typed percentage comes to, while it is a valid percentage and the tank's volume is known. */
-export function litersOfText(text: string, language: Language, netVolumeLiters: number | null): number | null {
+export function litersOfText(text: string, netVolumeLiters: number | null): number | null {
   if (netVolumeLiters === null) return null
-  const percent = readPercent(text, language)
+  const percent = readPercent(text)
   return typeof percent === 'number' ? litersOf(percent, netVolumeLiters) : null
 }
 
-function readPercent(text: string, language: Language): number | ErrorKey {
-  const value = parseNumber(text, language)
+function readPercent(text: string): number | ErrorKey {
+  const value = parseNumber(text)
   if (value === null) return 'maintenance.errors.percent_required'
   if (value === 'invalid' || Math.abs(value * 10 ** percentDecimals - Math.round(value * 10 ** percentDecimals)) > 1e-6) {
     return 'maintenance.errors.number_invalid'
@@ -100,7 +99,6 @@ function readPercent(text: string, language: Language): number | ErrorKey {
  */
 export function toDetails(
   form: MaintenanceForm,
-  language: Language,
   keptMoment: string | null,
 ): { details: MaintenanceDetails[] } | { errors: FormErrors } {
   const errors: FormErrors = {}
@@ -110,7 +108,7 @@ export function toDetails(
 
   let percent: number | null = null
   if (types.includes('water_change')) {
-    const read = readPercent(form.percent, language)
+    const read = readPercent(form.percent)
     if (typeof read === 'string') errors.percent = read
     else percent = read
   }

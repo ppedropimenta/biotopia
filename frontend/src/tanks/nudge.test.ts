@@ -32,7 +32,7 @@ describe('nudge', () => {
 
   it('treats a value that is not a number as empty', () => {
     expect(nudge('abc', 1, gh, 4, 'en')).toBe('5')
-    expect(nudge('1.5', 1, gh, 4, 'pt-BR')).toBe('5')
+    expect(nudge('1.5.0', 1, gh, 4, 'pt-BR')).toBe('5')
   })
 
   it('stays inside the limits of the Parameter', () => {

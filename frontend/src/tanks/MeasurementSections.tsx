@@ -164,9 +164,9 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
 }
 
 /**
- * The last 4 weeks of the two Parameters measured most often in that time, side by side, with a link to the charts
+ * The last 2 months of the two Parameters measured most often in that time, side by side, with a link to the charts
  * of all of them. A small chart has room for one Parameter only: Parameters do not share a value axis. Left out
- * when nothing was measured in the 4 weeks.
+ * when nothing was measured in the 2 months.
  */
 function RecentChart({
   tankId,
@@ -182,7 +182,7 @@ function RecentChart({
   now: Date
 }) {
   const { t } = useTranslation()
-  const from = periodStart('w4', now)
+  const from = periodStart('m2', now)
   const panels = busiestPanels(buildPanels(history, parameters, from), 2)
   if (panels.length === 0) return null
   const [start, end] = timeRange(panels, now)

@@ -72,16 +72,12 @@ test('a keeper adds a tank, finds it in the list and edits it, with numbers in t
   await choosePortuguese(page)
   await expect(card).toContainText('98,5')
 
-  // Editing shows the number the way it is typed in this language, and refuses the other notation.
+  // Editing shows the number the way it is written in this language, and takes a decimal point as well.
   await card.click()
   await page.getByRole('link', { name: 'Editar', exact: true }).click()
   await page.getByRole('button', { name: /^Passo 3/ }).click()
   await expect(page.getByRole('textbox', { name: 'Volume líquido' })).toHaveValue('98,5')
   await page.getByRole('textbox', { name: 'Volume líquido' }).fill('101.5')
-  await page.getByRole('button', { name: 'Salvar aquário' }).click()
-  await expect(page.getByText('Digite um número maior que 0, com no máximo 2 casas decimais, como 80,5.')).toBeVisible()
-
-  await page.getByRole('textbox', { name: 'Volume líquido' }).fill('101,5')
   await page.getByRole('button', { name: /^Passo 1/ }).click()
   await page.getByLabel('Nome').fill('Blackwater 125')
   await page.getByRole('button', { name: 'Salvar aquário' }).click()

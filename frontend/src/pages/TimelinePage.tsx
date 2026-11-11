@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Link, useParams, useSearchParams } from 'react-router'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router'
 import { api } from '../auth/api'
 import { Segmented } from '../components/ui/Chip'
 import { PageHeader } from '../components/ui/Structure'
@@ -7,6 +7,8 @@ import { LoadError } from '../tanks/LoadError'
 import { formatMoment, valueDecimals } from '../tanks/measurements'
 import { formatNumber } from '../tanks/numbers'
 import { buildPanels, momentsOf, periods, periodStart, type Panel, type TimelinePeriod } from '../tanks/series'
+import { returnHere } from '../tanks/returnTo'
+import type { Tank } from '../tanks/types'
 import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 import { PeriodSwitch } from './timeline/Controls'
@@ -111,7 +113,7 @@ export function TimelinePage() {
       ) : view === 'chart' ? (
         <ParameterBoard panels={panels} measurements={measurements} maintenance={maintenance} photos={photos} tank={tank} now={now} />
       ) : (
-        <ValuesTable panels={panels} />
+        <ValuesTable panels={panels} tank={tank} />
       )}
       {measurements.length >= historyCount && (
         <p className="m-0 text-xs text-ink-muted">{t('timeline.truncated', { count: historyCount })}</p>
@@ -134,10 +136,14 @@ function Empty({ tankId, anyMeasurements, readOnly }: { tankId: string; anyMeasu
   )
 }
 
-/** The chart's numbers as a table: the way to read them exactly, and the one a screen reader gets in full. */
-function ValuesTable({ panels }: { panels: Panel[] }) {
+/**
+ * The chart's numbers as a table: the way to read them exactly, and the one a screen reader gets in full. For the
+ * owner each number opens its edit form, which comes back here.
+ */
+function ValuesTable({ panels, tank }: { panels: Panel[]; tank: Pick<Tank, 'id' | 'readOnly'> }) {
   const { t } = useTranslation()
   const language = useLanguage()
+  const back = returnHere(useLocation())
   // Newest first, like the list on the tank page.
   const moments = momentsOf(panels).reverse()
   return (
@@ -157,21 +163,37 @@ function ValuesTable({ panels }: { panels: Panel[] }) {
           </tr>
         </thead>
         <tbody>
-          {moments.map((moment) => (
-            <tr key={moment} className="border-t border-dashed border-ink/40">
-              <th scope="row" className="px-4 py-2 text-left font-mono text-sm font-normal">
-                {formatMoment(new Date(moment).toISOString(), language)}
-              </th>
-              {panels.map((p) => {
-                const point = p.points.find((q) => q.at === moment)
-                return (
-                  <td key={p.parameter} className="px-3 py-2 text-right tabular-nums">
-                    {point ? formatNumber(point.value, language, { maxDecimals: valueDecimals }) : '—'}
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
+          {moments.map((moment) => {
+            const when = formatMoment(new Date(moment).toISOString(), language)
+            return (
+              <tr key={moment} className="border-t border-dashed border-ink/40">
+                <th scope="row" className="px-4 py-2 text-left font-mono text-sm font-normal">
+                  {when}
+                </th>
+                {panels.map((p) => {
+                  const point = p.points.find((q) => q.at === moment)
+                  const value = point && formatNumber(point.value, language, { maxDecimals: valueDecimals })
+                  return (
+                    <td key={p.parameter} className="px-3 py-2 text-right tabular-nums">
+                      {!point ? (
+                        '—'
+                      ) : tank.readOnly ? (
+                        value
+                      ) : (
+                        <Link
+                          to={`/tanks/${tank.id}/measurements/${point.id}/edit`}
+                          state={back}
+                          className="text-ink underline decoration-ink/40 decoration-dotted underline-offset-4 hover:text-ink hover:decoration-ink hover:decoration-solid"
+                        >
+                          {value}
+                        </Link>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>

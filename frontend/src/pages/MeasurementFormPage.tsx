@@ -18,7 +18,6 @@ import {
   type RecordForm,
 } from '../tanks/measurements'
 import type { Tank } from '../tanks/types'
-import { useLanguage } from '../tanks/useLanguage'
 import { useLoad } from '../tanks/useLoad'
 import { useMeasurementMessage } from '../tanks/useMeasurementMessage'
 
@@ -35,7 +34,6 @@ export function MeasurementFormPage() {
 
 function RecordScreen({ tank, parameters, latest }: { tank: Tank; parameters: Parameter[]; latest: Measurement[] }) {
   const { t } = useTranslation()
-  const language = useLanguage()
   const navigate = useNavigate()
   const message = useMeasurementMessage()
   // "Now" is only prefilled for the person to see; it is not sent unless they change it.
@@ -57,7 +55,7 @@ function RecordScreen({ tank, parameters, latest }: { tank: Tank; parameters: Pa
 
   async function submit(event: FormEvent) {
     event.preventDefault()
-    const checked = toNewMeasurements(form, parameters, language)
+    const checked = toNewMeasurements(form, parameters)
     if ('errors' in checked) {
       setErrors(checked.errors)
       return

@@ -11,7 +11,7 @@ import { useLanguage } from './useLanguage'
 import { useMeasurementMessage } from './useMeasurementMessage'
 
 /** Rarely measured, so they wait behind "More parameters" unless this tank already has a value for one. */
-const seldom: readonly ParameterCode[] = ['phosphate', 'conductivity', 'iron', 'potassium']
+const seldom: readonly ParameterCode[] = ['phosphate', 'tds', 'iron', 'potassium']
 
 type Props = {
   parameters: Parameter[]
@@ -100,7 +100,7 @@ function Tile({
   const name = t(`parameters.${parameter.code}`)
   const show = (n: number) => formatNumber(n, language, { grouping: false, maxDecimals: valueDecimals })
   const typed = (() => {
-    const parsed = parseNumber(value, language)
+    const parsed = parseNumber(value)
     return typeof parsed === 'number' ? parsed : null
   })()
   const withUnit = (n: number) => `${show(n)} ${parameter.unit}`.trim()

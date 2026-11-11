@@ -278,7 +278,7 @@ class MeasurementsApiTest {
 		assertThat(parameters.status()).isEqualTo(200);
 		assertThat(parameters.items()).extracting(p -> p.get("code"))
 			.containsExactly("temperature", "ph", "gh", "kh", "total_ammonia", "nitrite", "nitrate", "phosphate",
-					"conductivity", "iron", "potassium");
+					"tds", "iron", "potassium");
 		Map<String, Object> temperature = parameters.items().getFirst();
 		assertThat(temperature.get("unit")).isEqualTo("°C");
 		assertThat(((Number) temperature.get("min")).doubleValue()).isEqualTo(0.0);

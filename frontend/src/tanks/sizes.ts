@@ -20,7 +20,7 @@ export const volumeStep = 5
  * unreadable field starts from `start`, so the first press already shows something sensible.
  */
 export function stepped(text: string, direction: 1 | -1, step: number, start: number, language: Language): string {
-  const read = parseNumber(text, language)
+  const read = parseNumber(text)
   const base = typeof read === 'number' && read > 0 ? read : start
   const next = Math.max(step, Math.round((base + direction * step) * 100) / 100)
   return formatNumber(next, language, { grouping: false })

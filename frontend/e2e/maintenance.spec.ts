@@ -124,10 +124,8 @@ test('in Brazilian Portuguese the type names and the decimal comma are in Portug
   await choosePortuguese(page)
 
   await page.getByRole('link', { name: 'Registrar manutenção' }).click()
+  // A decimal point is read as well, and the record shows the comma.
   await page.getByLabel('Água trocada').fill('12.5')
-  await page.getByRole('button', { name: 'Salvar manutenção' }).click()
-  await expect(page.getByText('Digite um número com no máximo 2 casas decimais, como 12,5.')).toBeVisible()
-  await page.getByLabel('Água trocada').fill('12,5')
   await page.getByRole('button', { name: 'Salvar manutenção' }).click()
   await expect(page.getByText('Troca de água · 12,5% da água')).toBeVisible()
 })

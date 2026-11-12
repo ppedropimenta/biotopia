@@ -67,7 +67,9 @@
   --text-h1--line-height: 1;
   --text-display: clamp(2.25rem, 8vw, 3rem); /* 36-48px: titles on the landing page */
   --text-display--line-height: 1.06;
-  --text-hero: clamp(3rem, 6.4vw, 5.25rem); /* 48-84px: hero title */
+  /* 36-80px: hero title. Its italic line ("ao longo do tempo.") is about 7 times as wide as the type size, so on a
+     narrow phone the size follows the screen width (less the 24px margins) and the line never runs off the edge. */
+  --text-hero: clamp(2.25rem, min(max(3rem, 6.4vw), (100vw - 3rem) / 7.4), 5rem);
   --text-hero--line-height: 0.98;
 
   --tracking-label: 0.14em; /* mono labels, uppercase */
@@ -222,6 +224,10 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     font-optical-sizing: auto;
+  }
+  /* No paragraph ends on a word left alone on its last line. */
+  p {
+    text-wrap: pretty;
   }
   /* Scientific names are always italic: <i lang="la">Paracheirodon axelrodi</i> */
   i[lang='la'],

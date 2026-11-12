@@ -37,7 +37,7 @@ export function TankLifecycle({ tank, onChanged }: { tank: Tank; onChanged: () =
   return (
     <section aria-labelledby="lifecycle-title" className="flex flex-col gap-4 border-t border-dashed border-ink/45 pt-6">
       <SectionHeader title={<span id="lifecycle-title">{t('tanks.lifecycle.sectionTitle')}</span>} level={3} />
-      <p className="m-0 max-w-[60ch] text-ink-soft">{t('tanks.lifecycle.sectionLead')}</p>
+      <p className="m-0 max-w-[78ch] text-ink-soft">{t('tanks.lifecycle.sectionLead')}</p>
       {problem && <FormError>{problem}</FormError>}
 
       {pending === null ? (
@@ -59,7 +59,7 @@ export function TankLifecycle({ tank, onChanged }: { tank: Tank; onChanged: () =
         <div
           role="group"
           aria-label={t(pending === 'archive' ? 'tanks.lifecycle.archive' : 'tanks.lifecycle.delete')}
-          className="flex max-w-[60ch] flex-col gap-3"
+          className="flex max-w-[78ch] flex-col gap-3"
         >
           <p className="m-0 text-lead">
             {pending === 'archive'

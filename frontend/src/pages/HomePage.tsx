@@ -43,10 +43,12 @@ function Hero() {
       </div>
       <div className="relative mx-auto grid max-w-site grid-cols-[repeat(auto-fit,minmax(min(480px,100%),1fr))] items-center gap-14 px-6 pt-28 pb-24">
         <div className="flex flex-col gap-6.5">
-          <h1 id="hero-title" className="rise m-0 text-hero font-normal tracking-[-0.02em] text-balance">
-            {t('home.title')} <em className="font-light text-amber">{t('home.titleEmphasis')}</em>
+          {/* Two lines, the italic one on its own and never broken: the type size (text-hero) is chosen so it fits. */}
+          <h1 id="hero-title" className="rise m-0 text-hero font-normal tracking-[-0.02em]">
+            {t('home.title')} <br />
+            <em className="font-light whitespace-nowrap text-amber">{t('home.titleEmphasis')}</em>
           </h1>
-          <p className="rise m-0 [--rise-delay:90ms] max-w-[34ch] text-lead leading-normal text-river-text">{t('home.lead')}</p>
+          <p className="rise m-0 [--rise-delay:90ms] max-w-[44ch] text-lead leading-normal text-river-text">{t('home.lead')}</p>
           <div className="rise mt-1.5 [--rise-delay:180ms] flex flex-wrap items-center gap-x-6 gap-y-3">
             {state.status === 'in' ? (
               <ButtonLink to="/tanks" variant="amber" size="lg" iconEnd="arrowRight">
@@ -109,10 +111,10 @@ function Demo() {
           <DemoTankDrawing />
         </div>
         <div data-reveal="120" className="flex flex-col gap-4.5">
-          <h2 id="demo-title" className="m-0 text-display leading-[1.08] font-normal">
+          <h2 id="demo-title" className="m-0 text-display leading-[1.08] font-normal text-balance">
             {t('home.demo.title')}
           </h2>
-          <p className="m-0 max-w-[44ch] text-river-text">{t('home.demo.body')}</p>
+          <p className="m-0 max-w-[57ch] text-river-text">{t('home.demo.body')}</p>
           <div>
             <ButtonLink to="/demo" variant="amber" size="lg" iconEnd="arrowRight">
               {t('home.ctaDemo')}
@@ -153,7 +155,7 @@ function Idea() {
         <h2 id="idea-title" className="m-0 text-display font-normal tracking-[-0.015em] text-balance">
           {t('home.idea.title')}
         </h2>
-        <p className="m-0 max-w-[46ch] text-ink-soft">{t('home.idea.body')}</p>
+        <p className="m-0 max-w-[60ch] text-ink-soft">{t('home.idea.body')}</p>
       </div>
       <figure data-reveal="120" className={cx(plateClasses('md'), 'm-0')}>
         <PlateCorners items={[t('home.idea.chartLabel'), t('home.idea.chartRange')]} />
@@ -252,7 +254,7 @@ function Roadmap() {
           <h2 id="roadmap-title" className="m-0 text-display font-normal tracking-[-0.015em]">
             {t('home.roadmap.title')}
           </h2>
-          <p className="m-0 max-w-[54ch] text-ink-soft">{t('home.roadmap.lead')}</p>
+          <p className="m-0 max-w-[70ch] text-ink-soft">{t('home.roadmap.lead')}</p>
         </div>
         <Stamp tone="cardinal" size="xl" rotate={-10} main={t('home.roadmap.stamp')} />
       </div>

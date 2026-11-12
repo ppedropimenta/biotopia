@@ -63,7 +63,7 @@ export function Journal({
     if (hash.startsWith('#d-')) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' })
   }, [hash])
 
-  if (days.length === 0) return <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('timeline.history.empty')}</p>
+  if (days.length === 0) return <p className="m-0 max-w-[60ch] text-lead text-ink-soft">{t('timeline.history.empty')}</p>
 
   const months: { key: string; label: string; days: HistoryDay[] }[] = []
   const monthFormat = new Intl.DateTimeFormat(language, { month: 'long', year: 'numeric', timeZone: 'UTC' })

@@ -125,7 +125,7 @@ export function TimelinePage() {
 function Empty({ tankId, anyMeasurements, readOnly }: { tankId: string; anyMeasurements: boolean; readOnly: boolean }) {
   const { t } = useTranslation()
   return (
-    <div className="flex max-w-[46ch] flex-col gap-2 text-lead text-ink-soft">
+    <div className="flex max-w-[60ch] flex-col gap-2 text-lead text-ink-soft">
       <p className="m-0">{anyMeasurements ? t('timeline.emptyPeriod') : t('timeline.empty')}</p>
       {!anyMeasurements && !readOnly && (
         <Link to={`/tanks/${tankId}/measure`} className="font-mono text-label text-ink">

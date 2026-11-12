@@ -105,7 +105,7 @@ function LatestMeasurement({ tankId, values, readOnly }: { tankId: string; value
         aside={values.length > 0 && <span className="text-xs text-ink-muted">{t('measurements.latest.legend')}</span>}
       />
       {values.length === 0 && readOnly ? (
-        <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('measurements.latest.empty')}</p>
+        <p className="m-0 max-w-[60ch] text-lead text-ink-soft">{t('measurements.latest.empty')}</p>
       ) : values.length === 0 ? (
         <Link to={measure} className={dashedCard}>
           <span aria-hidden="true" className="text-2xl leading-none">
@@ -239,7 +239,7 @@ function MeasurementsTable({
     <section className="flex flex-col gap-3.5">
       <SectionHeader title={t('measurements.recent.title')} />
       {groups.length === 0 ? (
-        <p className="m-0 max-w-[46ch] text-lead text-ink-soft">{t('measurements.recent.empty')}</p>
+        <p className="m-0 max-w-[60ch] text-lead text-ink-soft">{t('measurements.recent.empty')}</p>
       ) : (
         <div className="overflow-x-auto border border-ink texture-card">
           <table className="w-full min-w-[520px] border-collapse text-base">

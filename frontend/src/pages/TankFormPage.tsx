@@ -177,7 +177,7 @@ function TankFormScreen({ tank, number }: { tank: Tank | null; number: number })
           <div key={step} className="rise flex flex-col gap-6">
             <div className="flex flex-col gap-1.5">
               <h2 className="m-0 text-h2 font-normal">{title}</h2>
-              <p className="m-0 max-w-[48ch] text-lead text-ink-soft">{t(`tanks.form.steps.${steps[step]}.lead`)}</p>
+              <p className="m-0 max-w-[62ch] text-lead text-ink-soft">{t(`tanks.form.steps.${steps[step]}.lead`)}</p>
             </div>
 
             {step === 0 && (

@@ -2,8 +2,7 @@
  * The drawn illustrations. The key is a stable slug. `width` and `height` are the original viewBox, used
  * to reserve the space and avoid a layout jump. Drawings are static SVG files made for this project.
  *
- * To add one: save the SVG in assets/illustrations/ and add a line here. The kit that drew these has
- * more (other fish, plants, a basin map); copy them when a screen needs them.
+ * To add one: save the SVG in assets/illustrations/ and add a line here.
  */
 import tankBlackwater from '../assets/illustrations/tanks/blackwater.svg'
 import tankPlanted from '../assets/illustrations/tanks/planted.svg'

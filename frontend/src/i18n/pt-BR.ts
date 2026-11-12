@@ -2,7 +2,7 @@ import type { Messages } from './en'
 
 export const ptBR: Messages = {
   ui: {
-    brand: { name: 'Biotopia', tagline: 'Caderno de aquário' },
+    brand: { name: 'Biotopia' },
     language: { label: 'Idioma' },
     nav: {
       label: 'Navegação principal',

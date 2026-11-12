@@ -13,7 +13,7 @@ import { useReveal } from '../lib/useReveal'
 import { formatNumber } from '../tanks/numbers'
 import { useLanguage } from '../tanks/useLanguage'
 
-/** The landing page, after the kit's. */
+/** The landing page. */
 export function HomePage() {
   useReveal()
   return (

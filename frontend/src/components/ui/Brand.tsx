@@ -8,7 +8,7 @@ import { findArt } from '../../lib/illustrations'
 
 /**
  * The leaffish symbol, drawn in the current colour. This is the cut for dark backgrounds (slightly wider veins);
- * the full logo kit, with the other cuts, lives outside the repo.
+ * the other cuts of the logo are not in this repository.
  */
 export function BrandSymbol({ className }: { className?: string }) {
   return (
@@ -22,21 +22,18 @@ export function BrandSymbol({ className }: { className?: string }) {
 }
 
 /**
- * The leaffish symbol, "Biotopia" in Source Serif 4 italic and the tagline in mono ("Aquarium logbook"). Always on
- * blackwater. The name and the tagline are set only here and in the translations (ui.brand). The tagline shows
- * only with `tagline` (the side menu).
+ * The leaffish symbol and "Biotopia" in Source Serif 4 italic. Always on blackwater. The name is set only here and
+ * in the translations (ui.brand).
  */
 export function Wordmark({
   to = '/',
   stacked = false,
   size = 'md',
-  tagline = false,
   className,
 }: {
   to?: string
   stacked?: boolean
   size?: 'md' | 'lg'
-  tagline?: boolean
   className?: string
 }) {
   const { t } = useTranslation()
@@ -50,12 +47,6 @@ export function Wordmark({
         <span className={cx('font-serif leading-none font-semibold italic', size === 'md' ? 'text-h3' : 'text-h2')}>
           {t('ui.brand.name')}
         </span>
-        {tagline && (
-          <>
-            <span className="sr-only"> · </span>
-            <span className="font-mono text-caption tracking-[0.16em] text-amber-soft uppercase">{t('ui.brand.tagline')}</span>
-          </>
-        )}
       </span>
     </Link>
   )

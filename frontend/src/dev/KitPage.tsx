@@ -15,7 +15,7 @@ import { fishArt, tankArt } from '../lib/illustrations'
 import { roman } from '../lib/roman'
 
 /**
- * Every component of the kit in one page, for checking them against the kit's screenshots. It exists only in
+ * Every shared component on one page, to check them side by side. It exists only in
  * development builds (see App.tsx), so its texts are plain English and not in the translations.
  */
 export default function KitPage() {

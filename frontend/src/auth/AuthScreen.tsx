@@ -23,7 +23,7 @@ type Props = {
 }
 
 /**
- * The frame of every account screen, from the kit's sign-in: a blackwater panel with a plate of a Victoria
+ * The frame of every account screen: a blackwater panel with a plate of a Victoria
  * amazonica on the left, the form on paper on the right. On a phone the plate gives way to a dark strip with
  * the brand, so the form comes first.
  */

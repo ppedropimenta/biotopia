@@ -1,6 +1,6 @@
 export const en = {
   ui: {
-    brand: { name: 'Biotopia', tagline: 'Aquarium logbook' },
+    brand: { name: 'Biotopia' },
     language: { label: 'Language' },
     nav: {
       label: 'Main navigation',

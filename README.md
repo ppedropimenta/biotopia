@@ -3,8 +3,8 @@
 A web app for fishkeepers. You log your tanks, water tests, maintenance and photos in one
 place, and see how things change over time.
 
-I keep a freshwater tank myself. My records were split between a phone app and the photo gallery, and I
-could not see measurements, maintenance and photos together over time. This project is my attempt to fix
+I keep a freshwater tank myself. My records were split between a notebook, my phone's notes and its photo
+gallery, and I could not see measurements, maintenance and photos together over time. This project is my attempt to fix
 that, and a way to build a full web app from database to deploy.
 
 The interface is in English and Brazilian Portuguese.

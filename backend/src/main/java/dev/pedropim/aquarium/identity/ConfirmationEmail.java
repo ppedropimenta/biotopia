@@ -18,12 +18,12 @@ final class ConfirmationEmail {
 
 	static Email to(String address, Language language, String link, String siteUrl) {
 		Words words = switch (language) {
-			case EN -> new Words("Confirm your email", "Welcome to the aquarium logbook.",
+			case EN -> new Words("Confirm your email", "One step left to start your Biotopia notebook.",
 					"Open this link to confirm your email address and finish creating your account:",
 					"Confirm your email address to finish creating your account.", "Confirm email",
 					"If the button does not open, copy this address into your browser:",
 					"The link works once and expires in 24 hours. If you did not sign up, you can ignore this message.");
-			case PT_BR -> new Words("Confirme seu e-mail", "Bem-vindo ao diário do seu aquário.",
+			case PT_BR -> new Words("Confirme seu e-mail", "Falta pouco para começar seu caderno no Biotopia.",
 					"Abra este link para confirmar seu e-mail e terminar de criar a conta:",
 					"Confirme seu e-mail para terminar de criar a conta.", "Confirmar e-mail",
 					"Se o botão não abrir, copie este endereço no navegador:",

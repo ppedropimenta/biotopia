@@ -63,8 +63,8 @@ class AccountsApiTest {
 
 		Email sent = mail.sentTo(email).getFirst();
 		assertThat(sent.subject()).isEqualTo("Confirme seu e-mail");
-		assertThat(sent.body()).contains("Bem-vindo");
-		assertThat(sent.html()).contains("lang=\"pt-BR\"", "Bem-vindo", "Confirmar e-mail", "token=" + confirmationToken(sent))
+		assertThat(sent.body()).contains("seu caderno no Biotopia");
+		assertThat(sent.html()).contains("lang=\"pt-BR\"", "seu caderno no Biotopia", "Confirmar e-mail", "token=" + confirmationToken(sent))
 			.contains("/email/cardinal.png");
 	}
 

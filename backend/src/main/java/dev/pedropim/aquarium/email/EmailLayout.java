@@ -8,7 +8,7 @@ import org.springframework.web.util.HtmlUtils;
  * The HTML of an email, with the site's look: the leaffish and the name on a blackwater band, the message on paper,
  * and the site's address at the foot. Email clients drop most of CSS, so the layout is tables with inline styles,
  * pictures and fonts come from the site by absolute URL (under {@code /email/} in the frontend's public folder), and
- * every font has a fallback: Apple Mail shows Fraunces, Gmail and Outlook show Georgia.
+ * every font has a fallback: Apple Mail shows Source Serif 4, Gmail and Outlook show Georgia.
  * <p>
  * The pieces take plain text and escape it, so a message is put together without writing HTML.
  */
@@ -33,7 +33,7 @@ public final class EmailLayout {
 
 	private static final String NEON = "#23628a";
 
-	private static final String SERIF = "'Fraunces', Georgia, 'Times New Roman', serif";
+	private static final String SERIF = "'Source Serif 4', Georgia, 'Times New Roman', serif";
 
 	private static final String MONO = "'IBM Plex Mono', Menlo, Consolas, 'Courier New', monospace";
 
@@ -58,8 +58,8 @@ public final class EmailLayout {
 				<meta name="supported-color-schemes" content="light">
 				<title>%2$s</title>
 				<style>
-				@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; src: url('%3$s/email/fonts/fraunces.woff2') format('woff2'); }
-				@font-face { font-family: 'Fraunces'; font-style: italic; font-weight: 100 900; src: url('%3$s/email/fonts/fraunces-italic.woff2') format('woff2'); }
+				@font-face { font-family: 'Source Serif 4'; font-style: normal; font-weight: 200 900; src: url('%3$s/email/fonts/source-serif-4.woff2') format('woff2'); }
+				@font-face { font-family: 'Source Serif 4'; font-style: italic; font-weight: 200 900; src: url('%3$s/email/fonts/source-serif-4-italic.woff2') format('woff2'); }
 				@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; src: url('%3$s/email/fonts/ibm-plex-mono-500.woff2') format('woff2'); }
 				@media (max-width: 600px) { .sheet { padding: 32px 24px !important; } .band { padding: 18px 24px !important; } .foot { padding: 20px 24px 0 !important; } }
 				</style>

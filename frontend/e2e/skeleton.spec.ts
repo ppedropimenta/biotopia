@@ -15,7 +15,7 @@ test('a visitor switches to Portuguese and opens the credits page', async ({ pag
   await page.getByRole('contentinfo').getByRole('link', { name: 'Créditos e licenças' }).click()
   await expect(page).toHaveURL(/\/credits$/)
   await expect(page.getByRole('heading', { name: 'Créditos e licenças' })).toBeVisible()
-  for (const font of ['Fraunces', 'IBM Plex Mono', 'Caveat']) {
+  for (const font of ['Source Serif 4', 'IBM Plex Mono', 'Caveat']) {
     await expect(page.getByRole('heading', { name: font })).toBeVisible()
   }
   await expect(page.getByRole('link', { name: 'SIL Open Font Licence 1.1' })).toHaveCount(3)

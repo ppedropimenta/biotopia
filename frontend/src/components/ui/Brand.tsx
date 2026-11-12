@@ -22,7 +22,7 @@ export function BrandSymbol({ className }: { className?: string }) {
 }
 
 /**
- * The leaffish symbol, "Biotopia" in Fraunces italic and the tagline in mono ("Aquarium logbook"). Always on
+ * The leaffish symbol, "Biotopia" in Source Serif 4 italic and the tagline in mono ("Aquarium logbook"). Always on
  * blackwater. The name and the tagline are set only here and in the translations (ui.brand). The tagline shows
  * only with `tagline` (the side menu).
  */

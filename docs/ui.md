@@ -44,7 +44,7 @@ alone: a symbol or a word goes with it (▲ ▼ =, "Not measured").
 
 ## Type
 
-- **Fraunces** for titles, names, running text and captions.
+- **Source Serif 4** for titles, names, running text and captions, with optical sizes.
 - **IBM Plex Mono** for data: field and parameter names, numbers, dates, table headers, buttons and the brand
   line.
 - **Caveat** for handwriting only: a note the keeper wrote, the "start a new plate" hint, the note on the
@@ -81,7 +81,7 @@ alone: a symbol or a word goes with it (▲ ▼ =, "Not measured").
 - The symbol is a fallen leaf that is also a fish: the Amazon leaffish (*Monocirrhus polyacanthus*), which
   hides in blackwater by looking like a dead leaf adrift. It was made for this project and is not credited.
 - In the app it is amber on blackwater (`BrandSymbol` in `frontend/src/components/ui/Brand.tsx`), always
-  before the name in Fraunces italic. Every screen shows the symbol and the name alone. `Wordmark` can still
+  before the name in Source Serif 4 italic. Every screen shows the symbol and the name alone. `Wordmark` can still
   show a tagline in mono under the name (`tagline` prop, text in `ui.brand.tagline`), but nothing uses it now.
 - The favicon and the app icons (`frontend/public`) are the symbol on a blackwater square. Under 24px the
   side veins go away.

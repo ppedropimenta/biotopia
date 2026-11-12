@@ -24,10 +24,10 @@ const openFontLicence = {
 }
 
 export const fonts = {
-  fraunces: {
-    title: 'Fraunces',
-    creator: 'Undercase Type',
-    sourceUrl: 'https://fonts.google.com/specimen/Fraunces',
+  sourceSerif: {
+    title: 'Source Serif 4',
+    creator: 'Frank Grießhammer, Adobe',
+    sourceUrl: 'https://fonts.google.com/specimen/Source+Serif+4',
     ...openFontLicence,
   },
   plexMono: {

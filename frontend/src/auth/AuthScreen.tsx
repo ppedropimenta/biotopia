@@ -32,7 +32,7 @@ export function AuthScreen({ title, lead, switcher, note, languageToggle, childr
   return (
     <div className="grid min-h-svh grid-rows-[auto_1fr] texture-paper font-serif text-ink lg:grid-cols-2 lg:grid-rows-1">
       <SkipLink />
-      <div className="texture-river px-6 py-2 lg:hidden">
+      <div className="texture-river max-lg:bg-size-[max(520px,100%)_auto] max-lg:bg-position-[right_0_top_-80px] px-6 py-2 lg:hidden">
         <Wordmark />
       </div>
 
